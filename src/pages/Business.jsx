@@ -279,10 +279,10 @@ export default function Business() {
           {/* Action buttons */}
           <div className="action-btns" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button className={`ghost-btn${activeSection === 'qr' ? ' active' : ''}`} onClick={() => setActiveSection(activeSection === 'qr' ? null : 'qr')}>
-              ⬛ Stempelkarte &amp; QR-Code
+              ⬛ QR-Code
             </button>
             <button className={`ghost-btn${activeSection === 'stamp' ? ' active' : ''}`} onClick={() => setActiveSection(activeSection === 'stamp' ? null : 'stamp')}>
-              ⚙️ Karte konfigurieren
+              ⚙️ Stempelkarte
             </button>
             <button className={`ghost-btn${activeSection === 'commission' ? ' active' : ''}`} onClick={() => setActiveSection(activeSection === 'commission' ? null : 'commission')}>
               💶 Provisionsmodell
@@ -369,22 +369,22 @@ export default function Business() {
             <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 20 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 <div>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.6)", display: "block", marginBottom: 7 }}>Betrag pro Stempel (€) &amp; nach X Besuchen</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                    <input type="number" min="5" className="settings-input" value={settings.minAmountForStamp} onChange={e => setSettings({ ...settings, minAmountForStamp: e.target.value })} placeholder="z.B. 20" />
-                    <select className="settings-input" value={settings.provisionAfterVisits} onChange={e => setSettings({ ...settings, provisionAfterVisits: e.target.value })} style={{ cursor: "pointer" }}>
-                      {[2, 3, 4, 5].map(v => <option key={v} value={v}>{v} Besuche</option>)}
-                    </select>
-                  </div>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.6)", display: "block", marginBottom: 7 }}>Provision ab X Besuchen</label>
+                  <select className="settings-input" value={settings.provisionAfterVisits} onChange={e => setSettings({ ...settings, provisionAfterVisits: e.target.value })} style={{ cursor: "pointer" }}>
+                    {[2, 3, 4, 5].map(v => <option key={v} value={v}>{v} Besuche</option>)}
+                  </select>
                 </div>
                 <div>
                   <label style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.6)", display: "block", marginBottom: 7 }}>Provision für Empfehlung</label>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    <div style={{ position: "relative" }}>
+                      <input type="number" min="0" className="settings-input" value={settings.provisionValue} onChange={e => setSettings({ ...settings, provisionValue: e.target.value })} placeholder={settings.provisionType === "percentage" ? "10" : "5"} style={{ paddingRight: 36 }} />
+                      <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "rgba(255,255,255,0.4)", pointerEvents: "none", fontWeight: 600 }}>{settings.provisionType === "percentage" ? "%" : "€"}</span>
+                    </div>
                     <select className="settings-input" value={settings.provisionType} onChange={e => setSettings({ ...settings, provisionType: e.target.value })} style={{ cursor: "pointer" }}>
                       <option value="percentage">% vom Umsatz</option>
                       <option value="fixed">Fester Betrag (€)</option>
                     </select>
-                    <input type="number" min="0" className="settings-input" value={settings.provisionValue} onChange={e => setSettings({ ...settings, provisionValue: e.target.value })} placeholder={settings.provisionType === "percentage" ? "10" : "5"} />
                   </div>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
