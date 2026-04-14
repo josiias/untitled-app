@@ -420,33 +420,11 @@ export default function ScanLanding() {
             </div>
           )}
 
-          {/* Stamp card — compact */}
-          <div style={{ background: "linear-gradient(135deg, rgba(99,255,180,0.12), rgba(16,185,129,0.05))", border: "1.5px solid rgba(99,255,180,0.3)", borderRadius: 16, padding: "10px 12px", marginBottom: 10 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Stempelkarte · {business.name}</div>
-              <div style={{ fontSize: 10, color: "#63FFB4", fontWeight: 700 }}>{stampsCount}/{business.stamps_required}</div>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(business.stamps_required, 5)}, 1fr)`, gap: 4, marginBottom: 8 }}>
-              {Array.from({ length: business.stamps_required }).map((_, i) => (
-                <div key={i} style={{
-                  aspectRatio: "1/1",
-                  background: i < stampsCount ? "linear-gradient(135deg, #63FFB4, #10B981)" : "rgba(255,255,255,0.06)",
-                  borderRadius: 7, border: i < stampsCount ? "none" : "1px solid rgba(255,255,255,0.1)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: i < stampsCount ? 13 : 10,
-                  color: i < stampsCount ? "#fff" : "rgba(255,255,255,0.15)",
-                  boxShadow: i < stampsCount ? "0 0 8px rgba(99,255,180,0.5)" : "none",
-                }}>
-                  {i < stampsCount ? (business.icon || "✂️") : "·"}
-                </div>
-              ))}
-            </div>
-            {/* Progress bar */}
-            <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 99, height: 5, marginBottom: 7, overflow: "hidden" }}>
-              <div style={{ height: "100%", width: `${(stampsCount / business.stamps_required) * 100}%`, background: "linear-gradient(90deg, #63FFB4, #10B981)", borderRadius: 99, transition: "width 0.6s ease" }} />
-            </div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textAlign: "center" }}>
-              Noch <strong style={{ color: "#FFD700" }}>{business.stamps_required - stampsCount} Stempel</strong> bis: {business.reward_description}
+          {/* Stamp confirmed hint */}
+          <div style={{ background: "rgba(99,255,180,0.08)", border: "1px solid rgba(99,255,180,0.2)", borderRadius: 14, padding: "10px 14px", marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 20 }}>🔒</span>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.4 }}>
+              Noch <strong style={{ color: "#63FFB4" }}>{business.stamps_required - stampsCount} Stempel</strong> bis zu deiner Prämie: <strong style={{ color: "#FFD700" }}>{business.reward_description}</strong>
             </div>
           </div>
 
