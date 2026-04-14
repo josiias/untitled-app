@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const BUSINESSES = [
   { name: "Kings Barbershop", emoji: "✂️", stamps: 8, reward: "10€ Gutschein", img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80" },
@@ -13,15 +13,31 @@ const STEPS = [
   { num: "03", icon: "🎁", title: "Prämie kassieren", img: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=80" },
 ];
 
+// Hero slideshow: first shows happy customer, then target audience
+const HERO_SLIDES = [
+  { img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80", label: "Für dich", sub: "Sammle Stempel bei deinen Lieblingsläden" },
+  { img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1200&q=80", label: "Cafés", sub: "Kaffee, Kuchen & treue Kunden" },
+  { img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&q=80", label: "Massage Studios", sub: "Entspannung mit echten Vorteilen" },
+  { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1200&q=80", label: "Barbershops", sub: "Stil sammeln, Prämien kassieren" },
+  { img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80", label: "Fitnessstudios", sub: "Training, das sich lohnt" },
+  { img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80", label: "Beauty & Nails", sub: "Schönheit mit Belohnung" },
+];
+
 export default function AppLanding() {
   const [phone, setPhone] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [activeCard, setActiveCard] = useState(0);
+  const [heroSlide, setHeroSlide] = useState(0);
   const [visibleSections, setVisibleSections] = useState({});
   const sectionRefs = useRef({});
 
   useEffect(() => {
     const t = setInterval(() => setActiveCard(i => (i + 1) % BUSINESSES.length), 2800);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setHeroSlide(i => (i + 1) % HERO_SLIDES.length), 3200);
     return () => clearInterval(t);
   }, []);
 
@@ -62,18 +78,18 @@ export default function AppLanding() {
           0%, 100% { transform: translateY(0px); }
           50%       { transform: translateY(-8px); }
         }
-        @keyframes shimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
         @keyframes pulse-dot {
           0%, 100% { opacity: 1; transform: scale(1); }
           50%       { opacity: 0.5; transform: scale(0.8); }
         }
+        @keyframes glowPulse {
+          0%, 100% { text-shadow: 0 0 20px rgba(255,255,255,0.25), 0 0 40px rgba(99,255,180,0.15); }
+          50%       { text-shadow: 0 0 40px rgba(255,255,255,0.45), 0 0 80px rgba(99,255,180,0.3); }
+        }
 
-        .shimmer-text {
+        .glow-headline {
           color: #ffffff;
-          opacity: 0.95;
+          animation: glowPulse 3s ease-in-out infinite;
         }
 
         .cta-btn {
@@ -134,57 +150,75 @@ export default function AppLanding() {
       </div>
 
       {/* ── NAVBAR ── */}
-      <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,17,27,0.88)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 20px" }}>
+      <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(17,30,40,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 20px" }}>
         <div style={{ maxWidth: 600, margin: "0 auto", height: 52, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
             <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 900, color: "#fff" }}>Sensalie</span>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 6px rgba(16,185,129,0.9)", animation: "pulse-dot 2s infinite" }} />
           </div>
           <a href="#register" style={{ textDecoration: "none" }}>
-            <button className="cta-btn" style={{ fontSize: 12, padding: "8px 16px", borderRadius: 9 }}>Kostenlos starten →</button>
+            <button className="cta-btn" style={{ fontSize: 12, padding: "8px 18px", borderRadius: 9 }}>Anmelden →</button>
           </a>
         </div>
       </nav>
 
       {/* ── HERO ── */}
-      <section style={{ position: "relative", zIndex: 1, maxWidth: 600, margin: "0 auto", padding: "48px 20px 32px" }}>
-        {/* Hero image */}
-        <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", marginBottom: 28, height: 190 }}>
-          <img
-            src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80"
-            alt="Happy customers"
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
-          />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(7,17,27,0.1) 0%, rgba(7,17,27,0.75) 100%)" }} />
-          {/* Floating badge */}
-          <div style={{ position: "absolute", bottom: 16, left: 16, display: "flex", alignItems: "center", gap: 8, background: "rgba(16,185,129,0.15)", backdropFilter: "blur(10px)", border: "1px solid rgba(16,185,129,0.4)", borderRadius: 100, padding: "6px 14px" }}>
-            <div style={{ display: "flex", gap: 2 }}>
-              {[...Array(5)].map((_, i) => <span key={i} style={{ color: "#FFD700", fontSize: 11 }}>★</span>)}
-            </div>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Zufriedene Kunden</span>
-          </div>
-          {/* Stamp badge */}
-          <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(7,17,27,0.7)", backdropFilter: "blur(8px)", border: "1px solid rgba(99,255,180,0.3)", borderRadius: 12, padding: "8px 12px", animation: "float 3s ease-in-out infinite" }}>
-            <div style={{ fontSize: 11, color: "#63FFB4", fontWeight: 700 }}>🎉 +1 Stempel!</div>
-          </div>
-        </div>
+      <section style={{ position: "relative", zIndex: 1, maxWidth: 600, margin: "0 auto", padding: "40px 20px 32px" }}>
 
-        {/* Headline */}
-        <h1 className="shimmer-text" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: "clamp(24px, 6vw, 36px)", fontWeight: 900, lineHeight: 1.15, marginBottom: 12, textAlign: "center" }}>
+        {/* Headline first */}
+        <h1 className="glow-headline" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: "clamp(26px, 7vw, 40px)", fontWeight: 900, lineHeight: 1.15, marginBottom: 24, textAlign: "center" }}>
           Stempel sammeln.<br />Prämien kassieren.<br />Geld verdienen.
         </h1>
 
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.6, textAlign: "center", marginBottom: 28, maxWidth: 420, margin: "0 auto 28px" }}>
-          Digitale Treuekarten für deine Lieblingsgeschäfte — und echte Prämien für Empfehlungen.
-        </p>
-
-        {/* CTA */}
-        <a href="#register" style={{ textDecoration: "none", display: "block" }}>
+        {/* CTA Button */}
+        <a href="#register" style={{ textDecoration: "none", display: "block", marginBottom: 10 }}>
           <button className="cta-btn" style={{ width: "100%", fontSize: 16, padding: "16px" }}>
             🚀 Jetzt kostenlos starten
           </button>
         </a>
-        <div style={{ textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.25)", marginTop: 8 }}>Kein Download · Keine Kreditkarte · 10 Sekunden</div>
+
+        {/* Subtext under button */}
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, textAlign: "center", marginBottom: 24 }}>
+          Digitale Treuekarte für deine Lieblingsgeschäfte — kostenlos &amp; sofort.
+        </p>
+
+        {/* Hero image slideshow */}
+        <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", height: 220 }}>
+          {HERO_SLIDES.map((slide, i) => (
+            <img
+              key={slide.img}
+              src={slide.img}
+              alt={slide.label}
+              style={{
+                position: "absolute", inset: 0,
+                width: "100%", height: "100%", objectFit: "cover",
+                opacity: i === heroSlide ? 1 : 0,
+                transition: "opacity 1.2s ease",
+              }}
+            />
+          ))}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(17,30,40,0.1) 0%, rgba(17,30,40,0.75) 100%)" }} />
+
+          {/* Slide label bottom left */}
+          <div style={{ position: "absolute", bottom: 14, left: 16, display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ background: "rgba(16,185,129,0.2)", backdropFilter: "blur(8px)", border: "1px solid rgba(16,185,129,0.45)", borderRadius: 100, padding: "5px 14px" }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#63FFB4" }}>{HERO_SLIDES[heroSlide].label}</span>
+            </div>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>{HERO_SLIDES[heroSlide].sub}</span>
+          </div>
+
+          {/* Dot indicators */}
+          <div style={{ position: "absolute", bottom: 16, right: 16, display: "flex", gap: 5 }}>
+            {HERO_SLIDES.map((_, i) => (
+              <div key={i} onClick={() => setHeroSlide(i)} style={{ width: 6, height: 6, borderRadius: "50%", background: i === heroSlide ? "#10B981" : "rgba(255,255,255,0.3)", transition: "background 0.5s", cursor: "pointer" }} />
+            ))}
+          </div>
+
+          {/* Floating stamp badge */}
+          <div style={{ position: "absolute", top: 14, right: 16, background: "rgba(17,30,40,0.7)", backdropFilter: "blur(8px)", border: "1px solid rgba(99,255,180,0.3)", borderRadius: 12, padding: "7px 12px", animation: "float 3s ease-in-out infinite" }}>
+            <div style={{ fontSize: 11, color: "#63FFB4", fontWeight: 700 }}>🎉 +1 Stempel!</div>
+          </div>
+        </div>
       </section>
 
       {/* ── 3 SCHRITTE ── */}
@@ -209,7 +243,7 @@ export default function AppLanding() {
               }}
             >
               <img src={step.img} alt={step.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(7,17,27,0.85) 0%, rgba(7,17,27,0.3) 100%)" }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(17,30,40,0.85) 0%, rgba(17,30,40,0.3) 100%)" }} />
               <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 24px", gap: 16 }}>
                 <div style={{ flexShrink: 0 }}>
                   <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 11, fontWeight: 700, color: "rgba(99,255,180,0.7)", letterSpacing: 2, marginBottom: 4 }}>{step.num}</div>
@@ -246,7 +280,7 @@ export default function AppLanding() {
               onClick={() => setActiveCard(i)}
             >
               <img src={biz.img} alt={biz.name} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s", transform: i === activeCard ? "scale(1.06)" : "scale(1)" }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 35%, rgba(7,17,27,0.95) 100%)" }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 35%, rgba(17,30,40,0.95) 100%)" }} />
               <div style={{ position: "absolute", bottom: 12, left: 12, right: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
                   <span style={{ fontSize: 15 }}>{biz.emoji}</span>
@@ -283,14 +317,13 @@ export default function AppLanding() {
         data-section="cta"
         style={{ position: "relative", zIndex: 1, maxWidth: 600, margin: "0 auto", padding: "48px 20px 80px" }}
       >
-        {/* Image behind CTA */}
         <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", marginBottom: 28, height: 180 }}>
           <img
             src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&q=80"
             alt="Community"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
-          <div style={{ position: "absolute", inset: 0, background: "rgba(7,17,27,0.55)" }} />
+          <div style={{ position: "absolute", inset: 0, background: "rgba(17,30,40,0.55)" }} />
           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 6 }}>
             <div style={{ fontSize: 36, animation: "float 3s ease-in-out infinite" }}>🎁</div>
             <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" }}>Starte jetzt kostenlos</div>
@@ -327,7 +360,6 @@ export default function AppLanding() {
       {/* ── FOOTER ── */}
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "24px 20px", textAlign: "center", position: "relative", zIndex: 1 }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-          <div style={{ width: 22, height: 22, background: "linear-gradient(135deg, #10B981, #059669)", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900 }}>S</div>
           <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 15, fontWeight: 900 }}>Sensalie</span>
           <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 6px rgba(16,185,129,0.9)" }} />
         </div>
