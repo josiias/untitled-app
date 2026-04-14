@@ -214,8 +214,8 @@ function PartnerCarousel() {
   const onPointerUp = () => { dragStart.current = null; setTimeout(() => { pausedRef.current = false; }, 1200); };
 
   return (
-    <div>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Partnerbetriebe</div>
+    <div style={{ margin: "0 -20px" }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10, padding: "0 20px" }}>Partnerbetriebe</div>
       <div ref={containerRef} style={{ overflow: "hidden", position: "relative", cursor: "grab", userSelect: "none" }}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp}>
         {/* Fade edges */}
@@ -659,14 +659,35 @@ export default function CustomerDashboard() {
           {/* Dropdown menu */}
           {menuOpen && (
             <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40 }}>
-              <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 60, right: 20, background: "#1a2530", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "8px 0", minWidth: 180, boxShadow: "0 16px 40px rgba(0,0,0,0.5)", zIndex: 41 }}>
+              <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 60, right: 20, background: "#1a2530", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "8px 0", minWidth: 200, boxShadow: "0 16px 40px rgba(0,0,0,0.5)", zIndex: 41 }}>
+                {/* Navigation tabs */}
+                <div style={{ padding: "6px 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 1, textTransform: "uppercase", paddingLeft: 8, marginBottom: 4 }}>Navigation</div>
+                  {TABS.map(t => {
+                    const active = tab === t.id;
+                    return (
+                      <div key={t.id} onClick={() => { setTab(t.id); setMenuOpen(false); }} style={{
+                        display: "flex", alignItems: "center", gap: 12, padding: "10px 10px", cursor: "pointer", fontSize: 13,
+                        fontWeight: active ? 700 : 500,
+                        color: active ? "#10B981" : "rgba(255,255,255,0.7)",
+                        background: active ? "rgba(16,185,129,0.1)" : "transparent",
+                        borderRadius: 10, marginBottom: 2,
+                      }}>
+                        <span style={{ fontSize: 16 }}>{t.icon}</span>
+                        {t.label}
+                        {active && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />}
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Settings items */}
                 {[
                   { icon: "👤", label: "Profil" },
                   { icon: "🔔", label: "Benachrichtigungen" },
                   { icon: "⚙️", label: "Einstellungen" },
                   { icon: "🚪", label: "Abmelden" },
                 ].map((item, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 18px", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.75)", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none" }}
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 18px", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.6)", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.04)" : "none" }}
                     onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     <span style={{ fontSize: 15 }}>{item.icon}</span>
@@ -680,47 +701,14 @@ export default function CustomerDashboard() {
       </div>
 
       {/* ── Content ── */}
-      <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px 20px 100px", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px 20px 40px", position: "relative", zIndex: 1 }}>
         {tab === "home"     && <HomeTab onTabChange={setTab} />}
         {tab === "cards"    && <CardsTab />}
         {tab === "rewards"  && <RewardsTab />}
         {tab === "referral" && <ReferralTab />}
       </div>
 
-      {/* ── Bottom Nav ── */}
-      <div style={{
-        position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 30,
-        background: "rgba(13,20,28,0.95)", backdropFilter: "blur(24px)",
-        borderTop: "1px solid rgba(255,255,255,0.07)",
-        padding: "10px 20px 20px",
-        display: "flex", justifyContent: "center",
-      }}>
-        <div style={{ maxWidth: 600, width: "100%", display: "flex", justifyContent: "space-around" }}>
-          {TABS.map(t => {
-            const active = tab === t.id;
-            return (
-              <button key={t.id} onClick={() => setTab(t.id)} style={{
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-                background: "none", border: "none", cursor: "pointer", padding: "4px 16px",
-                fontFamily: "inherit", transition: "all 0.2s",
-              }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: 12,
-                  background: active ? "rgba(16,185,129,0.2)" : "transparent",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 18, color: active ? "#10B981" : "rgba(255,255,255,0.3)",
-                  transition: "all 0.25s",
-                }}>
-                  {t.icon}
-                </div>
-                <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, color: active ? "#10B981" : "rgba(255,255,255,0.3)", transition: "color 0.25s" }}>
-                  {t.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* No bottom nav — navigation is in hamburger menu */}
     </div>
   );
 }

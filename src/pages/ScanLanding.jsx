@@ -245,23 +245,22 @@ export default function ScanLanding() {
             </div>
           </div>
 
-          {/* Stamp animation circle */}
-          <div style={{ position: "relative", width: 108, height: 108, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div className="ring1" style={{ width: 80, height: 80 }} />
-            <div className="ring2" style={{ width: 80, height: 80 }} />
-            <div className="ring3" style={{ width: 80, height: 80 }} />
+          {/* Small pulsing rings — no big stamp block */}
+          <div style={{ position: "relative", width: 60, height: 60, margin: "0 auto 6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="ring1" style={{ width: 44, height: 44 }} />
+            <div className="ring2" style={{ width: 44, height: 44 }} />
             <div className="stamp-icon pulse-glow" style={{
-              width: 72, height: 72,
+              width: 40, height: 40,
               background: "linear-gradient(135deg, #63FFB4 0%, #10B981 100%)",
-              borderRadius: 18,
+              borderRadius: 12,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 32, color: "#fff", fontWeight: 900,
+              fontSize: 20, color: "#fff", fontWeight: 900,
             }}>
               ✓
             </div>
           </div>
 
-          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 800, color: "#fff", margin: "0 0 3px", lineHeight: 1.1 }}>
+          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 800, color: "#fff", margin: "0 0 3px", lineHeight: 1.1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
             Glückwunsch! 🎉
           </h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "0 0 10px", lineHeight: 1.5 }}>
