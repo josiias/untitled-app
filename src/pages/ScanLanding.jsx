@@ -433,6 +433,17 @@ export default function ScanLanding() {
           <button onClick={() => window.location.href = "/"} style={{ width: "100%", padding: "11px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.45)", fontWeight: 600, fontSize: 12, borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", fontFamily: "inherit" }}>
             Zur Startseite
           </button>
+
+          {/* Sensalie Branding Footer */}
+          <div style={{ marginTop: 20, textAlign: "center" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 5 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 8px rgba(16,185,129,0.8)" }} />
+              <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 800, color: "#fff", letterSpacing: 0.3 }}>Sensalie</span>
+            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", lineHeight: 1.5 }}>
+              Deine digitale Kundenkarte — sicher, einfach &amp; überall dabei.
+            </div>
+          </div>
         </div>
       )}
     </div>
