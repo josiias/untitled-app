@@ -175,13 +175,14 @@ function StampCard({ card, compact = false }) {
   );
 }
 
-// ── Partner Auto-Ticker (slower + touch-scrollable) ───────────────────────────
+// ── Partner Auto-Ticker (compact scroll with smooth animation) ───────────────
 function PartnerCarousel() {
   const trackRef = useRef(null);
   const containerRef = useRef(null);
   const posRef = useRef(0);
   const pausedRef = useRef(false);
-  const CARD_W = 105 + 8; // minWidth + gap
+  const velocityRef = useRef(0);
+  const CARD_W = 80 + 6; // smaller + gap
   const totalW = PARTNER_BUSINESSES.length * CARD_W;
   const items = [...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES];
 
@@ -191,7 +192,7 @@ function PartnerCarousel() {
     let raf;
     const tick = () => {
       if (!pausedRef.current) {
-        posRef.current += 0.28; // slower
+        posRef.current += 0.15;
         if (posRef.current >= totalW) posRef.current = 0;
         track.style.transform = `translateX(-${posRef.current}px)`;
       }
@@ -201,43 +202,40 @@ function PartnerCarousel() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Allow touch/mouse drag to scroll — pause auto-scroll while dragging
   const dragStart = useRef(null);
   const onPointerDown = (e) => { pausedRef.current = true; dragStart.current = e.clientX; };
   const onPointerMove = (e) => {
     if (dragStart.current === null) return;
     const dx = dragStart.current - e.clientX;
-    posRef.current = Math.max(0, Math.min(posRef.current + dx, totalW - 1));
+    posRef.current = Math.max(0, Math.min(posRef.current + dx * 0.8, totalW - 1));
     trackRef.current.style.transform = `translateX(-${posRef.current}px)`;
     dragStart.current = e.clientX;
   };
-  const onPointerUp = () => { dragStart.current = null; setTimeout(() => { pausedRef.current = false; }, 1200); };
+  const onPointerUp = () => { dragStart.current = null; setTimeout(() => { pausedRef.current = false; }, 800); };
 
   return (
     <div style={{ margin: "0 -20px" }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10, padding: "0 20px" }}>Partnerbetriebe</div>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, padding: "0 20px" }}>Partnerbetriebe</div>
       <div ref={containerRef} style={{ overflow: "hidden", position: "relative", cursor: "grab", userSelect: "none" }}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp}>
-        {/* Fade edges */}
-        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 20, background: "linear-gradient(to right, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 20, background: "linear-gradient(to left, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
-        <div ref={trackRef} style={{ display: "flex", gap: 8, willChange: "transform" }}>
+        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 15, background: "linear-gradient(to right, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 15, background: "linear-gradient(to left, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
+        <div ref={trackRef} style={{ display: "flex", gap: 6, willChange: "transform", transition: "none" }}>
           {items.map((biz, idx) => (
             <div key={idx} style={{
-              minWidth: 105, borderRadius: 14, overflow: "hidden", position: "relative",
-              height: 140, flexShrink: 0,
+              minWidth: 80, borderRadius: 12, overflow: "hidden", position: "relative",
+              height: 110, flexShrink: 0,
               border: `1px solid ${biz.color}33`,
             }}>
               <img src={biz.img} alt={biz.name} draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 20%, rgba(13,20,28,0.97) 100%)" }} />
-              <div style={{ position: "absolute", top: 6, left: 6, background: `${biz.color}CC`, borderRadius: 100, padding: "1px 6px", fontSize: 7, fontWeight: 800, color: "#fff" }}>
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 25%, rgba(13,20,28,0.95) 100%)" }} />
+              <div style={{ position: "absolute", top: 4, left: 4, background: `${biz.color}CC`, borderRadius: 100, padding: "1px 5px", fontSize: 6, fontWeight: 700, color: "#fff" }}>
                 {biz.type === "referral" ? "💸" : biz.type === "stamps" ? "🎁" : "💸🎁"}
               </div>
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "8px 8px" }}>
-                <div style={{ fontSize: 11, marginBottom: 1 }}>{biz.emoji}</div>
-                <div style={{ fontSize: 10, fontWeight: 800, color: "#fff", lineHeight: 1.2, marginBottom: 2 }}>{biz.name}</div>
-                {biz.provision && <div style={{ fontSize: 8, color: "#63FFB4", fontWeight: 700 }}>💸 {biz.provision}</div>}
-                {biz.reward && <div style={{ fontSize: 8, color: biz.color, fontWeight: 600 }}>🎁 {biz.reward}</div>}
+              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "6px 6px" }}>
+                <div style={{ fontSize: 9, marginBottom: 1 }}>{biz.emoji}</div>
+                <div style={{ fontSize: 8, fontWeight: 700, color: "#fff", lineHeight: 1.2, marginBottom: 1 }}>{biz.name}</div>
+                {biz.provision && <div style={{ fontSize: 7, color: "#63FFB4", fontWeight: 600 }}>💸 {biz.provision}</div>}
               </div>
             </div>
           ))}
