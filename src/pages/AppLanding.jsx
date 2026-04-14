@@ -32,12 +32,12 @@ const STEPS = [
 
 // Hero: erst Kunde, dann Zielgruppe (kein Gym), ausgewogen M/F
 const HERO_SLIDES = [
-  { img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80", label: "Für dich", sub: "Sammle Stempel bei deinen Lieblingsläden" },
-  { img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1200&q=80", label: "Cafés", sub: "Kaffee, Kuchen & treue Kunden" },
-  { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1200&q=80", label: "Barbershops", sub: "Stil sammeln, Prämien kassieren" },
-  { img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&q=80", label: "Massage Studios", sub: "Entspannung mit echten Vorteilen" },
-  { img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1200&q=80", label: "Nägel & Beauty", sub: "Schönheit, die sich lohnt" },
-  { img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80", label: "Beauty Studios", sub: "Gepflegt & belohnt" },
+  { img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80", label: "Für dich", sub: "Sammle Stempel bei deinen Lieblingsläden", pos: "center center" },
+  { img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1200&q=80", label: "Cafés", sub: "Kaffee, Kuchen & treue Kunden", pos: "center center" },
+  { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1200&q=80", label: "Barbershops", sub: "Stil sammeln, Prämien kassieren", pos: "center 30%" },
+  { img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&q=80", label: "Massage Studios", sub: "Entspannung mit echten Vorteilen", pos: "center center" },
+  { img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1200&q=80", label: "Nägel & Beauty", sub: "Schönheit, die sich lohnt", pos: "center center" },
+  { img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80", label: "Beauty Studios", sub: "Gepflegt & belohnt", pos: "center center" },
 ];
 
 // Was uns definiert statt fake Zahlen
@@ -199,6 +199,7 @@ export default function AppLanding() {
               style={{
                 position: "absolute", inset: 0,
                 width: "100%", height: "100%", objectFit: "cover",
+                objectPosition: slide.pos || "center center",
                 opacity: i === heroSlide ? 1 : 0,
                 transition: "opacity 1.3s ease",
               }}

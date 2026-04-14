@@ -537,10 +537,26 @@ function RewardsTab() {
 // ── Referral Tab ───────────────────────────────────────────────────────────────
 function ReferralTab() {
   const [copied, setCopied] = useState(false);
+  const [search, setSearch] = useState("");
+
   const copy = () => {
     navigator.clipboard.writeText(`Schau dir Sensalie an: sensalie.app?ref=${REFERRAL_STATS.code}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const referrablePartners = PARTNER_BUSINESSES.filter(b => b.provision);
+  const filtered = search.trim()
+    ? referrablePartners.filter(b => b.name.toLowerCase().includes(search.toLowerCase()) || b.category.toLowerCase().includes(search.toLowerCase()))
+    : referrablePartners;
+
+  const handleShare = (biz) => {
+    const msg = `Hey! Ich empfehle dir ${biz.name} auf Sensalie – registriere dich mit meinem Code ${REFERRAL_STATS.code} und wir beide profitieren! 💸`;
+    if (navigator.share) {
+      navigator.share({ title: `${biz.name} empfehlen`, text: msg });
+    } else {
+      navigator.clipboard.writeText(msg);
+    }
   };
 
   return (
@@ -579,6 +595,49 @@ function ReferralTab() {
       <button style={{ width: "100%", padding: "15px", background: "linear-gradient(135deg, #10B981, #059669)", color: "#fff", border: "none", borderRadius: 16, fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(16,185,129,0.3)" }}>
         💬 Via WhatsApp teilen
       </button>
+
+      {/* Partner businesses to recommend */}
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Unternehmen empfehlen 💸</div>
+        {/* Search */}
+        <div style={{ position: "relative", marginBottom: 12 }}>
+          <span style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(255,255,255,0.25)" }}>🔍</span>
+          <input
+            type="text"
+            placeholder="Geschäft suchen..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{
+              width: "100%", padding: "11px 14px 11px 38px",
+              background: "#1a2530", border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 12, fontSize: 13, color: "#fff",
+              fontFamily: "inherit", outline: "none",
+            }}
+          />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {filtered.length === 0 && (
+            <div style={{ textAlign: "center", padding: "20px", color: "rgba(255,255,255,0.25)", fontSize: 13 }}>Keine Ergebnisse für „{search}"</div>
+          )}
+          {filtered.map(biz => (
+            <div key={biz.id} style={{ display: "flex", alignItems: "center", gap: 12, background: "#1a2530", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflow: "hidden" }}>
+              <div style={{ width: 60, height: 60, flexShrink: 0, position: "relative" }}>
+                <img src={biz.img} alt={biz.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.2)" }} />
+                <div style={{ position: "absolute", bottom: 3, left: 0, right: 0, textAlign: "center", fontSize: 14 }}>{biz.emoji}</div>
+              </div>
+              <div style={{ flex: 1, paddingRight: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{biz.name}</div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>{biz.category}</div>
+                <div style={{ fontSize: 11, color: "#63FFB4", fontWeight: 700, marginTop: 3 }}>💸 {biz.provision}</div>
+              </div>
+              <button onClick={() => handleShare(biz)} style={{ marginRight: 12, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10B981", borderRadius: 10, padding: "7px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                Teilen →
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* How it works */}
       <div style={{ background: "#1a2530", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "18px 20px" }}>
