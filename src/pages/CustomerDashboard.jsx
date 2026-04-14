@@ -175,55 +175,69 @@ function StampCard({ card, compact = false }) {
   );
 }
 
-// ── Partner Auto-Ticker ───────────────────────────────────────────────────────
+// ── Partner Auto-Ticker (slower + touch-scrollable) ───────────────────────────
 function PartnerCarousel() {
   const trackRef = useRef(null);
-  // Duplicate list for seamless loop
-  const items = [...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES];
+  const containerRef = useRef(null);
+  const posRef = useRef(0);
+  const pausedRef = useRef(false);
+  const CARD_W = 105 + 8; // minWidth + gap
+  const totalW = PARTNER_BUSINESSES.length * CARD_W;
+  const items = [...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES];
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    let pos = 0;
-    const speed = 0.6; // px per frame
-    const cardW = 130 + 10; // minWidth + gap
-    const totalW = PARTNER_BUSINESSES.length * cardW;
     let raf;
     const tick = () => {
-      pos += speed;
-      if (pos >= totalW) pos = 0;
-      track.style.transform = `translateX(-${pos}px)`;
+      if (!pausedRef.current) {
+        posRef.current += 0.28; // slower
+        if (posRef.current >= totalW) posRef.current = 0;
+        track.style.transform = `translateX(-${posRef.current}px)`;
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  // Allow touch/mouse drag to scroll — pause auto-scroll while dragging
+  const dragStart = useRef(null);
+  const onPointerDown = (e) => { pausedRef.current = true; dragStart.current = e.clientX; };
+  const onPointerMove = (e) => {
+    if (dragStart.current === null) return;
+    const dx = dragStart.current - e.clientX;
+    posRef.current = Math.max(0, Math.min(posRef.current + dx, totalW - 1));
+    trackRef.current.style.transform = `translateX(-${posRef.current}px)`;
+    dragStart.current = e.clientX;
+  };
+  const onPointerUp = () => { dragStart.current = null; setTimeout(() => { pausedRef.current = false; }, 1200); };
+
   return (
     <div>
       <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Partnerbetriebe</div>
-      <div style={{ overflow: "hidden", position: "relative" }}>
+      <div ref={containerRef} style={{ overflow: "hidden", position: "relative", cursor: "grab", userSelect: "none" }}
+        onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp}>
         {/* Fade edges */}
-        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 24, background: "linear-gradient(to right, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 24, background: "linear-gradient(to left, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
-        <div ref={trackRef} style={{ display: "flex", gap: 10, willChange: "transform" }}>
+        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 20, background: "linear-gradient(to right, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 20, background: "linear-gradient(to left, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
+        <div ref={trackRef} style={{ display: "flex", gap: 8, willChange: "transform" }}>
           {items.map((biz, idx) => (
             <div key={idx} style={{
-              minWidth: 130, borderRadius: 16, overflow: "hidden", position: "relative",
-              height: 170, flexShrink: 0, cursor: "pointer",
-              border: `1px solid ${biz.color}44`,
+              minWidth: 105, borderRadius: 14, overflow: "hidden", position: "relative",
+              height: 140, flexShrink: 0,
+              border: `1px solid ${biz.color}33`,
             }}>
-              <img src={biz.img} alt={biz.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 25%, rgba(13,20,28,0.96) 100%)" }} />
-              {/* Badge pill */}
-              <div style={{ position: "absolute", top: 8, left: 8, background: `${biz.color}DD`, backdropFilter: "blur(4px)", borderRadius: 100, padding: "2px 8px", fontSize: 8, fontWeight: 800, color: "#fff" }}>
-                {biz.type === "referral" ? "💸 Provision" : biz.type === "stamps" ? "🎁 Stempel" : "💸 & 🎁"}
+              <img src={biz.img} alt={biz.name} draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 20%, rgba(13,20,28,0.97) 100%)" }} />
+              <div style={{ position: "absolute", top: 6, left: 6, background: `${biz.color}CC`, borderRadius: 100, padding: "1px 6px", fontSize: 7, fontWeight: 800, color: "#fff" }}>
+                {biz.type === "referral" ? "💸" : biz.type === "stamps" ? "🎁" : "💸🎁"}
               </div>
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "10px 10px" }}>
-                <div style={{ fontSize: 13, marginBottom: 2 }}>{biz.emoji}</div>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "#fff", lineHeight: 1.2, marginBottom: 4 }}>{biz.name}</div>
-                {biz.provision && <div style={{ fontSize: 9, color: "#63FFB4", fontWeight: 700 }}>💸 {biz.provision}</div>}
-                {biz.reward && <div style={{ fontSize: 9, color: biz.color, fontWeight: 600 }}>🎁 {biz.reward}</div>}
+              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "8px 8px" }}>
+                <div style={{ fontSize: 11, marginBottom: 1 }}>{biz.emoji}</div>
+                <div style={{ fontSize: 10, fontWeight: 800, color: "#fff", lineHeight: 1.2, marginBottom: 2 }}>{biz.name}</div>
+                {biz.provision && <div style={{ fontSize: 8, color: "#63FFB4", fontWeight: 700 }}>💸 {biz.provision}</div>}
+                {biz.reward && <div style={{ fontSize: 8, color: biz.color, fontWeight: 600 }}>🎁 {biz.reward}</div>}
               </div>
             </div>
           ))}
@@ -265,102 +279,96 @@ function ProvisionWidget() {
   );
 }
 
-// ── Rangliste Coming Soon ─────────────────────────────────────────────────────
+// ── Rangliste Coming Soon — horizontal bar style ──────────────────────────────
 const LEADERBOARD = [
-  { rank: 1, medal: "🥇", name: "Mehmet B.", pts: 842, prize: "100€", bar: 100, color: "#F59E0B" },
-  { rank: 2, medal: "🥈", name: "Sara K.",   pts: 791, prize: "50€",  bar: 94,  color: "#94A3B8" },
-  { rank: 3, medal: "🥉", name: "Jonas W.",  pts: 723, prize: "25€",  bar: 86,  color: "#CD7F32" },
-  { rank: 4, medal: "4",  name: "Fatima A.", pts: 658, prize: "10€",  bar: 78,  color: "#8B5CF6" },
-  { rank: 5, medal: "5",  name: "Du?",       pts: null, prize: "—",   bar: 0,   color: "#C084FC", isYou: true },
+  { rank: 1, medal: "🥇", name: "Mehmet B.", pts: 842, prize: "100€", pct: 100, color: "#F59E0B" },
+  { rank: 2, medal: "🥈", name: "Sara K.",   pts: 791, prize: "50€",  pct: 94,  color: "#94A3B8" },
+  { rank: 3, medal: "🥉", name: "Jonas W.",  pts: 723, prize: "25€",  pct: 86,  color: "#CD7F32" },
+  { rank: 4, medal: "4",  name: "Fatima A.", pts: 610, prize: "10€",  pct: 72,  color: "#8B5CF6" },
+  { rank: 5, medal: "5",  name: "Du?",       pts: null, prize: "—",   pct: 0,   color: "#C084FC", isYou: true },
 ];
 
 function RankingComingSoon() {
   return (
     <div style={{ position: "relative" }}>
-      {/* Header row outside the card — diagonal shape */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 18 }}>🏆</span>
           <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 900, color: "#fff" }}>Rangliste</span>
           <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>· jedes Halbjahr</span>
         </div>
-        <div style={{ background: "rgba(168,85,247,0.18)", border: "1px solid rgba(168,85,247,0.45)", borderRadius: 100, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "#C084FC", letterSpacing: 0.5 }}>
+        <div style={{ background: "rgba(168,85,247,0.18)", border: "1px solid rgba(168,85,247,0.45)", borderRadius: 100, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "#C084FC" }}>
           COMING SOON
         </div>
       </div>
 
-      {/* Leaderboard card — real list with lock overlay */}
-      <div style={{ borderRadius: 20, overflow: "hidden", position: "relative", background: "linear-gradient(160deg, #16102a, #1e1540)", border: "1px solid rgba(168,85,247,0.2)" }}>
+      <div style={{ borderRadius: 20, overflow: "hidden", position: "relative", background: "linear-gradient(160deg, #16102a, #1e1540)", border: "1px solid rgba(168,85,247,0.2)", padding: "16px 16px" }}>
 
-        {/* Top 3 podium bar */}
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, padding: "16px 16px 0", height: 80 }}>
+        {/* Top 3 — horizontal bar chart rising upwards */}
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 10, height: 110, marginBottom: 14, paddingBottom: 4, borderBottom: "1px solid rgba(168,85,247,0.1)" }}>
           {[LEADERBOARD[1], LEADERBOARD[0], LEADERBOARD[2]].map((e, i) => {
-            const heights = [56, 72, 46];
+            const barHeights = [78, 100, 60];
+            const barH = barHeights[i];
             return (
-              <div key={e.rank} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                <div style={{ fontSize: i === 1 ? 16 : 12 }}>{e.medal}</div>
-                <div style={{ width: "100%", height: heights[i], borderRadius: "8px 8px 0 0", background: `linear-gradient(to top, ${e.color}55, ${e.color}22)`, border: `1px solid ${e.color}44`, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: 4 }}>
-                  <span style={{ fontSize: 9, fontWeight: 700, color: e.color }}>{e.prize}</span>
+              <div key={e.rank} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, flex: 1 }}>
+                {/* medal above bar */}
+                <div style={{ fontSize: i === 1 ? 18 : 14 }}>{e.medal}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: e.color }}>{e.pts} Pkt.</div>
+                {/* The bar itself */}
+                <div style={{
+                  width: "100%", height: barH,
+                  borderRadius: "10px 10px 0 0",
+                  background: `linear-gradient(to top, ${e.color}88, ${e.color}22)`,
+                  border: `1px solid ${e.color}55`,
+                  display: "flex", alignItems: "flex-end", justifyContent: "center", paddingBottom: 6,
+                }}>
+                  <span style={{ fontSize: 10, fontWeight: 800, color: e.color }}>{e.prize}</span>
                 </div>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", textAlign: "center", marginTop: 2, maxWidth: 70, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.name}</div>
               </div>
             );
           })}
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: "rgba(168,85,247,0.12)", margin: "0 16px" }} />
-
-        {/* List rows */}
-        {LEADERBOARD.map((entry, i) => (
+        {/* Rank 4 & 5 as simple rows */}
+        {LEADERBOARD.slice(3).map((entry, i) => (
           <div key={i} style={{
             display: "flex", alignItems: "center", gap: 10,
-            padding: "9px 16px",
-            background: entry.isYou ? "rgba(168,85,247,0.08)" : "transparent",
-            borderBottom: i < LEADERBOARD.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+            padding: "8px 4px",
+            background: entry.isYou ? "rgba(168,85,247,0.1)" : "transparent",
+            borderRadius: 10,
+            borderBottom: i < 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
           }}>
-            {/* Rank */}
-            <div style={{ width: 22, textAlign: "center", fontSize: entry.rank <= 3 ? 14 : 11, fontWeight: 700, color: entry.rank <= 3 ? entry.color : "rgba(255,255,255,0.3)" }}>
-              {entry.rank <= 3 ? entry.medal : entry.rank}
-            </div>
-            {/* Name + bar */}
+            <div style={{ width: 20, textAlign: "center", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.3)" }}>{entry.rank}</div>
             <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-                <span style={{ fontSize: 12, fontWeight: entry.isYou ? 800 : 600, color: entry.isYou ? "#C084FC" : "#fff" }}>
-                  {entry.name}
-                </span>
-                <span style={{ fontSize: 10, color: entry.pts ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.2)" }}>
-                  {entry.pts ? `${entry.pts} Pkt.` : "—"}
-                </span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: entry.isYou ? 800 : 600, color: entry.isYou ? "#C084FC" : "#fff" }}>{entry.name}</span>
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{entry.pts ? `${entry.pts} Pkt.` : "—"}</span>
               </div>
-              <div style={{ height: 3, borderRadius: 100, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${entry.bar}%`, background: `linear-gradient(90deg, ${entry.color}66, ${entry.color})`, borderRadius: 100 }} />
+              <div style={{ height: 4, borderRadius: 100, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${entry.pct}%`, background: `linear-gradient(90deg, ${entry.color}55, ${entry.color})`, borderRadius: 100 }} />
               </div>
             </div>
-            {/* Prize */}
-            <div style={{ fontSize: 11, fontWeight: 700, color: entry.prize !== "—" ? "#F59E0B" : "rgba(255,255,255,0.2)", minWidth: 30, textAlign: "right" }}>{entry.prize}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.2)", minWidth: 28, textAlign: "right" }}>{entry.prize}</div>
           </div>
         ))}
 
-        {/* Lock overlay */}
+        {/* Lock overlay — lighter blur so bars show through */}
         <div style={{
-          position: "absolute", inset: 0,
-          background: "rgba(13,10,25,0.55)",
-          backdropFilter: "blur(3px)",
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          gap: 8,
+          position: "absolute", inset: 0, borderRadius: 20,
+          background: "rgba(13,10,25,0.45)",
+          backdropFilter: "blur(2px)",
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8,
         }}>
-          {/* Lock icon — custom SVG shape */}
-          <div style={{ width: 48, height: 48, borderRadius: 16, background: "rgba(168,85,247,0.18)", border: "1.5px solid rgba(168,85,247,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="22" height="24" viewBox="0 0 22 24" fill="none">
-              <rect x="2" y="10" width="18" height="13" rx="4" fill="rgba(168,85,247,0.3)" stroke="#C084FC" strokeWidth="1.5"/>
+          <div style={{ width: 44, height: 44, borderRadius: 14, background: "rgba(168,85,247,0.2)", border: "1.5px solid rgba(168,85,247,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="20" height="22" viewBox="0 0 22 24" fill="none">
+              <rect x="2" y="10" width="18" height="13" rx="4" fill="rgba(168,85,247,0.35)" stroke="#C084FC" strokeWidth="1.5"/>
               <path d="M6 10V7a5 5 0 0 1 10 0v3" stroke="#C084FC" strokeWidth="1.5" strokeLinecap="round"/>
               <circle cx="11" cy="16.5" r="2" fill="#C084FC"/>
             </svg>
           </div>
-          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 15, fontWeight: 900, color: "#fff" }}>Kommt bald</div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", textAlign: "center", maxWidth: 180, lineHeight: 1.5 }}>
-            Jedes Halbjahr gewinnen die Aktivsten echte Preise
-          </div>
+          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 14, fontWeight: 900, color: "#fff" }}>Kommt bald</div>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textAlign: "center", maxWidth: 160, lineHeight: 1.5 }}>Jedes Halbjahr gewinnen die Aktivsten echte Preise</div>
         </div>
       </div>
     </div>
@@ -369,6 +377,9 @@ function RankingComingSoon() {
 
 // ── Home Tab ──────────────────────────────────────────────────────────────────
 function HomeTab({ onTabChange }) {
+  const [activityExpanded, setActivityExpanded] = useState(false);
+  const visibleActivity = activityExpanded ? ACTIVITY : ACTIVITY.slice(0, 2);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Hero greeting */}
@@ -403,9 +414,6 @@ function HomeTab({ onTabChange }) {
       {/* Provision Widget */}
       <ProvisionWidget />
 
-      {/* Rangliste Coming Soon */}
-      <RankingComingSoon />
-
       {/* Almost done card */}
       {STAMP_CARDS.filter(c => c.stamps >= c.required - 1).length > 0 && (
         <div>
@@ -435,12 +443,14 @@ function HomeTab({ onTabChange }) {
         </div>
       )}
 
-      {/* Activity */}
+      {/* Activity — collapsed to 2, expandable */}
       <div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Letzte Aktivität</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase" }}>Letzte Aktivität</div>
+        </div>
         <div style={{ background: "#1a2530", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, overflow: "hidden" }}>
-          {ACTIVITY.map((a, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 16px", borderBottom: i < ACTIVITY.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+          {visibleActivity.map((a, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
               <div style={{ width: 36, height: 36, background: a.type === "reward" ? "rgba(245,158,11,0.15)" : "rgba(16,185,129,0.1)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{a.icon}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{a.text}</div>
@@ -448,8 +458,19 @@ function HomeTab({ onTabChange }) {
               </div>
             </div>
           ))}
+          {/* Expand / collapse button */}
+          <button onClick={() => setActivityExpanded(v => !v)} style={{
+            width: "100%", padding: "11px", background: "transparent", border: "none",
+            color: "rgba(255,255,255,0.35)", fontSize: 12, fontWeight: 600, cursor: "pointer",
+            fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+          }}>
+            {activityExpanded ? "▲ Weniger anzeigen" : `▼ Alle ${ACTIVITY.length} Aktivitäten`}
+          </button>
         </div>
       </div>
+
+      {/* Rangliste — LAST */}
+      <RankingComingSoon />
     </div>
   );
 }
@@ -602,6 +623,7 @@ function ReferralTab() {
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
 export default function CustomerDashboard() {
   const [tab, setTab] = useState("home");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div style={{ minHeight: "100vh", background: "#111e28", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden", position: "relative" }}>
@@ -627,9 +649,33 @@ export default function CustomerDashboard() {
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>Mitglied seit {USER.since}</div>
             </div>
           </div>
-          <button style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "7px 14px", fontSize: 12, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "inherit" }}>
-            ⚙ Profil
+          {/* Hamburger menu */}
+          <button onClick={() => setMenuOpen(v => !v)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "9px 12px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 18, height: 2, background: "rgba(255,255,255,0.6)", borderRadius: 2 }} />
+            <div style={{ width: 18, height: 2, background: "rgba(255,255,255,0.6)", borderRadius: 2 }} />
+            <div style={{ width: 18, height: 2, background: "rgba(255,255,255,0.6)", borderRadius: 2 }} />
           </button>
+
+          {/* Dropdown menu */}
+          {menuOpen && (
+            <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40 }}>
+              <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 60, right: 20, background: "#1a2530", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "8px 0", minWidth: 180, boxShadow: "0 16px 40px rgba(0,0,0,0.5)", zIndex: 41 }}>
+                {[
+                  { icon: "👤", label: "Profil" },
+                  { icon: "🔔", label: "Benachrichtigungen" },
+                  { icon: "⚙️", label: "Einstellungen" },
+                  { icon: "🚪", label: "Abmelden" },
+                ].map((item, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 18px", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.75)", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <span style={{ fontSize: 15 }}>{item.icon}</span>
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
