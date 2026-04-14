@@ -420,20 +420,13 @@ export default function ScanLanding() {
             </div>
           )}
 
-          {/* Stamp confirmed hint */}
-          <div style={{ background: "rgba(99,255,180,0.08)", border: "1px solid rgba(99,255,180,0.2)", borderRadius: 14, padding: "10px 14px", marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 20 }}>🔒</span>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.4 }}>
-              Noch <strong style={{ color: "#63FFB4" }}>{business.stamps_required - stampsCount} Stempel</strong> bis zu deiner Prämie: <strong style={{ color: "#FFD700" }}>{business.reward_description}</strong>
-            </div>
-          </div>
+
 
           {/* Referral — slim info banner only */}
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(37,211,102,0.08)", border: "1px solid rgba(37,211,102,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 12, textAlign: "left" }}>
             <span style={{ fontSize: 20, flexShrink: 0 }}>💸</span>
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", lineHeight: 1.3 }}>Empfiehl dein Lieblingsunternehmen</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>& verdiene bis zu <strong style={{ color: "#25D366" }}>100€</strong> pro Empfehlung</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.4 }}>
+              Bei Sensalie kannst du dein Lieblingsunternehmen empfehlen und bis zu <strong style={{ color: "#25D366" }}>100€</strong> pro Empfehlung verdienen.
             </div>
           </div>
 
