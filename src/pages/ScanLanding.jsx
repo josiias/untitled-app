@@ -229,7 +229,10 @@ export default function ScanLanding() {
           </p>
 
           {/* Stamp preview card */}
-          <div className="float-anim" style={{ marginTop: 36, background: "rgba(99,255,180,0.05)", border: "1px solid rgba(99,255,180,0.15)", borderRadius: 18, padding: 18 }}>
+          <div className="float-anim" style={{ marginTop: 36, position: "relative", overflow: "hidden", background: "rgba(99,255,180,0.05)", border: "1px solid rgba(99,255,180,0.15)", borderRadius: 18, padding: 18 }}>
+            {/* Barbershop bg inside card */}
+            <div style={{ position: "absolute", inset: 0, backgroundImage: `url(${business.bg_images[bgIndex]})`, backgroundSize: "cover", backgroundPosition: "center", opacity: 0.08, transition: "opacity 1.5s ease-in-out", borderRadius: 18 }} />
+            <div style={{ position: "relative", zIndex: 1 }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>So sieht deine Karte aus</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: 12 }}>
               {Array.from({ length: business.stamps_required }).map((_, i) => (
@@ -248,6 +251,7 @@ export default function ScanLanding() {
             </div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", textAlign: "center" }}>
               🎁 Prämie: <span style={{ color: "#63FFB4", fontWeight: 600 }}>{business.reward_description}</span> nach {business.stamps_required} Stempeln
+            </div>
             </div>
           </div>
         </div>
