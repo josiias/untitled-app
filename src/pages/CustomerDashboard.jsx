@@ -679,10 +679,78 @@ function ReferralTab() {
   );
 }
 
+// ── QR Modal ──────────────────────────────────────────────────────────────────
+function QRModal({ onClose }) {
+  // Personal QR code — the cashier scans this
+  const qrData = `sensalie://stamp?user=${USER.phone.replace(/\s/g, "")}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&bgcolor=111e28&color=10B981&qzone=2&data=${encodeURIComponent(qrData)}`;
+
+  return (
+    <div onClick={onClose} style={{
+      position: "fixed", inset: 0, zIndex: 100,
+      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)",
+      display: "flex", alignItems: "flex-end", justifyContent: "center",
+    }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        width: "100%", maxWidth: 600,
+        background: "#111e28",
+        borderRadius: "28px 28px 0 0",
+        border: "1px solid rgba(255,255,255,0.1)",
+        borderBottom: "none",
+        padding: "24px 28px 48px",
+        boxShadow: "0 -20px 60px rgba(0,0,0,0.6)",
+      }}>
+        {/* Handle */}
+        <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 100, margin: "0 auto 24px" }} />
+
+        {/* Title */}
+        <div style={{ textAlign: "center", marginBottom: 6 }}>
+          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" }}>Dein Stempel-QR-Code</div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>Zeige diesen Code an der Kasse — der Kassierer scannt ihn</div>
+        </div>
+
+        {/* QR Code */}
+        <div style={{
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 16,
+          background: "rgba(255,255,255,0.03)", border: "1.5px solid rgba(16,185,129,0.25)",
+          borderRadius: 24, padding: "28px 20px", margin: "20px 0",
+        }}>
+          <div style={{
+            background: "#111e28", borderRadius: 16, padding: 14,
+            boxShadow: "0 0 40px rgba(16,185,129,0.2)",
+            border: "1px solid rgba(16,185,129,0.15)",
+          }}>
+            <img src={qrUrl} alt="QR Code" style={{ width: 200, height: 200, display: "block", borderRadius: 8 }} />
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginBottom: 4 }}>Verknüpft mit</div>
+            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 800, color: "#63FFB4" }}>{USER.phone}</div>
+          </div>
+        </div>
+
+        {/* Info row */}
+        <div style={{ display: "flex", gap: 10 }}>
+          {[
+            { icon: "📍", text: "An der Kasse zeigen" },
+            { icon: "⚡", text: "Sekunden dauert es" },
+            { icon: "✅", text: "Stempel automatisch" },
+          ].map((item, i) => (
+            <div key={i} style={{ flex: 1, textAlign: "center", background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "10px 6px" }}>
+              <div style={{ fontSize: 16, marginBottom: 4 }}>{item.icon}</div>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", lineHeight: 1.4 }}>{item.text}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
 export default function CustomerDashboard() {
   const [tab, setTab] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
 
   return (
     <div style={{ minHeight: "100vh", background: "#111e28", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden", position: "relative" }}>
@@ -760,14 +828,50 @@ export default function CustomerDashboard() {
       </div>
 
       {/* ── Content ── */}
-      <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px 20px 40px", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px 20px 110px", position: "relative", zIndex: 1 }}>
         {tab === "home"     && <HomeTab onTabChange={setTab} />}
         {tab === "cards"    && <CardsTab />}
         {tab === "rewards"  && <RewardsTab />}
         {tab === "referral" && <ReferralTab />}
       </div>
 
-      {/* No bottom nav — navigation is in hamburger menu */}
+      {/* ── Sticky Bottom Bar ── */}
+      <div style={{
+        position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 30,
+        padding: "12px 20px 28px",
+        background: "rgba(13,20,28,0.92)", backdropFilter: "blur(24px)",
+        borderTop: "1px solid rgba(255,255,255,0.07)",
+        display: "flex", justifyContent: "center",
+      }}>
+        <div style={{ maxWidth: 600, width: "100%" }}>
+          <button
+            onClick={() => setQrOpen(true)}
+            style={{
+              width: "100%", padding: "14px 20px",
+              background: "linear-gradient(135deg, #10B981, #059669)",
+              border: "none", borderRadius: 16, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
+              boxShadow: "0 6px 24px rgba(16,185,129,0.35)",
+              fontFamily: "inherit",
+            }}
+          >
+            {/* QR icon */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2"/>
+              <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2"/>
+              <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2"/>
+              <rect x="5" y="5" width="3" height="3" fill="white"/>
+              <rect x="16" y="5" width="3" height="3" fill="white"/>
+              <rect x="5" y="16" width="3" height="3" fill="white"/>
+              <path d="M14 14h2v2h-2zM18 14h3v2h-3zM14 18h2v3h-2zM18 18h1v1h-1zM20 20h1v1h-1z" fill="white"/>
+            </svg>
+            <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Stempel-QR zeigen</span>
+          </button>
+        </div>
+      </div>
+
+      {/* QR Modal */}
+      {qrOpen && <QRModal onClose={() => setQrOpen(false)} />}
     </div>
   );
 }
