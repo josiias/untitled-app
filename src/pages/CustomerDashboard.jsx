@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -175,51 +175,59 @@ function StampCard({ card, compact = false }) {
   );
 }
 
-// ── Partner Carousel ──────────────────────────────────────────────────────────
+// ── Partner Auto-Ticker ───────────────────────────────────────────────────────
 function PartnerCarousel() {
+  const trackRef = useRef(null);
+  // Duplicate list for seamless loop
+  const items = [...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES];
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    let pos = 0;
+    const speed = 0.6; // px per frame
+    const cardW = 130 + 10; // minWidth + gap
+    const totalW = PARTNER_BUSINESSES.length * cardW;
+    let raf;
+    const tick = () => {
+      pos += speed;
+      if (pos >= totalW) pos = 0;
+      track.style.transform = `translateX(-${pos}px)`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase" }}>Partnerbetriebe</div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>← scrolle →</div>
-      </div>
-      <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8, scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch", msOverflowStyle: "none", scrollbarWidth: "none" }}>
-        {PARTNER_BUSINESSES.map(biz => (
-          <div key={biz.id} style={{
-            minWidth: 160, borderRadius: 18, overflow: "hidden", position: "relative",
-            height: 220, flexShrink: 0, scrollSnapAlign: "start", cursor: "pointer",
-            border: `1.5px solid ${biz.color}33`,
-            boxShadow: `0 4px 20px ${biz.color}1A`,
-          }}>
-            <img src={biz.img} alt={biz.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 20%, rgba(13,20,28,0.97) 100%)" }} />
-
-            {/* Badge */}
-            <div style={{ position: "absolute", top: 10, left: 10, background: biz.color, borderRadius: 7, padding: "3px 9px", fontSize: 9, fontWeight: 800, color: "#fff" }}>
-              {biz.type === "referral" ? "💸 Provision" : biz.type === "stamps" ? "🎁 Stempel" : "💸 & 🎁"}
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "12px 12px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
-                <span style={{ fontSize: 14 }}>{biz.emoji}</span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{biz.name}</span>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Partnerbetriebe</div>
+      <div style={{ overflow: "hidden", position: "relative" }}>
+        {/* Fade edges */}
+        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 24, background: "linear-gradient(to right, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 24, background: "linear-gradient(to left, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
+        <div ref={trackRef} style={{ display: "flex", gap: 10, willChange: "transform" }}>
+          {items.map((biz, idx) => (
+            <div key={idx} style={{
+              minWidth: 130, borderRadius: 16, overflow: "hidden", position: "relative",
+              height: 170, flexShrink: 0, cursor: "pointer",
+              border: `1px solid ${biz.color}44`,
+            }}>
+              <img src={biz.img} alt={biz.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 25%, rgba(13,20,28,0.96) 100%)" }} />
+              {/* Badge pill */}
+              <div style={{ position: "absolute", top: 8, left: 8, background: `${biz.color}DD`, backdropFilter: "blur(4px)", borderRadius: 100, padding: "2px 8px", fontSize: 8, fontWeight: 800, color: "#fff" }}>
+                {biz.type === "referral" ? "💸 Provision" : biz.type === "stamps" ? "🎁 Stempel" : "💸 & 🎁"}
               </div>
-              {biz.provision && (
-                <div style={{ fontSize: 10, color: "#63FFB4", fontWeight: 700, marginBottom: 3 }}>💸 {biz.provision}</div>
-              )}
-              {biz.reward && (
-                <div style={{ fontSize: 10, color: biz.color, fontWeight: 600 }}>🎁 {biz.reward}</div>
-              )}
-              <button style={{
-                marginTop: 8, width: "100%", background: biz.color, color: "#fff",
-                border: "none", borderRadius: 8, padding: "7px 0", fontSize: 10,
-                fontWeight: 800, cursor: "pointer", fontFamily: "inherit",
-              }}>
-                {biz.provision ? "Empfehlen & verdienen" : "Stempel sammeln"}
-              </button>
+              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "10px 10px" }}>
+                <div style={{ fontSize: 13, marginBottom: 2 }}>{biz.emoji}</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#fff", lineHeight: 1.2, marginBottom: 4 }}>{biz.name}</div>
+                {biz.provision && <div style={{ fontSize: 9, color: "#63FFB4", fontWeight: 700 }}>💸 {biz.provision}</div>}
+                {biz.reward && <div style={{ fontSize: 9, color: biz.color, fontWeight: 600 }}>🎁 {biz.reward}</div>}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -258,60 +266,102 @@ function ProvisionWidget() {
 }
 
 // ── Rangliste Coming Soon ─────────────────────────────────────────────────────
+const LEADERBOARD = [
+  { rank: 1, medal: "🥇", name: "Mehmet B.", pts: 842, prize: "100€", bar: 100, color: "#F59E0B" },
+  { rank: 2, medal: "🥈", name: "Sara K.",   pts: 791, prize: "50€",  bar: 94,  color: "#94A3B8" },
+  { rank: 3, medal: "🥉", name: "Jonas W.",  pts: 723, prize: "25€",  bar: 86,  color: "#CD7F32" },
+  { rank: 4, medal: "4",  name: "Fatima A.", pts: 658, prize: "10€",  bar: 78,  color: "#8B5CF6" },
+  { rank: 5, medal: "5",  name: "Du?",       pts: null, prize: "—",   bar: 0,   color: "#C084FC", isYou: true },
+];
+
 function RankingComingSoon() {
   return (
-    <div style={{
-      borderRadius: 20, overflow: "hidden", position: "relative",
-      background: "linear-gradient(135deg, #1a1035, #2d1a4a)",
-      border: "1.5px solid rgba(168,85,247,0.3)",
-      padding: "20px 18px",
-    }}>
-      <div style={{ position: "absolute", top: "-20%", right: "-5%", width: 140, height: 140, background: "radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 65%)", borderRadius: "50%", pointerEvents: "none" }} />
-
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-            <span style={{ fontSize: 22 }}>🏆</span>
-            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 18, fontWeight: 900, color: "#fff" }}>Rangliste</div>
-          </div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5, maxWidth: 220 }}>
-            Jeden Monat tritt die Community gegeneinander an — die Besten gewinnen echte Preise.
-          </div>
+    <div style={{ position: "relative" }}>
+      {/* Header row outside the card — diagonal shape */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 18 }}>🏆</span>
+          <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 900, color: "#fff" }}>Rangliste</span>
+          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>· jedes Halbjahr</span>
         </div>
-        <div style={{ background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: 10, padding: "5px 11px", fontSize: 10, fontWeight: 800, color: "#C084FC", flexShrink: 0, marginLeft: 10 }}>
+        <div style={{ background: "rgba(168,85,247,0.18)", border: "1px solid rgba(168,85,247,0.45)", borderRadius: 100, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "#C084FC", letterSpacing: 0.5 }}>
           COMING SOON
         </div>
       </div>
 
-      {/* Fake leaderboard preview */}
-      <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, overflow: "hidden", marginBottom: 14 }}>
-        {[
-          { rank: "🥇", name: "Mehmet B.", pts: "842 Pkt.", prize: "100€" },
-          { rank: "🥈", name: "Sara K.", pts: "791 Pkt.", prize: "50€" },
-          { rank: "🥉", name: "Du?", pts: "— Pkt.", prize: "25€", isYou: true },
-        ].map((entry, i) => (
+      {/* Leaderboard card — real list with lock overlay */}
+      <div style={{ borderRadius: 20, overflow: "hidden", position: "relative", background: "linear-gradient(160deg, #16102a, #1e1540)", border: "1px solid rgba(168,85,247,0.2)" }}>
+
+        {/* Top 3 podium bar */}
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, padding: "16px 16px 0", height: 80 }}>
+          {[LEADERBOARD[1], LEADERBOARD[0], LEADERBOARD[2]].map((e, i) => {
+            const heights = [56, 72, 46];
+            return (
+              <div key={e.rank} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                <div style={{ fontSize: i === 1 ? 16 : 12 }}>{e.medal}</div>
+                <div style={{ width: "100%", height: heights[i], borderRadius: "8px 8px 0 0", background: `linear-gradient(to top, ${e.color}55, ${e.color}22)`, border: `1px solid ${e.color}44`, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: 4 }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: e.color }}>{e.prize}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: "rgba(168,85,247,0.12)", margin: "0 16px" }} />
+
+        {/* List rows */}
+        {LEADERBOARD.map((entry, i) => (
           <div key={i} style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "10px 14px",
-            background: entry.isYou ? "rgba(168,85,247,0.1)" : "transparent",
-            borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.04)" : "none",
-            filter: entry.isYou ? "none" : "blur(0px)",
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "9px 16px",
+            background: entry.isYou ? "rgba(168,85,247,0.08)" : "transparent",
+            borderBottom: i < LEADERBOARD.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
           }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 16 }}>{entry.rank}</span>
-              <span style={{ fontSize: 12, fontWeight: entry.isYou ? 800 : 600, color: entry.isYou ? "#C084FC" : "#fff" }}>{entry.name}</span>
+            {/* Rank */}
+            <div style={{ width: 22, textAlign: "center", fontSize: entry.rank <= 3 ? 14 : 11, fontWeight: 700, color: entry.rank <= 3 ? entry.color : "rgba(255,255,255,0.3)" }}>
+              {entry.rank <= 3 ? entry.medal : entry.rank}
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{entry.pts}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#F59E0B" }}>{entry.prize}</span>
+            {/* Name + bar */}
+            <div style={{ flex: 1 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+                <span style={{ fontSize: 12, fontWeight: entry.isYou ? 800 : 600, color: entry.isYou ? "#C084FC" : "#fff" }}>
+                  {entry.name}
+                </span>
+                <span style={{ fontSize: 10, color: entry.pts ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.2)" }}>
+                  {entry.pts ? `${entry.pts} Pkt.` : "—"}
+                </span>
+              </div>
+              <div style={{ height: 3, borderRadius: 100, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${entry.bar}%`, background: `linear-gradient(90deg, ${entry.color}66, ${entry.color})`, borderRadius: 100 }} />
+              </div>
             </div>
+            {/* Prize */}
+            <div style={{ fontSize: 11, fontWeight: 700, color: entry.prize !== "—" ? "#F59E0B" : "rgba(255,255,255,0.2)", minWidth: 30, textAlign: "right" }}>{entry.prize}</div>
           </div>
         ))}
-      </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 12, padding: "10px 14px" }}>
-        <span style={{ fontSize: 14 }}>🔔</span>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", lineHeight: 1.4 }}>Wir benachrichtigen dich, wenn die Rangliste startet. <span style={{ color: "#C084FC", fontWeight: 700 }}>Jedes Halbjahr</span> neue Gewinne.</div>
+        {/* Lock overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "rgba(13,10,25,0.55)",
+          backdropFilter: "blur(3px)",
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          gap: 8,
+        }}>
+          {/* Lock icon — custom SVG shape */}
+          <div style={{ width: 48, height: 48, borderRadius: 16, background: "rgba(168,85,247,0.18)", border: "1.5px solid rgba(168,85,247,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="22" height="24" viewBox="0 0 22 24" fill="none">
+              <rect x="2" y="10" width="18" height="13" rx="4" fill="rgba(168,85,247,0.3)" stroke="#C084FC" strokeWidth="1.5"/>
+              <path d="M6 10V7a5 5 0 0 1 10 0v3" stroke="#C084FC" strokeWidth="1.5" strokeLinecap="round"/>
+              <circle cx="11" cy="16.5" r="2" fill="#C084FC"/>
+            </svg>
+          </div>
+          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 15, fontWeight: 900, color: "#fff" }}>Kommt bald</div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", textAlign: "center", maxWidth: 180, lineHeight: 1.5 }}>
+            Jedes Halbjahr gewinnen die Aktivsten echte Preise
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -558,7 +608,7 @@ export default function CustomerDashboard() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:wght@700;800;900&display=swap');
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 0; }
+        ::-webkit-scrollbar { width: 0; height: 0; }
       `}</style>
 
       {/* BG glow */}
