@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Business from './pages/Business';
 import ScanStamp from './pages/ScanStamp';
 import ScanLanding from './pages/ScanLanding';
+import AppLanding from './pages/AppLanding';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/Business" element={<Business />} />
         <Route path="/ScanStamp" element={<ScanStamp />} />
         <Route path="/scan/:businessId" element={<ScanLanding />} />
+        <Route path="/app" element={<AppLanding />} />
       </Routes>
     </BrowserRouter>
   )
