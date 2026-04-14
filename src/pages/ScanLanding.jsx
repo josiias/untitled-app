@@ -29,6 +29,7 @@ export default function ScanLanding() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [particles, setParticles] = useState([]);
+  const [imgIndex, setImgIndex] = useState(0);
 
   const business = MOCK_BUSINESS;
 
@@ -54,6 +55,17 @@ export default function ScanLanding() {
       return () => clearTimeout(t);
     }
   }, [step]);
+
+  // Slideshow: cycle through category images every 3s
+  const categoryImages = CATEGORY_IMAGES[business.category] ? [
+    CATEGORY_IMAGES[business.category],
+    ...Object.values(CATEGORY_IMAGES).filter(v => v !== CATEGORY_IMAGES[business.category]).slice(0, 2)
+  ] : Object.values(CATEGORY_IMAGES).slice(0, 3);
+
+  useEffect(() => {
+    const t = setInterval(() => setImgIndex(i => (i + 1) % categoryImages.length), 3000);
+    return () => clearInterval(t);
+  }, []);
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -123,6 +135,11 @@ export default function ScanLanding() {
           0%, 100% { transform: translateY(0); }
           50%       { transform: translateY(-8px); }
         }
+        @keyframes imgFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 0.5; }
+        }
+        .slide-img { animation: imgFadeIn 0.8s ease forwards; }
         @keyframes orb {
           0%, 100% { transform: translate(0, 0) scale(1); }
           33%       { transform: translate(30px, -20px) scale(1.1); }
@@ -191,102 +208,105 @@ export default function ScanLanding() {
       {step === "stamp-anim" && (
         <div style={{ textAlign: "center", maxWidth: 360, width: "100%", position: "relative", zIndex: 1 }}>
 
-          {/* Category background image strip */}
-          <div style={{
-            position: "relative",
-            width: "100%",
-            height: 120,
-            borderRadius: 20,
-            overflow: "hidden",
-            marginBottom: 24,
-          }}>
-            <img
-              src={CATEGORY_IMAGES[business.category] || CATEGORY_IMAGES.barbershop}
-              alt=""
-              style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.5 }}
-            />
-            {/* Dark overlay + business badge on top */}
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.6), rgba(10,22,18,0.2))" }} />
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 20px" }}>
+          {/* Slideshow banner */}
+          <div style={{ position: "relative", width: "100%", height: 110, borderRadius: 18, overflow: "hidden", marginBottom: 16 }}>
+            {categoryImages.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt=""
+                className={i === imgIndex ? "slide-img" : ""}
+                style={{
+                  position: "absolute", inset: 0, width: "100%", height: "100%",
+                  objectFit: "cover", opacity: i === imgIndex ? 0.5 : 0,
+                  transition: "opacity 0.8s ease",
+                }}
+              />
+            ))}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.65), rgba(10,22,18,0.25))" }} />
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 38, height: 38, background: "rgba(16,185,129,0.9)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{business.emoji}</div>
+                <div style={{ width: 36, height: 36, background: "rgba(16,185,129,0.9)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{business.emoji}</div>
                 <div style={{ textAlign: "left" }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{business.name}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}>Stempelkarte</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{business.name}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.6)" }}>Stempelkarte</div>
                 </div>
+              </div>
+              {/* Dot indicators */}
+              <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
+                {categoryImages.map((_, i) => (
+                  <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: i === imgIndex ? "#10B981" : "rgba(255,255,255,0.3)", transition: "background 0.4s" }} />
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Stamp animation circle */}
-          <div style={{ position: "relative", width: 160, height: 160, margin: "0 auto 32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div className="ring1" style={{ width: 120, height: 120 }} />
-            <div className="ring2" style={{ width: 120, height: 120 }} />
-            <div className="ring3" style={{ width: 120, height: 120 }} />
+          {/* Stamp animation circle — slightly smaller */}
+          <div style={{ position: "relative", width: 140, height: 140, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="ring1" style={{ width: 104, height: 104 }} />
+            <div className="ring2" style={{ width: 104, height: 104 }} />
+            <div className="ring3" style={{ width: 104, height: 104 }} />
             <div className="stamp-icon pulse-glow" style={{
-              width: 110, height: 110,
+              width: 96, height: 96,
               background: "linear-gradient(135deg, #63FFB4 0%, #10B981 100%)",
-              borderRadius: 28,
+              borderRadius: 24,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 52, color: "#fff",
-              fontWeight: 900,
+              fontSize: 44, color: "#fff", fontWeight: 900,
             }}>
               ✓
             </div>
           </div>
 
-          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 32, fontWeight: 800, color: "#fff", margin: "0 0 8px", lineHeight: 1.1 }}>
+          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 6px", lineHeight: 1.1 }}>
             Glückwunsch! 🎉
           </h1>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.6)", margin: "0 0 28px", lineHeight: 1.5 }}>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", margin: "0 0 16px", lineHeight: 1.5 }}>
             Du hast einen Stempel bei <strong style={{ color: "#63FFB4" }}>{business.name}</strong> erhalten!
           </p>
 
-          {/* Stamp card preview */}
-          <div className="float" style={{
+          {/* Stamp card preview — compact */}
+          <div style={{
             background: "linear-gradient(135deg, rgba(99,255,180,0.12), rgba(16,185,129,0.06))",
             border: "1.5px solid rgba(99,255,180,0.3)",
-            borderRadius: 20, padding: 20, marginBottom: 28,
+            borderRadius: 16, padding: 14, marginBottom: 16,
           }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Deine Stempelkarte</div>
-              <div style={{ fontSize: 11, color: "#63FFB4", fontWeight: 700 }}>{stampsCount}/{business.stamps_required}</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Deine Stempelkarte</div>
+              <div style={{ fontSize: 10, color: "#63FFB4", fontWeight: 700 }}>{stampsCount}/{business.stamps_required}</div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(business.stamps_required, 4)}, 1fr)`, gap: 7, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(business.stamps_required, 4)}, 1fr)`, gap: 5, marginBottom: 10 }}>
               {Array.from({ length: business.stamps_required }).map((_, i) => (
                 <div key={i} style={{
                   aspectRatio: "1/1",
-                  background: i < stampsCount
-                    ? "linear-gradient(135deg, #63FFB4, #10B981)"
-                    : "rgba(255,255,255,0.06)",
-                  borderRadius: 10,
+                  background: i < stampsCount ? "linear-gradient(135deg, #63FFB4, #10B981)" : "rgba(255,255,255,0.06)",
+                  borderRadius: 8,
                   border: i < stampsCount ? "none" : "1px solid rgba(255,255,255,0.1)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 16, color: "#fff",
-                  boxShadow: i === stampsCount - 1 ? "0 0 20px rgba(99,255,180,0.6)" : "none",
+                  fontSize: 13, color: "#fff",
+                  boxShadow: i === stampsCount - 1 ? "0 0 16px rgba(99,255,180,0.6)" : "none",
                 }}>
                   {i < stampsCount ? "✓" : ""}
                 </div>
               ))}
             </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-              <span style={{ fontSize: 16 }}>🎁</span>
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Prämie: <strong style={{ color: "#FFD700" }}>{business.reward_description}</strong></span>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+              <span style={{ fontSize: 13 }}>🎁</span>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Prämie: <strong style={{ color: "#FFD700" }}>{business.reward_description}</strong></span>
             </div>
           </div>
 
           {animDone && (
-            <div className="fade-up" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="fade-up" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <button
                 className="green-pulse-btn"
                 onClick={() => setStep("register-prompt")}
-                style={{ width: "100%", padding: "15px", fontWeight: 800, fontSize: 15, borderRadius: 14, border: "none", cursor: "pointer", fontFamily: "inherit", letterSpacing: 0.3 }}
+                style={{ width: "100%", padding: "14px", fontWeight: 800, fontSize: 15, borderRadius: 14, border: "none", cursor: "pointer", fontFamily: "inherit", letterSpacing: 0.3 }}
               >
                 ✅ Stempel sichern
               </button>
               <button
                 onClick={() => setStep("register-prompt")}
-                style={{ width: "100%", padding: "11px", background: "transparent", color: "rgba(255,255,255,0.35)", fontWeight: 500, fontSize: 12, borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer", fontFamily: "inherit" }}
+                style={{ width: "100%", padding: "10px", background: "transparent", color: "rgba(255,255,255,0.35)", fontWeight: 500, fontSize: 11, borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer", fontFamily: "inherit" }}
               >
                 ⚠️ Ohne Registrierung (Stempel geht verloren)
               </button>
