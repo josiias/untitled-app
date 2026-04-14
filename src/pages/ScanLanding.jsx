@@ -389,28 +389,15 @@ export default function ScanLanding() {
           ))}
 
           {/* Happy people banner — compact */}
-          <div style={{ position: "relative", width: "100%", height: 90, borderRadius: 16, overflow: "hidden", marginBottom: 12 }}>
-            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.7 }} />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,22,18,0.2) 0%, rgba(10,22,18,0.65) 100%)" }} />
-            <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, fontSize: 11, color: "rgba(255,255,255,0.85)", fontWeight: 600 }}>
-              ✨ Tausende glückliche Kunden nutzen Sensalie
-            </div>
-          </div>
-
-          {/* Header row — icon + title inline */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 4 }}>
-            <div style={{ fontSize: 28, animation: "bounce 1.2s ease-in-out infinite" }}>🎉</div>
-            <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 800, color: "#fff", margin: 0 }}>
-              Willkommen bei Sensalie!
-            </h2>
-          </div>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 12, lineHeight: 1.5 }}>
+          <div style={{ position: "relative", width: "100%", height: 90, borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
+...
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 20, lineHeight: 1.5 }}>
             Stempel bei <strong style={{ color: "#63FFB4" }}>{business.name}</strong> gesichert 🔒
           </p>
 
           {/* Optional name input */}
           {!name && (
-            <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "12px 14px", marginBottom: 12 }}>
+            <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "16px 18px", marginBottom: 20 }}>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>Wie heißt du? <span style={{ color: "rgba(255,255,255,0.25)" }}>(optional)</span></div>
               <div style={{ display: "flex", gap: 7 }}>
                 <input type="text" className="settings-input" placeholder="Dein Name" value={name} onChange={e => setName(e.target.value)} style={{ flex: 1, padding: "9px 12px", fontSize: 13 }} />
@@ -423,7 +410,7 @@ export default function ScanLanding() {
 
 
           {/* Referral — slim info banner only */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(37,211,102,0.08)", border: "1px solid rgba(37,211,102,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 12, textAlign: "left" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(37,211,102,0.08)", border: "1px solid rgba(37,211,102,0.2)", borderRadius: 12, padding: "14px 16px", marginBottom: 20, textAlign: "left" }}>
             <span style={{ fontSize: 20, flexShrink: 0 }}>💸</span>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.4 }}>
               Bei Sensalie kannst du dein Lieblingsunternehmen empfehlen und bis zu <strong style={{ color: "#25D366" }}>100€</strong> pro Empfehlung verdienen.
@@ -435,10 +422,10 @@ export default function ScanLanding() {
           </button>
 
           {/* Sensalie Branding Footer */}
-          <div style={{ marginTop: 20, textAlign: "center" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 5 }}>
-              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 8px rgba(16,185,129,0.8)" }} />
+          <div style={{ marginTop: 32, textAlign: "center" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 8 }}>
               <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 800, color: "#fff", letterSpacing: 0.3 }}>Sensalie</span>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 8px rgba(16,185,129,0.8)" }} />
             </div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", lineHeight: 1.5 }}>
               Deine digitale Kundenkarte — sicher, einfach &amp; überall dabei.
