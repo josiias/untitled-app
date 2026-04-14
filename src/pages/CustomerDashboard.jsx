@@ -103,10 +103,10 @@ const TABS = [
 // ── StampDots ─────────────────────────────────────────────────────────────────
 function StampDots({ stamps, required, color }) {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(22px, 1fr))", gap: 5 }}>
       {Array.from({ length: required }).map((_, i) => (
         <div key={i} style={{
-          width: 22, height: 22, borderRadius: 6,
+          width: "100%", aspectRatio: "1/1", borderRadius: 6,
           background: i < stamps ? color : "rgba(255,255,255,0.07)",
           border: i < stamps ? "none" : "1px solid rgba(255,255,255,0.1)",
           display: "flex", alignItems: "center", justifyContent: "center",

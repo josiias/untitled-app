@@ -383,12 +383,21 @@ export default function AppLanding() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "20px 20px", textAlign: "center", position: "relative", zIndex: 1 }}>
+      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "20px 20px 32px", textAlign: "center", position: "relative", zIndex: 1 }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
           <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 13, fontWeight: 900, color: "rgba(255,255,255,0.7)" }}>Sensalie</span>
           <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 5px rgba(16,185,129,0.9)" }} />
         </div>
-        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.18)" }}>© 2026 Sensalie · Datenschutz · Impressum</div>
+        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.18)", marginBottom: 14 }}>© 2026 Sensalie · Datenschutz · Impressum</div>
+        {/* Dev shortcuts */}
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+          <a href="/dashboard" style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "5px 12px" }}>
+            👤 Kunden-Dashboard
+          </a>
+          <a href="/Business" style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "5px 12px" }}>
+            🏪 Business-Dashboard
+          </a>
+        </div>
       </footer>
     </div>
   );
