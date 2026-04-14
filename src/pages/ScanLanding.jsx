@@ -134,6 +134,11 @@ export default function ScanLanding() {
           0%, 100% { transform: translateY(0); }
           50%       { transform: translateY(-8px); }
         }
+        @keyframes giftFloat {
+          0%, 100% { transform: translateY(0px) rotate(-4deg) scale(1); }
+          50%       { transform: translateY(-6px) rotate(4deg) scale(1.08); }
+        }
+        .gift-float { animation: giftFloat 2.2s ease-in-out infinite; display: inline-block; }
         @keyframes imgFadeIn {
           from { opacity: 0; }
           to   { opacity: 0.5; }
@@ -222,10 +227,13 @@ export default function ScanLanding() {
               />
             ))}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,22,18,0.3) 0%, rgba(10,22,18,0.65) 100%)" }} />
-            {/* Business name overlay — bottom left */}
-            <div style={{ position: "absolute", bottom: 12, left: 16 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{business.name}</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Stempelkarte aktiv</div>
+            {/* Business name overlay — bottom left with emoji */}
+            <div style={{ position: "absolute", bottom: 12, left: 16, display: "flex", alignItems: "center", gap: 7 }}>
+              <div style={{ width: 28, height: 28, background: "rgba(16,185,129,0.85)", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, backdropFilter: "blur(4px)" }}>{business.emoji}</div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{business.name}</div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Stempelkarte aktiv</div>
+              </div>
             </div>
             {/* Dot indicators bottom right */}
             <div style={{ position: "absolute", bottom: 14, right: 14, display: "flex", gap: 4 }}>
@@ -252,7 +260,7 @@ export default function ScanLanding() {
           </div>
 
           <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 800, color: "#fff", margin: "0 0 3px", lineHeight: 1.1 }}>
-            Glückwunsch!
+            Glückwunsch! 🎉
           </h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "0 0 10px", lineHeight: 1.5 }}>
             Du hast einen Stempel bei <strong style={{ color: "#63FFB4" }}>{business.name}</strong> erhalten!
@@ -284,10 +292,12 @@ export default function ScanLanding() {
                 </div>
               ))}
             </div>
-            {/* Reward — bigger, prominent */}
+            {/* Reward — bigger, prominent with floating gift emoji */}
             <div style={{ textAlign: "center", paddingTop: 6, borderTop: "1px solid rgba(99,255,180,0.15)" }}>
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginBottom: 2 }}>Prämie nach {business.stamps_required} Stempeln</div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#FFD700", letterSpacing: 0.3 }}>{business.reward_description}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#FFD700", letterSpacing: 0.3 }}>
+                <span className="gift-float">🎁</span> {business.reward_description}
+              </div>
             </div>
           </div>
 
