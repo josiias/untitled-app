@@ -16,9 +16,14 @@ const CATEGORY_IMAGES = {
   barbershop: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80",
   cafe: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80",
   restaurant: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
+  massage: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80",
+  nails: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80",
   fitness: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
   beauty: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80",
 };
+
+// All category images for the slideshow teaser
+const ALL_CATEGORY_IMAGES = Object.values(CATEGORY_IMAGES);
 
 export default function ScanLanding() {
   const { businessId } = useParams();
@@ -56,14 +61,9 @@ export default function ScanLanding() {
     }
   }, [step]);
 
-  // Slideshow: cycle through category images every 3s
-  const categoryImages = CATEGORY_IMAGES[business.category] ? [
-    CATEGORY_IMAGES[business.category],
-    ...Object.values(CATEGORY_IMAGES).filter(v => v !== CATEGORY_IMAGES[business.category]).slice(0, 2)
-  ] : Object.values(CATEGORY_IMAGES).slice(0, 3);
-
+  // Slideshow: cycle through ALL category images every 3s
   useEffect(() => {
-    const t = setInterval(() => setImgIndex(i => (i + 1) % categoryImages.length), 3000);
+    const t = setInterval(() => setImgIndex(i => (i + 1) % ALL_CATEGORY_IMAGES.length), 3000);
     return () => clearInterval(t);
   }, []);
 
@@ -205,106 +205,89 @@ export default function ScanLanding() {
 
       {/* ── STEP 1: Stamp Animation ── */}
       {step === "stamp-anim" && (
-        <div style={{ textAlign: "center", maxWidth: 360, width: "100%", position: "relative", zIndex: 1 }}>
+        <div style={{ textAlign: "center", maxWidth: 420, width: "100%", position: "relative", zIndex: 1, marginTop: -20 }}>
 
-          {/* Slideshow banner */}
-          <div style={{ position: "relative", width: "100%", height: 110, borderRadius: 18, overflow: "hidden", marginBottom: 14 }}>
-            {categoryImages.map((src, i) => (
+          {/* Slideshow banner — full width, no emojis */}
+          <div style={{ position: "relative", width: "100%", height: 120, borderRadius: 20, overflow: "hidden", marginBottom: 12 }}>
+            {ALL_CATEGORY_IMAGES.map((src, i) => (
               <img
                 key={src}
                 src={src}
                 alt=""
                 style={{
                   position: "absolute", inset: 0, width: "100%", height: "100%",
-                  objectFit: "cover", opacity: i === imgIndex ? 0.45 : 0,
-                  transition: "opacity 1.2s ease",
+                  objectFit: "cover", opacity: i === imgIndex ? 0.55 : 0,
+                  transition: "opacity 1.4s ease",
                 }}
               />
             ))}
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.8), rgba(10,22,18,0.3))" }} />
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px" }}>
-              {/* Left: current business */}
-              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                <div style={{ width: 34, height: 34, background: "rgba(16,185,129,0.9)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{business.emoji}</div>
-                <div style={{ textAlign: "left" }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{business.name}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.55)" }}>Stempelkarte aktiv</div>
-                </div>
-              </div>
-              {/* Right: other industries teaser */}
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase" }}>Auch verfügbar bei</div>
-                <div style={{ display: "flex", gap: 5 }}>
-                  {[
-                    { emoji: "☕", label: "Café" },
-                    { emoji: "🍽️", label: "Restaurant" },
-                    { emoji: "💅", label: "Nagel" },
-                    { emoji: "💆", label: "Massage" },
-                  ].map((b) => (
-                    <div key={b.label} title={b.label} style={{
-                      width: 26, height: 26, borderRadius: 7,
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 13,
-                    }}>{b.emoji}</div>
-                  ))}
-                </div>
-              </div>
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,22,18,0.3) 0%, rgba(10,22,18,0.65) 100%)" }} />
+            {/* Business name overlay — bottom left */}
+            <div style={{ position: "absolute", bottom: 12, left: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{business.name}</div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Stempelkarte aktiv</div>
+            </div>
+            {/* Dot indicators bottom right */}
+            <div style={{ position: "absolute", bottom: 14, right: 14, display: "flex", gap: 4 }}>
+              {ALL_CATEGORY_IMAGES.map((_, i) => (
+                <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: i === imgIndex ? "#10B981" : "rgba(255,255,255,0.3)", transition: "background 0.6s" }} />
+              ))}
             </div>
           </div>
 
           {/* Stamp animation circle */}
-          <div style={{ position: "relative", width: 118, height: 118, margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div className="ring1" style={{ width: 88, height: 88 }} />
-            <div className="ring2" style={{ width: 88, height: 88 }} />
-            <div className="ring3" style={{ width: 88, height: 88 }} />
+          <div style={{ position: "relative", width: 108, height: 108, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="ring1" style={{ width: 80, height: 80 }} />
+            <div className="ring2" style={{ width: 80, height: 80 }} />
+            <div className="ring3" style={{ width: 80, height: 80 }} />
             <div className="stamp-icon pulse-glow" style={{
-              width: 80, height: 80,
+              width: 72, height: 72,
               background: "linear-gradient(135deg, #63FFB4 0%, #10B981 100%)",
-              borderRadius: 20,
+              borderRadius: 18,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 36, color: "#fff", fontWeight: 900,
+              fontSize: 32, color: "#fff", fontWeight: 900,
             }}>
               ✓
             </div>
           </div>
 
-          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 4px", lineHeight: 1.1 }}>
-            Glückwunsch! 🎉
+          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 800, color: "#fff", margin: "0 0 3px", lineHeight: 1.1 }}>
+            Glückwunsch!
           </h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "0 0 12px", lineHeight: 1.5 }}>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "0 0 10px", lineHeight: 1.5 }}>
             Du hast einen Stempel bei <strong style={{ color: "#63FFB4" }}>{business.name}</strong> erhalten!
           </p>
 
-          {/* Stamp card preview — compact */}
+          {/* Stamp card preview */}
           <div style={{
             background: "linear-gradient(135deg, rgba(99,255,180,0.12), rgba(16,185,129,0.06))",
             border: "1.5px solid rgba(99,255,180,0.3)",
-            borderRadius: 16, padding: 14, marginBottom: 16,
+            borderRadius: 16, padding: "10px 12px", marginBottom: 14,
           }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Deine Stempelkarte</div>
               <div style={{ fontSize: 10, color: "#63FFB4", fontWeight: 700 }}>{stampsCount}/{business.stamps_required}</div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(business.stamps_required, 4)}, 1fr)`, gap: 5, marginBottom: 10 }}>
+            {/* Grid with max-width to make cells ~5% smaller */}
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(business.stamps_required, 4)}, 1fr)`, gap: 4, marginBottom: 10, maxWidth: "95%", margin: "0 auto 10px" }}>
               {Array.from({ length: business.stamps_required }).map((_, i) => (
                 <div key={i} style={{
                   aspectRatio: "1/1",
                   background: i < stampsCount ? "linear-gradient(135deg, #63FFB4, #10B981)" : "rgba(255,255,255,0.06)",
-                  borderRadius: 8,
+                  borderRadius: 7,
                   border: i < stampsCount ? "none" : "1px solid rgba(255,255,255,0.1)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 13, color: "#fff",
-                  boxShadow: i === stampsCount - 1 ? "0 0 16px rgba(99,255,180,0.6)" : "none",
+                  fontSize: 12, color: "#fff",
+                  boxShadow: i === stampsCount - 1 ? "0 0 14px rgba(99,255,180,0.6)" : "none",
                 }}>
                   {i < stampsCount ? "✓" : ""}
                 </div>
               ))}
             </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
-              <span style={{ fontSize: 13 }}>🎁</span>
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Prämie: <strong style={{ color: "#FFD700" }}>{business.reward_description}</strong></span>
+            {/* Reward — bigger, prominent */}
+            <div style={{ textAlign: "center", paddingTop: 6, borderTop: "1px solid rgba(99,255,180,0.15)" }}>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginBottom: 2 }}>Prämie nach {business.stamps_required} Stempeln</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#FFD700", letterSpacing: 0.3 }}>{business.reward_description}</div>
             </div>
           </div>
 
