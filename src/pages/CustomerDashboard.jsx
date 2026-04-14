@@ -51,6 +51,40 @@ const REFERRAL_STATS = {
   ],
 };
 
+// ── Partner Businesses (Werbetreibende) ──────────────────────────────────────
+const PARTNER_BUSINESSES = [
+  {
+    id: 1, name: "Kings Barbershop", emoji: "✂️", category: "Barbershop",
+    img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80",
+    reward: "10€ Gutschein", provision: "15€ pro Empfehlung", color: "#10B981", type: "both",
+  },
+  {
+    id: 2, name: "Café Milano", emoji: "☕", category: "Café",
+    img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80",
+    reward: "1 Kaffee gratis", provision: "8€ pro Empfehlung", color: "#F59E0B", type: "both",
+  },
+  {
+    id: 3, name: "Bella Nails", emoji: "💅", category: "Beauty",
+    img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80",
+    reward: "Maniküre gratis", provision: "12€ pro Empfehlung", color: "#EC4899", type: "both",
+  },
+  {
+    id: 4, name: "Massage Studio", emoji: "💆", category: "Wellness",
+    img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80",
+    reward: "1 Massage gratis", provision: null, color: "#8B5CF6", type: "stamps",
+  },
+  {
+    id: 5, name: "Flower Garden", emoji: "🌸", category: "Floristik",
+    img: "https://images.unsplash.com/photo-1487530811015-780b4baa2c76?w=800&q=80",
+    reward: null, provision: "20€ pro Empfehlung", color: "#F472B6", type: "referral",
+  },
+  {
+    id: 6, name: "Sushi Lounge", emoji: "🍱", category: "Restaurant",
+    img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80",
+    reward: "1 Rolle gratis", provision: "10€ pro Empfehlung", color: "#06B6D4", type: "both",
+  },
+];
+
 const ACTIVITY = [
   { icon: "✂️", text: "Stempel bei Kings Barbershop", time: "Heute, 14:32", type: "stamp" },
   { icon: "💅", text: "Stempel bei Bella Nails", time: "Gestern, 11:05", type: "stamp" },
@@ -141,6 +175,148 @@ function StampCard({ card, compact = false }) {
   );
 }
 
+// ── Partner Carousel ──────────────────────────────────────────────────────────
+function PartnerCarousel() {
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase" }}>Partnerbetriebe</div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>← scrolle →</div>
+      </div>
+      <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8, scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch", msOverflowStyle: "none", scrollbarWidth: "none" }}>
+        {PARTNER_BUSINESSES.map(biz => (
+          <div key={biz.id} style={{
+            minWidth: 160, borderRadius: 18, overflow: "hidden", position: "relative",
+            height: 220, flexShrink: 0, scrollSnapAlign: "start", cursor: "pointer",
+            border: `1.5px solid ${biz.color}33`,
+            boxShadow: `0 4px 20px ${biz.color}1A`,
+          }}>
+            <img src={biz.img} alt={biz.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 20%, rgba(13,20,28,0.97) 100%)" }} />
+
+            {/* Badge */}
+            <div style={{ position: "absolute", top: 10, left: 10, background: biz.color, borderRadius: 7, padding: "3px 9px", fontSize: 9, fontWeight: 800, color: "#fff" }}>
+              {biz.type === "referral" ? "💸 Provision" : biz.type === "stamps" ? "🎁 Stempel" : "💸 & 🎁"}
+            </div>
+
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "12px 12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
+                <span style={{ fontSize: 14 }}>{biz.emoji}</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{biz.name}</span>
+              </div>
+              {biz.provision && (
+                <div style={{ fontSize: 10, color: "#63FFB4", fontWeight: 700, marginBottom: 3 }}>💸 {biz.provision}</div>
+              )}
+              {biz.reward && (
+                <div style={{ fontSize: 10, color: biz.color, fontWeight: 600 }}>🎁 {biz.reward}</div>
+              )}
+              <button style={{
+                marginTop: 8, width: "100%", background: biz.color, color: "#fff",
+                border: "none", borderRadius: 8, padding: "7px 0", fontSize: 10,
+                fontWeight: 800, cursor: "pointer", fontFamily: "inherit",
+              }}>
+                {biz.provision ? "Empfehlen & verdienen" : "Stempel sammeln"}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Provision Widget ──────────────────────────────────────────────────────────
+function ProvisionWidget() {
+  return (
+    <div style={{
+      borderRadius: 20, overflow: "hidden", position: "relative",
+      background: "linear-gradient(135deg, #0d1f14, #0f2d1f)",
+      border: "1.5px solid rgba(16,185,129,0.25)",
+      padding: "18px 18px",
+    }}>
+      <div style={{ position: "absolute", top: "-30%", right: "-10%", width: 160, height: 160, background: "radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 65%)", borderRadius: "50%", pointerEvents: "none" }} />
+      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1, fontWeight: 700 }}>Deine Provision</div>
+      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+        <div style={{ flex: 1, background: "rgba(255,255,255,0.05)", borderRadius: 14, padding: "12px 14px" }}>
+          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 900, color: "#10B981" }}>{REFERRAL_STATS.earned.toFixed(2)}€</div>
+          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>Gesamt verdient</div>
+        </div>
+        <div style={{ flex: 1, background: "rgba(255,255,255,0.05)", borderRadius: 14, padding: "12px 14px" }}>
+          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 900, color: "#F59E0B" }}>{REFERRAL_STATS.pending.toFixed(2)}€</div>
+          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>Ausstehend</div>
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 12, padding: "10px 14px" }}>
+        <div>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginBottom: 2 }}>Dein Empfehlungscode</div>
+          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 18, fontWeight: 900, color: "#63FFB4", letterSpacing: 2 }}>{REFERRAL_STATS.code}</div>
+        </div>
+        <div style={{ fontSize: 10, color: "#10B981", fontWeight: 700 }}>{REFERRAL_STATS.count} Empfehlungen →</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Rangliste Coming Soon ─────────────────────────────────────────────────────
+function RankingComingSoon() {
+  return (
+    <div style={{
+      borderRadius: 20, overflow: "hidden", position: "relative",
+      background: "linear-gradient(135deg, #1a1035, #2d1a4a)",
+      border: "1.5px solid rgba(168,85,247,0.3)",
+      padding: "20px 18px",
+    }}>
+      <div style={{ position: "absolute", top: "-20%", right: "-5%", width: 140, height: 140, background: "radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 65%)", borderRadius: "50%", pointerEvents: "none" }} />
+
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <span style={{ fontSize: 22 }}>🏆</span>
+            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 18, fontWeight: 900, color: "#fff" }}>Rangliste</div>
+          </div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5, maxWidth: 220 }}>
+            Jeden Monat tritt die Community gegeneinander an — die Besten gewinnen echte Preise.
+          </div>
+        </div>
+        <div style={{ background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: 10, padding: "5px 11px", fontSize: 10, fontWeight: 800, color: "#C084FC", flexShrink: 0, marginLeft: 10 }}>
+          COMING SOON
+        </div>
+      </div>
+
+      {/* Fake leaderboard preview */}
+      <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, overflow: "hidden", marginBottom: 14 }}>
+        {[
+          { rank: "🥇", name: "Mehmet B.", pts: "842 Pkt.", prize: "100€" },
+          { rank: "🥈", name: "Sara K.", pts: "791 Pkt.", prize: "50€" },
+          { rank: "🥉", name: "Du?", pts: "— Pkt.", prize: "25€", isYou: true },
+        ].map((entry, i) => (
+          <div key={i} style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "10px 14px",
+            background: entry.isYou ? "rgba(168,85,247,0.1)" : "transparent",
+            borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.04)" : "none",
+            filter: entry.isYou ? "none" : "blur(0px)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 16 }}>{entry.rank}</span>
+              <span style={{ fontSize: 12, fontWeight: entry.isYou ? 800 : 600, color: entry.isYou ? "#C084FC" : "#fff" }}>{entry.name}</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{entry.pts}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#F59E0B" }}>{entry.prize}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 12, padding: "10px 14px" }}>
+        <span style={{ fontSize: 14 }}>🔔</span>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", lineHeight: 1.4 }}>Wir benachrichtigen dich, wenn die Rangliste startet. <span style={{ color: "#C084FC", fontWeight: 700 }}>Jedes Halbjahr</span> neue Gewinne.</div>
+      </div>
+    </div>
+  );
+}
+
 // ── Home Tab ──────────────────────────────────────────────────────────────────
 function HomeTab({ onTabChange }) {
   return (
@@ -170,6 +346,15 @@ function HomeTab({ onTabChange }) {
           </div>
         </div>
       </div>
+
+      {/* Partner Businesses Carousel */}
+      <PartnerCarousel />
+
+      {/* Provision Widget */}
+      <ProvisionWidget />
+
+      {/* Rangliste Coming Soon */}
+      <RankingComingSoon />
 
       {/* Almost done card */}
       {STAMP_CARDS.filter(c => c.stamps >= c.required - 1).length > 0 && (
