@@ -435,7 +435,7 @@ export default function ScanLanding() {
           </button>
 
           {/* Sensalie Branding Footer */}
-          <div style={{ marginTop: 32, textAlign: "center" }}>
+          <div style={{ marginTop: 64, textAlign: "center" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 8 }}>
               <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 800, color: "#fff", letterSpacing: 0.3 }}>Sensalie</span>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 8px rgba(16,185,129,0.8)" }} />
