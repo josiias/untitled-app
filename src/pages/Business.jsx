@@ -250,7 +250,10 @@ export default function Business() {
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Business Dashboard</div>
             </div>
           </div>
-          <a href="/" style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textDecoration: "none", fontWeight: 500 }}>← Zurück</a>
+          <div style={{ display: "flex", gap: 12 }}>
+            <a href="/dashboard" style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textDecoration: "none", fontWeight: 500 }}>👤 Kunden-Dashboard</a>
+            <a href="/" style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textDecoration: "none", fontWeight: 500 }}>← Zurück</a>
+          </div>
         </div>
       </div>
 
