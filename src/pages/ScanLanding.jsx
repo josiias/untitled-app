@@ -390,7 +390,20 @@ export default function ScanLanding() {
 
           {/* Happy people banner — compact */}
           <div style={{ position: "relative", width: "100%", height: 90, borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
-...
+            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.7 }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,22,18,0.2) 0%, rgba(10,22,18,0.65) 100%)" }} />
+            <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, fontSize: 11, color: "rgba(255,255,255,0.85)", fontWeight: 600 }}>
+              ✨ Tausende glückliche Kunden nutzen Sensalie
+            </div>
+          </div>
+
+          {/* Header row — icon + title inline */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 4 }}>
+            <div style={{ fontSize: 28, animation: "bounce 1.2s ease-in-out infinite" }}>🎉</div>
+            <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 800, color: "#fff", margin: 0 }}>
+              Willkommen bei Sensalie!
+            </h2>
+          </div>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 20, lineHeight: 1.5 }}>
             Stempel bei <strong style={{ color: "#63FFB4" }}>{business.name}</strong> gesichert 🔒
           </p>
