@@ -30,8 +30,8 @@ export default function ScanLanding() {
   const [step, setStep] = useState("stamp-anim");
   const [stampsCount] = useState(1);
   const [animDone, setAnimDone] = useState(false);
+  const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [particles, setParticles] = useState([]);
   const [imgIndex, setImgIndex] = useState(0);
@@ -72,6 +72,8 @@ export default function ScanLanding() {
     setSubmitted(true);
     setTimeout(() => setStep("registered"), 600);
   };
+
+  const refCode = phone.replace(/\s+/g, "").slice(-6) || "user";
 
   return (
     <div style={{
@@ -324,19 +326,20 @@ export default function ScanLanding() {
       {/* ── STEP 2: Register Prompt ── */}
       {step === "register-prompt" && (
         <div className="fade-up card-bg" style={{ maxWidth: 360, width: "100%", borderRadius: 24, padding: 28, position: "relative", zIndex: 1 }}>
-          <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 40, marginBottom: 12, animation: "bounce 1.5s ease-in-out infinite" }}>📲</div>
-            <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 8px" }}>Stempel sichern</h2>
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <div style={{ fontSize: 40, marginBottom: 10, animation: "bounce 1.5s ease-in-out infinite" }}>📲</div>
+            <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 6px" }}>Stempel sichern</h2>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: 0, lineHeight: 1.6 }}>
-              Registriere dich kurz und dein Stempel bei <strong style={{ color: "#63FFB4" }}>{business.name}</strong> ist für immer gespeichert.
+              Nur deine Handynummer – fertig.<br/>
+              Dein Stempel bei <strong style={{ color: "#63FFB4" }}>{business.name}</strong> ist für immer gespeichert.
             </p>
           </div>
 
-          <div style={{ background: "rgba(99,255,180,0.06)", border: "1px solid rgba(99,255,180,0.15)", borderRadius: 14, padding: 16, marginBottom: 22 }}>
+          <div style={{ background: "rgba(99,255,180,0.06)", border: "1px solid rgba(99,255,180,0.15)", borderRadius: 14, padding: 14, marginBottom: 20 }}>
             {[
               { icon: "🎯", text: "Stempel gehen nie verloren" },
               { icon: "🎁", text: `Prämie nach ${business.stamps_required} Stempeln: ${business.reward_description}` },
-              { icon: "📣", text: "Freunde einladen & Geld verdienen" },
+              { icon: "💸", text: "Empfehle weiter & verdiene bis zu 100€" },
             ].map((b, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 2 ? 10 : 0 }}>
                 <span style={{ fontSize: 18, flexShrink: 0 }}>{b.icon}</span>
@@ -346,8 +349,16 @@ export default function ScanLanding() {
           </div>
 
           <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <input type="text" className="settings-input" placeholder="Dein Name" value={name} onChange={e => setName(e.target.value)} required autoFocus />
-            <input type="email" className="settings-input" placeholder="E-Mail Adresse" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input
+              type="tel"
+              inputMode="numeric"
+              className="settings-input"
+              placeholder="📱 Deine Handynummer"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              required
+              autoFocus
+            />
             <button
               type="submit"
               disabled={submitted}
@@ -365,47 +376,89 @@ export default function ScanLanding() {
 
       {/* ── STEP 3: Registered ── */}
       {step === "registered" && (
-        <div className="fade-up" style={{ maxWidth: 360, width: "100%", textAlign: "center", position: "relative", zIndex: 1 }}>
-          {/* Confetti again */}
+        <div className="fade-up" style={{ maxWidth: 380, width: "100%", textAlign: "center", position: "relative", zIndex: 1 }}>
+          {/* Confetti */}
           {particles.slice(0, 25).map(p => (
             <div key={p.id} style={{
-              position: "fixed",
-              left: `${p.x}%`,
-              top: "-20px",
-              width: p.size,
-              height: p.size,
-              background: p.color,
+              position: "fixed", left: `${p.x}%`, top: "-20px",
+              width: p.size, height: p.size, background: p.color,
               borderRadius: p.shape === "circle" ? "50%" : "2px",
               animation: `confettiFall ${p.duration}s ease-in ${p.delay * 0.3}s forwards`,
-              pointerEvents: "none",
-              zIndex: 100,
+              pointerEvents: "none", zIndex: 100,
             }} />
           ))}
 
-          <div style={{ width: 90, height: 90, background: "linear-gradient(135deg, #FFD700, #FF6B6B)", borderRadius: 24, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 44, animation: "bounce 1.2s ease-in-out infinite", boxShadow: "0 0 40px rgba(255,215,0,0.4)" }}>
+          {/* Happy people image banner */}
+          <div style={{ position: "relative", width: "100%", height: 140, borderRadius: 20, overflow: "hidden", marginBottom: 20 }}>
+            <img
+              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80"
+              alt="Glückliche Menschen"
+              style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.75 }}
+            />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,22,18,0.1) 0%, rgba(10,22,18,0.7) 100%)" }} />
+            <div style={{ position: "absolute", bottom: 14, left: 0, right: 0, textAlign: "center" }}>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", fontWeight: 600 }}>
+                ✨ Tausende glückliche Kunden nutzen Sensalie
+              </div>
+            </div>
+          </div>
+
+          <div style={{ width: 70, height: 70, background: "linear-gradient(135deg, #FFD700, #FF6B6B)", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px", fontSize: 36, animation: "bounce 1.2s ease-in-out infinite", boxShadow: "0 0 40px rgba(255,215,0,0.4)" }}>
             🎉
           </div>
-          <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 8px" }}>
-            Willkommen, {name}!
+
+          <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 26, fontWeight: 800, color: "#fff", margin: "0 0 6px" }}>
+            Willkommen bei Sensalie!
           </h2>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", marginBottom: 28, lineHeight: 1.6 }}>
-            Dein Stempel ist gesichert 🔒<br/>
-            Bestätigung geht an <strong style={{ color: "#63FFB4" }}>{email}</strong>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", marginBottom: 18, lineHeight: 1.6 }}>
+            Dein Stempel bei <strong style={{ color: "#63FFB4" }}>{business.name}</strong> ist gesichert 🔒
           </p>
 
+          {/* Optional name input */}
+          {!name ? (
+            <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 16, marginBottom: 16, textAlign: "left" }}>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 10, textAlign: "center" }}>
+                Wie sollen wir dich nennen? <span style={{ color: "rgba(255,255,255,0.3)" }}>(optional)</span>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Dein Name"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  style={{ flex: 1, padding: "10px 14px", fontSize: 14 }}
+                />
+                <button
+                  onClick={() => {}}
+                  style={{ padding: "10px 16px", background: "#10B981", color: "#fff", fontWeight: 700, fontSize: 13, borderRadius: 10, border: "none", cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit" }}
+                >
+                  ✓ OK
+                </button>
+              </div>
+              <button
+                onClick={() => setName("Gast")}
+                style={{ width: "100%", marginTop: 8, padding: "7px", background: "transparent", color: "rgba(255,255,255,0.25)", fontSize: 11, border: "none", cursor: "pointer", fontFamily: "inherit" }}
+              >
+                Später eintragen
+              </button>
+            </div>
+          ) : (
+            <div style={{ fontSize: 15, color: "#63FFB4", fontWeight: 700, marginBottom: 16 }}>Hey {name}! 👋</div>
+          )}
+
           {/* Stamp card */}
-          <div className="float" style={{ background: "linear-gradient(135deg, rgba(99,255,180,0.12), rgba(16,185,129,0.05))", border: "1.5px solid rgba(99,255,180,0.3)", borderRadius: 20, padding: 20, marginBottom: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <div className="float" style={{ background: "linear-gradient(135deg, rgba(99,255,180,0.12), rgba(16,185,129,0.05))", border: "1.5px solid rgba(99,255,180,0.3)", borderRadius: 20, padding: 18, marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Stempelkarte · {business.name}</div>
               <div style={{ fontSize: 11, color: "#63FFB4", fontWeight: 700 }}>{stampsCount}/{business.stamps_required}</div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(business.stamps_required, 4)}, 1fr)`, gap: 7, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(business.stamps_required, 4)}, 1fr)`, gap: 7, marginBottom: 12 }}>
               {Array.from({ length: business.stamps_required }).map((_, i) => (
                 <div key={i} style={{
                   aspectRatio: "1/1",
                   background: i < stampsCount ? "linear-gradient(135deg, #63FFB4, #10B981)" : "rgba(255,255,255,0.06)",
-                  borderRadius: 10,
-                  border: i < stampsCount ? "none" : "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 10, border: i < stampsCount ? "none" : "1px solid rgba(255,255,255,0.1)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 16, color: "#fff",
                   boxShadow: i < stampsCount ? "0 0 12px rgba(99,255,180,0.5)" : "none",
@@ -419,13 +472,36 @@ export default function ScanLanding() {
             </div>
           </div>
 
-          {/* Referral */}
-          <div style={{ background: "rgba(255,215,0,0.07)", border: "1px solid rgba(255,215,0,0.2)", borderRadius: 14, padding: 16, marginBottom: 20 }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>💰 Dein Empfehlungslink</div>
-            <div style={{ fontSize: 12, color: "#FFD700", fontWeight: 700, fontFamily: "monospace", marginBottom: 6 }}>
-              sensalie.app/ref/{name.toLowerCase().replace(/\s+/g, "")}
+          {/* Referral — redesigned, WhatsApp focus */}
+          <div style={{ background: "linear-gradient(135deg, rgba(37,211,102,0.12), rgba(37,211,102,0.05))", border: "1.5px solid rgba(37,211,102,0.3)", borderRadius: 18, padding: 18, marginBottom: 16, textAlign: "left" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+              <div style={{ fontSize: 28 }}>💸</div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>Empfiehl dein Lieblingsunternehmen</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>& verdiene bis zu <strong style={{ color: "#25D366" }}>100€</strong> pro Empfehlung</div>
+              </div>
             </div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Teile ihn & kassiere Provision für jede Empfehlung</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 14, lineHeight: 1.5 }}>
+              Schick einfach deinen Link an Freunde per WhatsApp – wenn sie Kunde werden, bekommst du automatisch Provision.
+            </div>
+            {/* WhatsApp share button */}
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(`Hey! 😊 Ich sammle Stempel bei ${business.name} mit Sensalie und finde es super. Hol dir jetzt deinen ersten Stempel kostenlos: sensalie.app/ref/${refCode}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                background: "#25D366", color: "#fff", fontWeight: 800, fontSize: 14,
+                padding: "13px 20px", borderRadius: 12, textDecoration: "none",
+                boxShadow: "0 4px 20px rgba(37,211,102,0.35)",
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Per WhatsApp teilen
+            </a>
+            <div style={{ textAlign: "center", marginTop: 8, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
+              sensalie.app/ref/{refCode}
+            </div>
           </div>
 
           <button onClick={() => window.location.href = "/"} style={{ width: "100%", padding: "12px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)", fontWeight: 600, fontSize: 13, borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", fontFamily: "inherit" }}>
