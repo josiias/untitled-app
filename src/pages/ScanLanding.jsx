@@ -8,6 +8,16 @@ const MOCK_BUSINESS = {
   min_purchase_amount: 20,
   reward_description: "10€ Gutschein",
   emoji: "✂️",
+  category: "barbershop", // barbershop | cafe | restaurant | fitness | beauty
+};
+
+// Unsplash background images per business category
+const CATEGORY_IMAGES = {
+  barbershop: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80",
+  cafe: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80",
+  restaurant: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
+  fitness: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
+  beauty: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80",
 };
 
 export default function ScanLanding() {
@@ -91,9 +101,9 @@ export default function ScanLanding() {
           0%, 100% { box-shadow: 0 0 30px rgba(99,255,180,0.4), 0 0 60px rgba(99,255,180,0.15); }
           50%       { box-shadow: 0 0 60px rgba(99,255,180,0.7), 0 0 100px rgba(99,255,180,0.3); }
         }
-        @keyframes shimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position: 200% center; }
+        @keyframes greenPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5), 0 4px 20px rgba(16,185,129,0.3); }
+          50%       { box-shadow: 0 0 0 10px rgba(16,185,129,0), 0 4px 30px rgba(16,185,129,0.5); }
         }
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(-3deg); }
@@ -126,12 +136,12 @@ export default function ScanLanding() {
         .fade-up { animation: fadeUp 0.5s ease forwards; }
         .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
         .float { animation: float 3s ease-in-out infinite; }
-        .shimmer-btn {
-          background: linear-gradient(90deg, #63FFB4 0%, #FFD700 30%, #FF6B9D 60%, #63FFB4 100%);
-          background-size: 300% auto;
-          animation: shimmer 3s linear infinite;
-          color: #0d1f3c !important;
+        .green-pulse-btn {
+          background: #10B981;
+          animation: greenPulse 2s ease-in-out infinite;
+          color: #fff;
         }
+        .green-pulse-btn:hover { background: #059669; }
         .settings-input {
           width: 100%;
           border: 1.5px solid rgba(255,255,255,0.12);
@@ -180,12 +190,31 @@ export default function ScanLanding() {
       {/* ── STEP 1: Stamp Animation ── */}
       {step === "stamp-anim" && (
         <div style={{ textAlign: "center", maxWidth: 360, width: "100%", position: "relative", zIndex: 1 }}>
-          {/* Business badge */}
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 100, padding: "8px 16px 8px 10px", marginBottom: 36 }}>
-            <div style={{ width: 32, height: 32, background: "linear-gradient(135deg, #63FFB4, #10B981)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>{business.emoji}</div>
-            <div style={{ textAlign: "left" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{business.name}</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>Stempelkarte</div>
+
+          {/* Category background image strip */}
+          <div style={{
+            position: "relative",
+            width: "100%",
+            height: 120,
+            borderRadius: 20,
+            overflow: "hidden",
+            marginBottom: 24,
+          }}>
+            <img
+              src={CATEGORY_IMAGES[business.category] || CATEGORY_IMAGES.barbershop}
+              alt=""
+              style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.5 }}
+            />
+            {/* Dark overlay + business badge on top */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.6), rgba(10,22,18,0.2))" }} />
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 38, height: 38, background: "rgba(16,185,129,0.9)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{business.emoji}</div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{business.name}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}>Stempelkarte</div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -249,11 +278,11 @@ export default function ScanLanding() {
           {animDone && (
             <div className="fade-up" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <button
-                className="shimmer-btn"
+                className="green-pulse-btn"
                 onClick={() => setStep("register-prompt")}
                 style={{ width: "100%", padding: "15px", fontWeight: 800, fontSize: 15, borderRadius: 14, border: "none", cursor: "pointer", fontFamily: "inherit", letterSpacing: 0.3 }}
               >
-                ✨ Stempel sichern & Konto erstellen
+                ✅ Stempel sichern
               </button>
               <button
                 onClick={() => setStep("register-prompt")}
@@ -296,7 +325,7 @@ export default function ScanLanding() {
             <button
               type="submit"
               disabled={submitted}
-              className="shimmer-btn"
+              className="green-pulse-btn"
               style={{ padding: "15px", fontWeight: 800, fontSize: 15, borderRadius: 14, border: "none", cursor: submitted ? "not-allowed" : "pointer", fontFamily: "inherit", marginTop: 4, opacity: submitted ? 0.7 : 1 }}
             >
               {submitted ? "Wird gespeichert…" : "Stempel jetzt sichern →"}
