@@ -91,15 +91,14 @@ export default function ScanLanding() {
         * { box-sizing: border-box; }
 
         @keyframes stampDrop {
-          0%   { transform: scale(4) rotate(-30deg); opacity: 0; filter: blur(8px); }
-          50%  { filter: blur(0px); }
-          65%  { transform: scale(0.85) rotate(5deg); opacity: 1; }
-          80%  { transform: scale(1.1) rotate(-3deg); }
+          0%   { transform: scale(1.6) rotate(-8deg); opacity: 0; filter: blur(4px); }
+          60%  { filter: blur(0px); transform: scale(0.95) rotate(2deg); opacity: 1; }
+          80%  { transform: scale(1.03) rotate(-1deg); }
           100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
         @keyframes ringPulse {
-          0%   { transform: scale(0.6); opacity: 1; }
-          100% { transform: scale(2.8); opacity: 0; }
+          0%   { transform: scale(0.7); opacity: 0.8; }
+          100% { transform: scale(2.2); opacity: 0; }
         }
         @keyframes confettiFall {
           0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
@@ -146,10 +145,10 @@ export default function ScanLanding() {
           66%       { transform: translate(-20px, 15px) scale(0.9); }
         }
 
-        .stamp-icon { animation: stampDrop 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-        .ring1 { position: absolute; border-radius: 50%; border: 3px solid rgba(99,255,180,0.7); animation: ringPulse 1s ease-out 0.3s forwards; pointer-events: none; }
-        .ring2 { position: absolute; border-radius: 50%; border: 2px solid rgba(99,255,180,0.4); animation: ringPulse 1.3s ease-out 0.6s forwards; pointer-events: none; }
-        .ring3 { position: absolute; border-radius: 50%; border: 1.5px solid rgba(255,215,0,0.3); animation: ringPulse 1.6s ease-out 0.9s forwards; pointer-events: none; }
+        .stamp-icon { animation: stampDrop 1.1s cubic-bezier(0.25,0.8,0.25,1) forwards; }
+        .ring1 { position: absolute; border-radius: 50%; border: 2px solid rgba(99,255,180,0.5); animation: ringPulse 1.4s ease-out 0.5s forwards; pointer-events: none; }
+        .ring2 { position: absolute; border-radius: 50%; border: 1.5px solid rgba(99,255,180,0.3); animation: ringPulse 1.8s ease-out 0.9s forwards; pointer-events: none; }
+        .ring3 { position: absolute; border-radius: 50%; border: 1px solid rgba(255,215,0,0.2); animation: ringPulse 2.2s ease-out 1.2s forwards; pointer-events: none; }
         .fade-up { animation: fadeUp 0.5s ease forwards; }
         .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
         .float { animation: float 3s ease-in-out infinite; }
@@ -209,58 +208,72 @@ export default function ScanLanding() {
         <div style={{ textAlign: "center", maxWidth: 360, width: "100%", position: "relative", zIndex: 1 }}>
 
           {/* Slideshow banner */}
-          <div style={{ position: "relative", width: "100%", height: 110, borderRadius: 18, overflow: "hidden", marginBottom: 16 }}>
+          <div style={{ position: "relative", width: "100%", height: 110, borderRadius: 18, overflow: "hidden", marginBottom: 14 }}>
             {categoryImages.map((src, i) => (
               <img
                 key={src}
                 src={src}
                 alt=""
-                className={i === imgIndex ? "slide-img" : ""}
                 style={{
                   position: "absolute", inset: 0, width: "100%", height: "100%",
-                  objectFit: "cover", opacity: i === imgIndex ? 0.5 : 0,
-                  transition: "opacity 0.8s ease",
+                  objectFit: "cover", opacity: i === imgIndex ? 0.45 : 0,
+                  transition: "opacity 1.2s ease",
                 }}
               />
             ))}
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.65), rgba(10,22,18,0.25))" }} />
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 18px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 36, height: 36, background: "rgba(16,185,129,0.9)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{business.emoji}</div>
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.8), rgba(10,22,18,0.3))" }} />
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px" }}>
+              {/* Left: current business */}
+              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                <div style={{ width: 34, height: 34, background: "rgba(16,185,129,0.9)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{business.emoji}</div>
                 <div style={{ textAlign: "left" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{business.name}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.6)" }}>Stempelkarte</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{business.name}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.55)" }}>Stempelkarte aktiv</div>
                 </div>
               </div>
-              {/* Dot indicators */}
-              <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
-                {categoryImages.map((_, i) => (
-                  <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: i === imgIndex ? "#10B981" : "rgba(255,255,255,0.3)", transition: "background 0.4s" }} />
-                ))}
+              {/* Right: other industries teaser */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase" }}>Auch verfügbar bei</div>
+                <div style={{ display: "flex", gap: 5 }}>
+                  {[
+                    { emoji: "☕", label: "Café" },
+                    { emoji: "🍽️", label: "Restaurant" },
+                    { emoji: "💅", label: "Nagel" },
+                    { emoji: "💆", label: "Massage" },
+                  ].map((b) => (
+                    <div key={b.label} title={b.label} style={{
+                      width: 26, height: 26, borderRadius: 7,
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 13,
+                    }}>{b.emoji}</div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Stamp animation circle — slightly smaller */}
-          <div style={{ position: "relative", width: 140, height: 140, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div className="ring1" style={{ width: 104, height: 104 }} />
-            <div className="ring2" style={{ width: 104, height: 104 }} />
-            <div className="ring3" style={{ width: 104, height: 104 }} />
+          {/* Stamp animation circle */}
+          <div style={{ position: "relative", width: 118, height: 118, margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="ring1" style={{ width: 88, height: 88 }} />
+            <div className="ring2" style={{ width: 88, height: 88 }} />
+            <div className="ring3" style={{ width: 88, height: 88 }} />
             <div className="stamp-icon pulse-glow" style={{
-              width: 96, height: 96,
+              width: 80, height: 80,
               background: "linear-gradient(135deg, #63FFB4 0%, #10B981 100%)",
-              borderRadius: 24,
+              borderRadius: 20,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 44, color: "#fff", fontWeight: 900,
+              fontSize: 36, color: "#fff", fontWeight: 900,
             }}>
               ✓
             </div>
           </div>
 
-          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 6px", lineHeight: 1.1 }}>
+          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 4px", lineHeight: 1.1 }}>
             Glückwunsch! 🎉
           </h1>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", margin: "0 0 16px", lineHeight: 1.5 }}>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "0 0 12px", lineHeight: 1.5 }}>
             Du hast einen Stempel bei <strong style={{ color: "#63FFB4" }}>{business.name}</strong> erhalten!
           </p>
 
