@@ -45,7 +45,7 @@ export default function AppLanding() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#07111B", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "#111e28", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:wght@700;800;900&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -72,11 +72,8 @@ export default function AppLanding() {
         }
 
         .shimmer-text {
-          background: linear-gradient(90deg, #63FFB4 0%, #fff 45%, #FFD700 70%, #63FFB4 100%);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: shimmer 3.5s linear infinite;
+          color: #ffffff;
+          opacity: 0.95;
         }
 
         .cta-btn {
@@ -139,10 +136,9 @@ export default function AppLanding() {
       {/* ── NAVBAR ── */}
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,17,27,0.88)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 20px" }}>
         <div style={{ maxWidth: 600, margin: "0 auto", height: 52, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <div style={{ width: 26, height: 26, background: "linear-gradient(135deg, #10B981, #059669)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900 }}>S</div>
-            <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 900 }}>Sensalie</span>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 6px rgba(16,185,129,0.9)", marginLeft: 1, animation: "pulse-dot 2s infinite" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 900, color: "#fff" }}>Sensalie</span>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 6px rgba(16,185,129,0.9)", animation: "pulse-dot 2s infinite" }} />
           </div>
           <a href="#register" style={{ textDecoration: "none" }}>
             <button className="cta-btn" style={{ fontSize: 12, padding: "8px 16px", borderRadius: 9 }}>Kostenlos starten →</button>
@@ -153,7 +149,7 @@ export default function AppLanding() {
       {/* ── HERO ── */}
       <section style={{ position: "relative", zIndex: 1, maxWidth: 600, margin: "0 auto", padding: "48px 20px 32px" }}>
         {/* Hero image */}
-        <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", marginBottom: 28, height: 240 }}>
+        <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", marginBottom: 28, height: 190 }}>
           <img
             src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80"
             alt="Happy customers"
@@ -174,7 +170,7 @@ export default function AppLanding() {
         </div>
 
         {/* Headline */}
-        <h1 className="shimmer-text" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: "clamp(30px, 8vw, 46px)", fontWeight: 900, lineHeight: 1.1, marginBottom: 12, textAlign: "center" }}>
+        <h1 className="shimmer-text" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: "clamp(24px, 6vw, 36px)", fontWeight: 900, lineHeight: 1.15, marginBottom: 12, textAlign: "center" }}>
           Stempel sammeln.<br />Prämien kassieren.<br />Geld verdienen.
         </h1>
 
