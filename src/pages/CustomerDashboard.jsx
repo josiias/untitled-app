@@ -516,10 +516,10 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Willkommen zurück 👋</div>
           <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 900, color: "#fff", marginBottom: 10 }}>{USER.name.split(" ")[0]}</div>
           <div style={{ display: "flex", gap: 12 }}>
-            <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "#10B981" }}>{STAMP_CARDS.reduce((a, c) => a + c.stamps, 0)}</div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Stempel gesamt</div>
-            </div>
+          <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#10B981" }}>34€</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Gespart</div>
+          </div>
             <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
               <div style={{ fontSize: 18, fontWeight: 900, color: "#F59E0B" }}>{STAMP_CARDS.length}</div>
               <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Aktive Karten</div>
