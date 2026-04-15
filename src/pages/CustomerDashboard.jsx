@@ -201,7 +201,7 @@ function PartnerCarousel() {
   const containerRef = useRef(null);
   const posRef = useRef(0);
   const pausedRef = useRef(false);
-  const CARD_W = 74 + 6; // card width + gap
+  const CARD_W = 62 + 6; // card width + gap
   const totalW = PARTNER_BUSINESSES.length * CARD_W;
   const items = [...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES];
 
@@ -242,8 +242,8 @@ function PartnerCarousel() {
         <div ref={trackRef} style={{ display: "flex", gap: 6, willChange: "transform", transition: "none" }}>
           {items.map((biz, idx) => (
             <div key={idx} style={{
-              minWidth: 74, borderRadius: 12, overflow: "hidden", position: "relative",
-              height: 105, flexShrink: 0,
+              minWidth: 62, borderRadius: 10, overflow: "hidden", position: "relative",
+              height: 90, flexShrink: 0,
               border: `1px solid ${biz.color}33`,
             }}>
               <img src={biz.img} alt={biz.name} draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }} />
@@ -251,10 +251,9 @@ function PartnerCarousel() {
               <div style={{ position: "absolute", top: 4, left: 4, background: `${biz.color}CC`, borderRadius: 100, padding: "1px 5px", fontSize: 6, fontWeight: 700, color: "#fff" }}>
                 {biz.type === "referral" ? "💸" : biz.type === "stamps" ? "🎁" : "💸🎁"}
               </div>
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "6px 6px" }}>
-                <div style={{ fontSize: 9, marginBottom: 1 }}>{biz.emoji}</div>
-                <div style={{ fontSize: 8, fontWeight: 700, color: "#fff", lineHeight: 1.2, marginBottom: 1 }}>{biz.name}</div>
-                {biz.provision && <div style={{ fontSize: 7, color: "#63FFB4", fontWeight: 600 }}>💸 {biz.provision}</div>}
+              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "4px 5px" }}>
+                <div style={{ fontSize: 10, lineHeight: 1 }}>{biz.emoji}</div>
+                <div style={{ fontSize: 7, fontWeight: 700, color: "#fff", lineHeight: 1.2, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{biz.name}</div>
               </div>
             </div>
           ))}
