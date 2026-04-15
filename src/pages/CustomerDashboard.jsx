@@ -230,7 +230,7 @@ function PartnerShowcase() {
   const slide = SHOWCASE_SLIDES[activeSlide];
 
   return (
-    <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", height: 140 }}>
+    <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", height: 100 }}>
       {/* Slides */}
       {SHOWCASE_SLIDES.map((s, i) => (
         <img
@@ -356,31 +356,50 @@ function AppointmentModal({ card, onClose, onBook }) {
 
 // ── Provision Widget ──────────────────────────────────────────────────────────
 function ProvisionWidget() {
+  const refLink = `sensalie.app/ref/${REFERRAL_STATS.code}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&bgcolor=0d1f14&color=63FFB4&qzone=1&data=${encodeURIComponent("https://" + refLink)}`;
+
+  const handleShare = () => {
+    const msg = `Hey! Ich empfehle dir Sensalie – die digitale Stempelkarte. Einfach auf meinen Link klicken und loslegen: https://${refLink} 💸`;
+    if (navigator.share) {
+      navigator.share({ title: "Sensalie empfehlen", text: msg, url: "https://" + refLink });
+    } else {
+      navigator.clipboard.writeText("https://" + refLink);
+    }
+  };
+
   return (
     <div style={{
-      borderRadius: 20, overflow: "hidden", position: "relative",
+      borderRadius: 16, overflow: "hidden", position: "relative",
       background: "linear-gradient(135deg, #0d1f14, #0f2d1f)",
       border: "1.5px solid rgba(16,185,129,0.25)",
-      padding: "18px 18px",
+      padding: "14px 14px",
     }}>
-      <div style={{ position: "absolute", top: "-30%", right: "-10%", width: 160, height: 160, background: "radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 65%)", borderRadius: "50%", pointerEvents: "none" }} />
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1, fontWeight: 700 }}>Deine Provision</div>
-      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-        <div style={{ flex: 1, background: "rgba(255,255,255,0.05)", borderRadius: 14, padding: "12px 14px" }}>
-          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 900, color: "#10B981" }}>{REFERRAL_STATS.earned.toFixed(2)}€</div>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>Gesamt verdient</div>
+      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginBottom: 10, textTransform: "uppercase", letterSpacing: 1, fontWeight: 700 }}>Deine Provision</div>
+      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        {/* Stats */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            <div style={{ flex: 1, background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "8px 10px" }}>
+              <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 18, fontWeight: 900, color: "#10B981" }}>{REFERRAL_STATS.earned.toFixed(0)}€</div>
+              <div style={{ fontSize: 8, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>Verdient</div>
+            </div>
+            <div style={{ flex: 1, background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "8px 10px" }}>
+              <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 18, fontWeight: 900, color: "#F59E0B" }}>{REFERRAL_STATS.pending.toFixed(0)}€</div>
+              <div style={{ fontSize: 8, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>Ausstehend</div>
+            </div>
+          </div>
+          <button onClick={handleShare} style={{ width: "100%", padding: "8px", background: "linear-gradient(135deg, #10B981, #059669)", color: "#fff", border: "none", borderRadius: 10, fontSize: 11, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
+            💬 Link teilen
+          </button>
         </div>
-        <div style={{ flex: 1, background: "rgba(255,255,255,0.05)", borderRadius: 14, padding: "12px 14px" }}>
-          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 900, color: "#F59E0B" }}>{REFERRAL_STATS.pending.toFixed(2)}€</div>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>Ausstehend</div>
+        {/* QR Code */}
+        <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <div style={{ background: "#0d1f14", border: "1px solid rgba(99,255,180,0.3)", borderRadius: 10, padding: 6 }}>
+            <img src={qrUrl} alt="Empfehlungs-QR" style={{ width: 72, height: 72, display: "block", borderRadius: 6 }} />
+          </div>
+          <div style={{ fontSize: 8, color: "rgba(255,255,255,0.3)", textAlign: "center" }}>Scan zum Teilen</div>
         </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 12, padding: "10px 14px" }}>
-        <div>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginBottom: 2 }}>Dein Empfehlungscode</div>
-          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 18, fontWeight: 900, color: "#63FFB4", letterSpacing: 2 }}>{REFERRAL_STATS.code}</div>
-        </div>
-        <div style={{ fontSize: 10, color: "#10B981", fontWeight: 700 }}>{REFERRAL_STATS.count} Empfehlungen →</div>
       </div>
     </div>
   );
@@ -679,10 +698,27 @@ function ReferralTab() {
   const [copied, setCopied] = useState(false);
   const [search, setSearch] = useState("");
 
-  const copy = () => {
-    navigator.clipboard.writeText(`Schau dir Sensalie an: sensalie.app?ref=${REFERRAL_STATS.code}`);
+  const refLink = `https://sensalie.app/ref/${REFERRAL_STATS.code}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&bgcolor=0d2137&color=63FFB4&qzone=2&data=${encodeURIComponent(refLink)}`;
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(refLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const shareWhatsApp = () => {
+    const msg = `Hey! Schau dir mal Sensalie an – einfach über meinen Link registrieren und Stempel sammeln 🎁\n${refLink}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+  };
+
+  const shareGeneric = () => {
+    const msg = `Hey! Schau dir mal Sensalie an – einfach über meinen Link registrieren und Stempel sammeln 🎁`;
+    if (navigator.share) {
+      navigator.share({ title: "Sensalie", text: msg, url: refLink });
+    } else {
+      copyLink();
+    }
   };
 
   const referrablePartners = PARTNER_BUSINESSES.filter(b => b.provision);
@@ -690,10 +726,10 @@ function ReferralTab() {
     ? referrablePartners.filter(b => b.name.toLowerCase().includes(search.toLowerCase()) || b.category.toLowerCase().includes(search.toLowerCase()))
     : referrablePartners;
 
-  const handleShare = (biz) => {
-    const msg = `Hey! Ich empfehle dir ${biz.name} auf Sensalie – registriere dich mit meinem Code ${REFERRAL_STATS.code} und wir beide profitieren! 💸`;
+  const handleShareBiz = (biz) => {
+    const msg = `Hey! Ich empfehle dir ${biz.name} auf Sensalie – einfach über meinen Link registrieren: ${refLink} 💸`;
     if (navigator.share) {
-      navigator.share({ title: `${biz.name} empfehlen`, text: msg });
+      navigator.share({ title: `${biz.name} empfehlen`, text: msg, url: refLink });
     } else {
       navigator.clipboard.writeText(msg);
     }
@@ -702,39 +738,47 @@ function ReferralTab() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* Earnings overview */}
-      <div style={{ borderRadius: 24, background: "linear-gradient(135deg, #0d2137, #1a3a4a)", border: "1px solid rgba(99,255,180,0.15)", padding: "22px 22px" }}>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 14 }}>Deine Einnahmen</div>
-        <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-          <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: 16, padding: "14px 16px" }}>
-            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 28, fontWeight: 900, color: "#10B981" }}>{REFERRAL_STATS.earned.toFixed(2)}€</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 3 }}>Gesamt verdient</div>
+      <div style={{ borderRadius: 20, background: "linear-gradient(135deg, #0d2137, #1a3a4a)", border: "1px solid rgba(99,255,180,0.15)", padding: "18px 18px" }}>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 12 }}>Deine Einnahmen</div>
+        <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+          <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "12px 14px" }}>
+            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 900, color: "#10B981" }}>{REFERRAL_STATS.earned.toFixed(2)}€</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>Gesamt verdient</div>
           </div>
-          <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: 16, padding: "14px 16px" }}>
-            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 28, fontWeight: 900, color: "#F59E0B" }}>{REFERRAL_STATS.pending.toFixed(2)}€</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 3 }}>Ausstehend</div>
+          <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "12px 14px" }}>
+            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 900, color: "#F59E0B" }}>{REFERRAL_STATS.pending.toFixed(2)}€</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>Ausstehend</div>
           </div>
-          <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: 16, padding: "14px 16px" }}>
-            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 28, fontWeight: 900, color: "#EC4899" }}>{REFERRAL_STATS.count}</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 3 }}>Empfehlungen</div>
+          <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "12px 14px" }}>
+            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 900, color: "#EC4899" }}>{REFERRAL_STATS.count}</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>Empfehlungen</div>
           </div>
         </div>
 
-        {/* Referral code */}
-        <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "14px 16px" }}>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginBottom: 8 }}>Dein persönlicher Code</div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 900, color: "#63FFB4", letterSpacing: 3 }}>{REFERRAL_STATS.code}</div>
-            <button onClick={copy} style={{ background: copied ? "#10B981" : "rgba(16,185,129,0.15)", color: copied ? "#fff" : "#10B981", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 10, padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.3s" }}>
-              {copied ? "✓ Kopiert!" : "Kopieren"}
+        {/* QR + Link row */}
+        <div style={{ display: "flex", gap: 12, alignItems: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(99,255,180,0.15)", borderRadius: 14, padding: "12px 14px" }}>
+          <div style={{ background: "#0d2137", border: "1px solid rgba(99,255,180,0.3)", borderRadius: 10, padding: 6, flexShrink: 0 }}>
+            <img src={qrUrl} alt="Referral QR" style={{ width: 64, height: 64, display: "block", borderRadius: 6 }} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", marginBottom: 4 }}>Dein persönlicher Link</div>
+            <div style={{ fontSize: 11, color: "#63FFB4", fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 8 }}>{refLink}</div>
+            <button onClick={copyLink} style={{ background: copied ? "#10B981" : "rgba(16,185,129,0.15)", color: copied ? "#fff" : "#10B981", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 8, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.3s" }}>
+              {copied ? "✓ Kopiert!" : "🔗 Link kopieren"}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Share CTA */}
-      <button style={{ width: "100%", padding: "15px", background: "linear-gradient(135deg, #10B981, #059669)", color: "#fff", border: "none", borderRadius: 16, fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(16,185,129,0.3)" }}>
-        💬 Via WhatsApp teilen
-      </button>
+      {/* Share buttons */}
+      <div style={{ display: "flex", gap: 10 }}>
+        <button onClick={shareWhatsApp} style={{ flex: 1, padding: "13px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "#fff", border: "none", borderRadius: 14, fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
+          💬 WhatsApp
+        </button>
+        <button onClick={shareGeneric} style={{ flex: 1, padding: "13px", background: "linear-gradient(135deg, #10B981, #059669)", color: "#fff", border: "none", borderRadius: 14, fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
+          ↗ Link teilen
+        </button>
+      </div>
 
       {/* Partner businesses to recommend */}
       <div>
@@ -771,7 +815,7 @@ function ReferralTab() {
                 <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>{biz.category}</div>
                 <div style={{ fontSize: 11, color: "#63FFB4", fontWeight: 700, marginTop: 3 }}>💸 {biz.provision}</div>
               </div>
-              <button onClick={() => handleShare(biz)} style={{ marginRight: 12, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10B981", borderRadius: 10, padding: "7px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+              <button onClick={() => handleShareBiz(biz)} style={{ marginRight: 12, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10B981", borderRadius: 10, padding: "7px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
                 Teilen →
               </button>
             </div>
@@ -783,13 +827,13 @@ function ReferralTab() {
       <div style={{ background: "#1a2530", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "18px 20px" }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 14 }}>So verdienst du Geld</div>
         {[
-          { icon: "1️⃣", text: "Teile deinen Code mit Freunden" },
-          { icon: "2️⃣", text: "Dein Freund registriert sich & besucht ein Geschäft" },
-          { icon: "3️⃣", text: "Du erhältst automatisch deine Provision" },
+          { icon: "1️⃣", text: "Teile deinen persönlichen Link per WhatsApp oder direkt" },
+          { icon: "2️⃣", text: "Dein Freund öffnet den Link, besucht das Geschäft & sammelt Stempel" },
+          { icon: "3️⃣", text: "Sobald er den Mindestumsatz erreicht, wird deine Provision automatisch freigeschaltet" },
         ].map((s, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: i < 2 ? 12 : 0 }}>
-            <span style={{ fontSize: 18 }}>{s.icon}</span>
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.4 }}>{s.text}</span>
+          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: i < 2 ? 12 : 0 }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>{s.icon}</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>{s.text}</span>
           </div>
         ))}
       </div>
