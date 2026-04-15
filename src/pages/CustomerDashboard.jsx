@@ -120,6 +120,98 @@ const TABS = [
   { id: "referral", icon: "◎",  label: "Empfehlen" },
 ];
 
+// ── Mini Savings Chart ────────────────────────────────────────────────────────
+const CHART_DATA = [
+  { month: "Jan", saved: 0, earned: 0 },
+  { month: "Feb", saved: 8, earned: 0 },
+  { month: "Mär", saved: 8, earned: 12.5 },
+  { month: "Apr", saved: 34, earned: 42.5 },
+];
+
+function MiniSavingsChart() {
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const maxVal = 50;
+
+  return (
+    <>
+      <div
+        onClick={() => setShowUpgrade(true)}
+        style={{
+          marginTop: 14,
+          background: "rgba(255,255,255,0.07)",
+          borderRadius: 12,
+          padding: "10px 12px",
+          cursor: "pointer",
+          border: "1px solid rgba(255,255,255,0.1)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Dein Verlauf</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />
+              <span style={{ fontSize: 8, color: "rgba(255,255,255,0.35)" }}>Gespart</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#EC4899" }} />
+              <span style={{ fontSize: 8, color: "rgba(255,255,255,0.35)" }}>Verdient</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 3, background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.35)", borderRadius: 6, padding: "2px 6px" }}>
+              <span style={{ fontSize: 7, color: "#C084FC", fontWeight: 700 }}>🔒 PLUS</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bars */}
+        <div style={{ display: "flex", gap: 6, alignItems: "flex-end", height: 40 }}>
+          {CHART_DATA.map((d, i) => (
+            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+              <div style={{ width: "100%", display: "flex", gap: 2, alignItems: "flex-end", height: 32 }}>
+                <div style={{ flex: 1, height: `${(d.saved / maxVal) * 100}%`, background: "linear-gradient(to top, #10B981, #34D399)", borderRadius: "3px 3px 0 0", minHeight: d.saved > 0 ? 3 : 0, transition: "height 0.6s ease" }} />
+                <div style={{ flex: 1, height: `${(d.earned / maxVal) * 100}%`, background: "linear-gradient(to top, #EC4899, #F472B6)", borderRadius: "3px 3px 0 0", minHeight: d.earned > 0 ? 3 : 0, transition: "height 0.6s ease" }} />
+              </div>
+              <div style={{ fontSize: 7, color: "rgba(255,255,255,0.3)" }}>{d.month}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 6, fontSize: 8, color: "rgba(168,85,247,0.7)", textAlign: "center" }}>
+          Tippe für detaillierte Analyse (Plus)
+        </div>
+      </div>
+
+      {/* Upgrade Modal */}
+      {showUpgrade && (
+        <div onClick={() => setShowUpgrade(false)} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 600, background: "#111e28", borderRadius: "28px 28px 0 0", border: "1px solid rgba(168,85,247,0.2)", borderBottom: "none", padding: "24px 24px 48px", boxShadow: "0 -20px 60px rgba(0,0,0,0.6)" }}>
+            <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 100, margin: "0 auto 20px" }} />
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>📊</div>
+              <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 20, fontWeight: 900, color: "#fff", marginBottom: 6 }}>Detaillierte Analyse</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>Sieh genau, wie viel du pro Monat sparst und verdienst — mit dem Sensalie Plus-Abo.</div>
+            </div>
+            <div style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: "16px 18px", marginBottom: 16 }}>
+              {["Vollständige Sparübersicht", "Monatliche Verdienstanalyse", "Empfehlungs-Statistiken"].map((f, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 2 ? 10 : 0 }}>
+                  <span style={{ fontSize: 14, color: "#C084FC" }}>✦</span>
+                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{f}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(168,85,247,0.1))", border: "1.5px solid rgba(168,85,247,0.4)", borderRadius: 14, padding: "14px", textAlign: "center", marginBottom: 12 }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: "#C084FC", fontFamily: "'Bricolage Grotesque', sans-serif" }}>Sensalie Plus</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>nur 1,99 € / Monat — bald verfügbar</div>
+            </div>
+            <button onClick={() => setShowUpgrade(false)} style={{ width: "100%", padding: "12px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", border: "none", borderRadius: 12, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+              Schließen
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ── StampDots ─────────────────────────────────────────────────────────────────
 function StampDots({ stamps = 0, required = 8, color }) {
   const safeRequired = Number(required) || 8;
@@ -518,17 +610,20 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
           <div style={{ display: "flex", gap: 12 }}>
           <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
             <div style={{ fontSize: 18, fontWeight: 900, color: "#10B981" }}>34€</div>
-            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Gespart</div>
-          </div>
-            <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "#F59E0B" }}>{STAMP_CARDS.length}</div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Aktive Karten</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>mit Sensalie gespart</div>
             </div>
             <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "#EC4899" }}>{REFERRAL_STATS.earned.toFixed(0)}€</div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Verdient</div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#F59E0B" }}>{STAMP_CARDS.length}</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Aktive Karten</div>
             </div>
-          </div>
+            <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#EC4899" }}>{REFERRAL_STATS.earned.toFixed(0)}€</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Verdient</div>
+            </div>
+            </div>
+
+            {/* Mini Chart — dezent, klickbar → Hinweis auf Plus-Abo */}
+            <MiniSavingsChart />
         </div>
       </div>
 
