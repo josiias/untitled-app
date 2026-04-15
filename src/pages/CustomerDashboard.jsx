@@ -121,20 +121,22 @@ const TABS = [
 ];
 
 // ── StampDots ─────────────────────────────────────────────────────────────────
-function StampDots({ stamps, required, color }) {
+function StampDots({ stamps = 0, required = 8, color }) {
+  const safeRequired = Number(required) || 8;
+  const safeStamps = Number(stamps) || 0;
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(22px, 1fr))", gap: 5 }}>
-      {Array.from({ length: required }).map((_, i) => (
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(safeRequired, 8)}, 1fr)`, gap: 5 }}>
+      {Array.from({ length: safeRequired }).map((_, i) => (
         <div key={i} style={{
           width: "100%", aspectRatio: "1/1", borderRadius: 6,
-          background: i < stamps ? color : "rgba(255,255,255,0.07)",
-          border: i < stamps ? "none" : "1px solid rgba(255,255,255,0.1)",
+          background: i < safeStamps ? color : "rgba(255,255,255,0.07)",
+          border: i < safeStamps ? "none" : "1px solid rgba(255,255,255,0.1)",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 10, color: "#fff", fontWeight: 700,
-          boxShadow: i === stamps - 1 ? `0 0 10px ${color}88` : "none",
+          boxShadow: i === safeStamps - 1 ? `0 0 10px ${color}88` : "none",
           transition: "all 0.3s",
         }}>
-          {i < stamps ? "✓" : ""}
+          {i < safeStamps ? "✓" : ""}
         </div>
       ))}
     </div>
