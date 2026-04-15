@@ -120,89 +120,133 @@ const TABS = [
   { id: "referral", icon: "◎",  label: "Empfehlen" },
 ];
 
-// ── Mini Savings Chart ────────────────────────────────────────────────────────
-const CHART_DATA = [
+// ── Locked Analytics Chart ────────────────────────────────────────────────────
+const CHART_POINTS = [
   { month: "Jan", saved: 0, earned: 0 },
   { month: "Feb", saved: 8, earned: 0 },
   { month: "Mär", saved: 8, earned: 12.5 },
   { month: "Apr", saved: 34, earned: 42.5 },
 ];
 
-function MiniSavingsChart() {
-  const [showUpgrade, setShowUpgrade] = useState(false);
+function LockedAnalyticsChart() {
+  const [showModal, setShowModal] = useState(false);
+  const W = 280, H = 90, pad = 10;
   const maxVal = 50;
+
+  // Convert data points to SVG path
+  const toX = (i) => pad + (i / (CHART_POINTS.length - 1)) * (W - pad * 2);
+  const toY = (v) => H - pad - (v / maxVal) * (H - pad * 2);
+
+  const pathSaved = CHART_POINTS.map((d, i) => `${i === 0 ? "M" : "L"} ${toX(i)} ${toY(d.saved)}`).join(" ");
+  const pathEarned = CHART_POINTS.map((d, i) => `${i === 0 ? "M" : "L"} ${toX(i)} ${toY(d.earned)}`).join(" ");
 
   return (
     <>
-      <div
-        onClick={() => setShowUpgrade(true)}
-        style={{
-          marginTop: 14,
-          background: "rgba(255,255,255,0.07)",
-          borderRadius: 12,
-          padding: "10px 12px",
-          cursor: "pointer",
-          border: "1px solid rgba(255,255,255,0.1)",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Dein Verlauf</div>
+      <div style={{ position: "relative" }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />
-              <span style={{ fontSize: 8, color: "rgba(255,255,255,0.35)" }}>Gespart</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#EC4899" }} />
-              <span style={{ fontSize: 8, color: "rgba(255,255,255,0.35)" }}>Verdient</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 3, background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.35)", borderRadius: 6, padding: "2px 6px" }}>
-              <span style={{ fontSize: 7, color: "#C084FC", fontWeight: 700 }}>🔒 PLUS</span>
-            </div>
+            <span style={{ fontSize: 16 }}>📈</span>
+            <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 900, color: "#fff" }}>Mein Verlauf</span>
+          </div>
+          <div style={{ background: "rgba(168,85,247,0.18)", border: "1px solid rgba(168,85,247,0.45)", borderRadius: 100, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "#C084FC" }}>
+            PLUS
           </div>
         </div>
 
-        {/* Bars */}
-        <div style={{ display: "flex", gap: 6, alignItems: "flex-end", height: 40 }}>
-          {CHART_DATA.map((d, i) => (
-            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-              <div style={{ width: "100%", display: "flex", gap: 2, alignItems: "flex-end", height: 32 }}>
-                <div style={{ flex: 1, height: `${(d.saved / maxVal) * 100}%`, background: "linear-gradient(to top, #10B981, #34D399)", borderRadius: "3px 3px 0 0", minHeight: d.saved > 0 ? 3 : 0, transition: "height 0.6s ease" }} />
-                <div style={{ flex: 1, height: `${(d.earned / maxVal) * 100}%`, background: "linear-gradient(to top, #EC4899, #F472B6)", borderRadius: "3px 3px 0 0", minHeight: d.earned > 0 ? 3 : 0, transition: "height 0.6s ease" }} />
-              </div>
-              <div style={{ fontSize: 7, color: "rgba(255,255,255,0.3)" }}>{d.month}</div>
+        {/* Chart card */}
+        <div style={{ borderRadius: 20, overflow: "hidden", position: "relative", background: "linear-gradient(160deg, #0d1a26, #111e28)", border: "1px solid rgba(255,255,255,0.07)", padding: "16px 16px 12px" }}>
+          {/* Legend */}
+          <div style={{ display: "flex", gap: 14, marginBottom: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <div style={{ width: 18, height: 2, background: "#10B981", borderRadius: 2 }} />
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>Gespart</span>
             </div>
-          ))}
-        </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <div style={{ width: 18, height: 2, background: "#EC4899", borderRadius: 2 }} />
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>Verdient</span>
+            </div>
+          </div>
 
-        <div style={{ marginTop: 6, fontSize: 8, color: "rgba(168,85,247,0.7)", textAlign: "center" }}>
-          Tippe für detaillierte Analyse (Plus)
+          {/* SVG Line Chart */}
+          <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block", overflow: "visible" }}>
+            {/* Grid lines */}
+            {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
+              <line key={i} x1={pad} y1={toY(t * maxVal)} x2={W - pad} y2={toY(t * maxVal)}
+                stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+            ))}
+            {/* Saved area fill */}
+            <path d={`${pathSaved} L ${toX(CHART_POINTS.length - 1)} ${H - pad} L ${toX(0)} ${H - pad} Z`}
+              fill="url(#savedGrad)" opacity="0.3" />
+            {/* Earned area fill */}
+            <path d={`${pathEarned} L ${toX(CHART_POINTS.length - 1)} ${H - pad} L ${toX(0)} ${H - pad} Z`}
+              fill="url(#earnedGrad)" opacity="0.3" />
+            {/* Lines */}
+            <path d={pathSaved} fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d={pathEarned} fill="none" stroke="#EC4899" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Dots */}
+            {CHART_POINTS.map((d, i) => (
+              <g key={i}>
+                <circle cx={toX(i)} cy={toY(d.saved)} r="3" fill="#10B981" />
+                <circle cx={toX(i)} cy={toY(d.earned)} r="3" fill="#EC4899" />
+              </g>
+            ))}
+            {/* Month labels */}
+            {CHART_POINTS.map((d, i) => (
+              <text key={i} x={toX(i)} y={H} textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.3)">{d.month}</text>
+            ))}
+            <defs>
+              <linearGradient id="savedGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10B981" /><stop offset="100%" stopColor="#10B981" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="earnedGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#EC4899" /><stop offset="100%" stopColor="#EC4899" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          {/* Lock overlay */}
+          <div onClick={() => setShowModal(true)} style={{
+            position: "absolute", inset: 0, borderRadius: 20,
+            background: "rgba(10,15,22,0.55)", backdropFilter: "blur(3px)",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6,
+            cursor: "pointer",
+          }}>
+            <div style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(168,85,247,0.2)", border: "1.5px solid rgba(168,85,247,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="16" height="18" viewBox="0 0 22 24" fill="none">
+                <rect x="2" y="10" width="18" height="13" rx="4" fill="rgba(168,85,247,0.35)" stroke="#C084FC" strokeWidth="1.5"/>
+                <path d="M6 10V7a5 5 0 0 1 10 0v3" stroke="#C084FC" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="11" cy="16.5" r="2" fill="#C084FC"/>
+              </svg>
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#C084FC" }}>Sensalie Plus freischalten</div>
+          </div>
         </div>
       </div>
 
       {/* Upgrade Modal */}
-      {showUpgrade && (
-        <div onClick={() => setShowUpgrade(false)} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 600, background: "#111e28", borderRadius: "28px 28px 0 0", border: "1px solid rgba(168,85,247,0.2)", borderBottom: "none", padding: "24px 24px 48px", boxShadow: "0 -20px 60px rgba(0,0,0,0.6)" }}>
+      {showModal && (
+        <div onClick={() => setShowModal(false)} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 600, background: "#111e28", borderRadius: "28px 28px 0 0", border: "1px solid rgba(168,85,247,0.2)", borderBottom: "none", padding: "24px 24px 48px" }}>
             <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 100, margin: "0 auto 20px" }} />
             <div style={{ textAlign: "center", marginBottom: 20 }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>📊</div>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>📈</div>
               <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 20, fontWeight: 900, color: "#fff", marginBottom: 6 }}>Detaillierte Analyse</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>Sieh genau, wie viel du pro Monat sparst und verdienst — mit dem Sensalie Plus-Abo.</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>Sieh genau, wie viel du pro Monat sparst und verdienst — mit Sensalie Plus.</div>
             </div>
             <div style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: "16px 18px", marginBottom: 16 }}>
               {["Vollständige Sparübersicht", "Monatliche Verdienstanalyse", "Empfehlungs-Statistiken"].map((f, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 2 ? 10 : 0 }}>
-                  <span style={{ fontSize: 14, color: "#C084FC" }}>✦</span>
+                  <span style={{ color: "#C084FC" }}>✦</span>
                   <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{f}</span>
                 </div>
               ))}
             </div>
             <div style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(168,85,247,0.1))", border: "1.5px solid rgba(168,85,247,0.4)", borderRadius: 14, padding: "14px", textAlign: "center", marginBottom: 12 }}>
-              <div style={{ fontSize: 22, fontWeight: 900, color: "#C084FC", fontFamily: "'Bricolage Grotesque', sans-serif" }}>Sensalie Plus</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>nur 1,99 € / Monat — bald verfügbar</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: "#C084FC", fontFamily: "'Bricolage Grotesque', sans-serif" }}>Sensalie Plus · 1,99 € / Monat</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>Bald verfügbar</div>
             </div>
-            <button onClick={() => setShowUpgrade(false)} style={{ width: "100%", padding: "12px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", border: "none", borderRadius: 12, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={() => setShowModal(false)} style={{ width: "100%", padding: "12px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", border: "none", borderRadius: 12, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
               Schließen
             </button>
           </div>
@@ -621,8 +665,6 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
             <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Verdient</div>
           </div>
         </div>
-        {/* Mini Chart — dezent, klickbar → Hinweis auf Plus-Abo */}
-        <MiniSavingsChart />
       </div>
 
       {/* Partner Showcase */}
@@ -654,6 +696,9 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
 
       {/* Provision Widget */}
       <ProvisionWidget />
+
+      {/* Locked Analytics Chart */}
+      <LockedAnalyticsChart />
 
       {/* Almost done card */}
       {STAMP_CARDS.filter(c => c.stamps >= c.required - 1).length > 0 && (
