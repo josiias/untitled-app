@@ -258,13 +258,14 @@ function LockedAnalyticsChart() {
 }
 
 // ── StampDots ─────────────────────────────────────────────────────────────────
-function StampDots({ stamps = 0, required = 8, color = "#10B981" }) {
+function StampDots({ stamps, required, color }) {
   const safeRequired = Math.max(1, Math.floor(Number(required) || 8));
   const safeStamps = Math.max(0, Math.floor(Number(stamps) || 0));
   const safeColor = color || "#10B981";
+  const items = Array.from({ length: safeRequired }, (_, i) => i);
   return (
     <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(safeRequired, 8)}, 1fr)`, gap: 5 }}>
-      {Array.from({ length: safeRequired }, (_, i) => (
+      {items.map((i) => (
         <div key={i} style={{
           width: "100%", aspectRatio: "1/1", borderRadius: 6,
           background: i < safeStamps ? safeColor : "rgba(255,255,255,0.07)",
