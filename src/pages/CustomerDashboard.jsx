@@ -64,24 +64,44 @@ const PARTNER_BUSINESSES = [
     reward: "1 Kaffee gratis", provision: "8€ pro Empfehlung", color: "#F59E0B", type: "both",
   },
   {
-    id: 3, name: "Bella Nails", emoji: "💅", category: "Beauty",
+    id: 3, name: "Bella Nails", emoji: "💅", category: "Nagelstudio",
     img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80",
     reward: "Maniküre gratis", provision: "12€ pro Empfehlung", color: "#EC4899", type: "both",
   },
   {
-    id: 4, name: "Massage Studio", emoji: "💆", category: "Wellness",
+    id: 4, name: "Lotus Massage", emoji: "💆", category: "Massage",
     img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80",
-    reward: "1 Massage gratis", provision: null, color: "#8B5CF6", type: "stamps",
+    reward: "1 Massage gratis", provision: "18€ pro Empfehlung", color: "#8B5CF6", type: "both",
   },
   {
-    id: 5, name: "Flower Garden", emoji: "🌸", category: "Floristik",
-    img: "https://images.unsplash.com/photo-1487530811015-780b4baa2c76?w=800&q=80",
-    reward: null, provision: "20€ pro Empfehlung", color: "#F472B6", type: "referral",
-  },
-  {
-    id: 6, name: "Sushi Lounge", emoji: "🍱", category: "Restaurant",
+    id: 5, name: "Sushi Lounge", emoji: "🍱", category: "Restaurant",
     img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80",
     reward: "1 Rolle gratis", provision: "10€ pro Empfehlung", color: "#06B6D4", type: "both",
+  },
+  {
+    id: 6, name: "Glam Studio", emoji: "💄", category: "Beauty",
+    img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80",
+    reward: "Styling gratis", provision: "14€ pro Empfehlung", color: "#F472B6", type: "both",
+  },
+  {
+    id: 7, name: "Barber Club", emoji: "🪒", category: "Barbershop",
+    img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80",
+    reward: "1 Rasur gratis", provision: "12€ pro Empfehlung", color: "#34D399", type: "both",
+  },
+  {
+    id: 8, name: "Pizza Roma", emoji: "🍕", category: "Restaurant",
+    img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80",
+    reward: "1 Pizza gratis", provision: "8€ pro Empfehlung", color: "#FB923C", type: "both",
+  },
+  {
+    id: 9, name: "Wellness Oase", emoji: "🧖", category: "Wellness",
+    img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
+    reward: "Gesichtsmaske gratis", provision: "20€ pro Empfehlung", color: "#A78BFA", type: "both",
+  },
+  {
+    id: 10, name: "Hair & Style", emoji: "💇", category: "Friseur",
+    img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80",
+    reward: "Haarschnitt gratis", provision: "10€ pro Empfehlung", color: "#38BDF8", type: "both",
   },
 ];
 
@@ -181,8 +201,7 @@ function PartnerCarousel() {
   const containerRef = useRef(null);
   const posRef = useRef(0);
   const pausedRef = useRef(false);
-  const velocityRef = useRef(0);
-  const CARD_W = 80 + 6; // smaller + gap
+  const CARD_W = 74 + 6; // card width + gap
   const totalW = PARTNER_BUSINESSES.length * CARD_W;
   const items = [...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES];
 
@@ -223,8 +242,8 @@ function PartnerCarousel() {
         <div ref={trackRef} style={{ display: "flex", gap: 6, willChange: "transform", transition: "none" }}>
           {items.map((biz, idx) => (
             <div key={idx} style={{
-              minWidth: 80, borderRadius: 12, overflow: "hidden", position: "relative",
-              height: 110, flexShrink: 0,
+              minWidth: 74, borderRadius: 12, overflow: "hidden", position: "relative",
+              height: 105, flexShrink: 0,
               border: `1px solid ${biz.color}33`,
             }}>
               <img src={biz.img} alt={biz.name} draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }} />
