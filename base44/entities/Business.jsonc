@@ -1,0 +1,51 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "emoji": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "min_purchase_amount": {
+      "type": "number"
+    },
+    "stamps_required": {
+      "type": "integer"
+    },
+    "reward_description": {
+      "type": "string"
+    },
+    "payout_threshold_visits": {
+      "type": "integer"
+    },
+    "provision_type": {
+      "type": "string",
+      "enum": [
+        "percentage",
+        "fixed"
+      ]
+    },
+    "provision_value": {
+      "type": "number"
+    },
+    "color": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "emoji",
+    "category",
+    "min_purchase_amount",
+    "stamps_required",
+    "reward_description",
+    "payout_threshold_visits",
+    "provision_type",
+    "provision_value"
+  ],
+  "name": "Business"
+}

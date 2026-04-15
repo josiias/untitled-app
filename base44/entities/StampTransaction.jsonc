@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "type": "string"
+    },
+    "business_id": {
+      "type": "string"
+    },
+    "employee_confirmed": {
+      "type": "boolean"
+    },
+    "amount": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "customer_id",
+    "business_id",
+    "employee_confirmed",
+    "amount"
+  ],
+  "name": "StampTransaction"
+}

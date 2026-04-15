@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "properties": {
+    "phone": {
+      "type": "string"
+    },
+    "business_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "referred_by_customer_id": {
+      "type": "string"
+    },
+    "referral_code": {
+      "type": "string"
+    },
+    "total_stamps": {
+      "type": "integer"
+    },
+    "total_visits": {
+      "type": "integer"
+    },
+    "provision_earned": {
+      "type": "number"
+    },
+    "provision_paid": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "phone",
+    "business_id",
+    "total_stamps",
+    "total_visits",
+    "provision_earned",
+    "provision_paid"
+  ],
+  "name": "Customer"
+}

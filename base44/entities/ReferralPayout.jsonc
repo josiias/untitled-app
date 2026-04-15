@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "properties": {
+    "referrer_customer_id": {
+      "type": "string"
+    },
+    "new_customer_id": {
+      "type": "string"
+    },
+    "business_id": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "offen",
+        "ausgezahlt"
+      ]
+    }
+  },
+  "required": [
+    "referrer_customer_id",
+    "new_customer_id",
+    "business_id",
+    "amount",
+    "status"
+  ],
+  "name": "ReferralPayout"
+}
