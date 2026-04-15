@@ -697,9 +697,6 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
       {/* Provision Widget */}
       <ProvisionWidget />
 
-      {/* Locked Analytics Chart */}
-      <LockedAnalyticsChart />
-
       {/* Almost done card */}
       {STAMP_CARDS.filter(c => c.stamps >= c.required - 1).length > 0 && (
         <div>
@@ -755,8 +752,11 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
         </div>
       </div>
 
-      {/* Rangliste — LAST */}
+      {/* Rangliste */}
       <RankingComingSoon />
+
+      {/* Locked Analytics Chart — ganz unten */}
+      <LockedAnalyticsChart />
     </div>
   );
 }
@@ -830,6 +830,7 @@ function RewardsTab() {
 function ReferralTab() {
   const [copied, setCopied] = useState(false);
   const [search, setSearch] = useState("");
+  const [showAllBiz, setShowAllBiz] = useState(false);
 
   const refLink = `https://sensalie.app/ref/${REFERRAL_STATS.code}`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&bgcolor=0d2137&color=63FFB4&qzone=2&data=${encodeURIComponent(refLink)}`;
@@ -927,7 +928,7 @@ function ReferralTab() {
           {filtered.length === 0 && (
             <div style={{ textAlign: "center", padding: "20px", color: "rgba(255,255,255,0.25)", fontSize: 13 }}>Keine Ergebnisse für „{search}"</div>
           )}
-          {filtered.map(biz => (
+          {(showAllBiz || search ? filtered : filtered.slice(0, 5)).map(biz => (
             <div key={biz.id} style={{ display: "flex", alignItems: "center", gap: 12, background: "#1a2530", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflow: "hidden" }}>
               <div style={{ width: 60, height: 60, flexShrink: 0, position: "relative" }}>
                 <img src={biz.img} alt={biz.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -944,6 +945,12 @@ function ReferralTab() {
               </button>
             </div>
           ))}
+          {/* Show more / less button */}
+          {!search && filtered.length > 5 && (
+            <button onClick={() => setShowAllBiz(v => !v)} style={{ width: "100%", padding: "12px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "inherit" }}>
+              {showAllBiz ? "▲ Weniger anzeigen" : `▼ Alle ${filtered.length} Unternehmen zeigen`}
+            </button>
+          )}
         </div>
       </div>
 
