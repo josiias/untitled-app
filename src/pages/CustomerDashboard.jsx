@@ -600,31 +600,29 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Hero greeting */}
       <div style={{
-        borderRadius: 24, overflow: "hidden", position: "relative", height: 160,
+        borderRadius: 24, overflow: "hidden", position: "relative",
         background: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
+        padding: "22px 22px",
       }}>
-        <div style={{ position: "absolute", top: "-30%", right: "-10%", width: 220, height: 220, background: "radial-gradient(circle, rgba(16,185,129,0.25) 0%, transparent 65%)", borderRadius: "50%" }} />
-        <div style={{ position: "absolute", inset: 0, padding: "22px 22px" }}>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Willkommen zurück 👋</div>
-          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 900, color: "#fff", marginBottom: 10 }}>{USER.name.split(" ")[0]}</div>
-          <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ position: "absolute", top: "-30%", right: "-10%", width: 220, height: 220, background: "radial-gradient(circle, rgba(16,185,129,0.25) 0%, transparent 65%)", borderRadius: "50%", pointerEvents: "none" }} />
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Willkommen zurück 👋</div>
+        <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 24, fontWeight: 900, color: "#fff", marginBottom: 10 }}>{USER.name.split(" ")[0]}</div>
+        <div style={{ display: "flex", gap: 12, marginBottom: 0 }}>
           <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
             <div style={{ fontSize: 18, fontWeight: 900, color: "#10B981" }}>34€</div>
             <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>mit Sensalie gespart</div>
-            </div>
-            <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
+          </div>
+          <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
             <div style={{ fontSize: 18, fontWeight: 900, color: "#F59E0B" }}>{STAMP_CARDS.length}</div>
             <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Aktive Karten</div>
-            </div>
-            <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
+          </div>
+          <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 12, padding: "8px 14px" }}>
             <div style={{ fontSize: 18, fontWeight: 900, color: "#EC4899" }}>{REFERRAL_STATS.earned.toFixed(0)}€</div>
             <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Verdient</div>
-            </div>
-            </div>
-
-            {/* Mini Chart — dezent, klickbar → Hinweis auf Plus-Abo */}
-            <MiniSavingsChart />
+          </div>
         </div>
+        {/* Mini Chart — dezent, klickbar → Hinweis auf Plus-Abo */}
+        <MiniSavingsChart />
       </div>
 
       {/* Partner Showcase */}
