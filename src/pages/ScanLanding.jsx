@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
 
 const MOCK_BUSINESS = {
   id: "demo-kings-barbershop-001",
@@ -35,8 +36,27 @@ export default function ScanLanding() {
   const [submitted, setSubmitted] = useState(false);
   const [particles, setParticles] = useState([]);
   const [imgIndex, setImgIndex] = useState(0);
+  const [realBusiness, setRealBusiness] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [totalStamps, setTotalStamps] = useState(1);
 
-  const business = MOCK_BUSINESS;
+  // Try to load real business from DB, fall back to mock
+  useEffect(() => {
+    if (!businessId) return;
+    base44.entities.Business.filter({ id: businessId }, "-created_date", 1)
+      .then(results => { if (results.length > 0) setRealBusiness(results[0]); })
+      .catch(() => {});
+  }, [businessId]);
+
+  const business = realBusiness ? {
+    id: realBusiness.id,
+    name: realBusiness.name,
+    stamps_required: realBusiness.stamps_required,
+    min_purchase_amount: realBusiness.min_purchase_amount,
+    reward_description: realBusiness.reward_description,
+    emoji: realBusiness.emoji || "🏪",
+    category: realBusiness.category || "barbershop",
+  } : MOCK_BUSINESS;
 
   // Generate confetti particles
   useEffect(() => {
@@ -67,10 +87,49 @@ export default function ScanLanding() {
     return () => clearInterval(t);
   }, []);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setSubmitted(true);
-    setTimeout(() => setStep("registered"), 600);
+    try {
+      const bizId = business.id;
+      // Find or create customer
+      const existing = await base44.entities.Customer.filter({ phone, business_id: bizId }, "-created_date", 1);
+      let cust;
+      if (existing.length > 0) {
+        cust = existing[0];
+        // Check if already stamped today
+        const today = new Date().toISOString().split("T")[0];
+        const recentTx = await base44.entities.StampTransaction.filter({ customer_id: cust.id, business_id: bizId }, "-created_date", 1);
+        const alreadyToday = recentTx.length > 0 && recentTx[0].created_date?.startsWith(today);
+        if (alreadyToday) {
+          setTotalStamps(cust.total_stamps);
+          setCustomer(cust);
+          setStep("registered");
+          return;
+        }
+        // Give stamp
+        await base44.entities.StampTransaction.create({ customer_id: cust.id, business_id: bizId, employee_confirmed: true, amount: business.min_purchase_amount });
+        cust = await base44.entities.Customer.update(cust.id, { total_stamps: cust.total_stamps + 1, total_visits: cust.total_visits + 1 });
+      } else {
+        // New customer
+        cust = await base44.entities.Customer.create({
+          phone,
+          business_id: bizId,
+          name: name || "",
+          referral_code: `REF-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+          total_stamps: 1,
+          total_visits: 1,
+          provision_earned: 0,
+          provision_paid: 0,
+        });
+        await base44.entities.StampTransaction.create({ customer_id: cust.id, business_id: bizId, employee_confirmed: true, amount: business.min_purchase_amount });
+      }
+      setCustomer(cust);
+      setTotalStamps(cust.total_stamps);
+    } catch (err) {
+      console.error(err);
+    }
+    setStep("registered");
   };
 
   const refCode = phone.replace(/\s+/g, "").slice(-6) || "user";
@@ -275,21 +334,21 @@ export default function ScanLanding() {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Deine Stempelkarte</div>
-              <div style={{ fontSize: 10, color: "#63FFB4", fontWeight: 700 }}>{stampsCount}/{business.stamps_required}</div>
+              <div style={{ fontSize: 10, color: "#63FFB4", fontWeight: 700 }}>{totalStamps}/{business.stamps_required}</div>
             </div>
             {/* Grid with max-width to make cells ~5% smaller */}
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(business.stamps_required, 4)}, 1fr)`, gap: 4, marginBottom: 10, maxWidth: "95%", margin: "0 auto 10px" }}>
               {Array.from({ length: business.stamps_required }).map((_, i) => (
                 <div key={i} style={{
                   aspectRatio: "1/1",
-                  background: i < stampsCount ? "linear-gradient(135deg, #63FFB4, #10B981)" : "rgba(255,255,255,0.06)",
+                  background: i < totalStamps ? "linear-gradient(135deg, #63FFB4, #10B981)" : "rgba(255,255,255,0.06)",
                   borderRadius: 7,
-                  border: i < stampsCount ? "none" : "1px solid rgba(255,255,255,0.1)",
+                  border: i < totalStamps ? "none" : "1px solid rgba(255,255,255,0.1)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 12, color: "#fff",
-                  boxShadow: i === stampsCount - 1 ? "0 0 14px rgba(99,255,180,0.6)" : "none",
+                  boxShadow: i === totalStamps - 1 ? "0 0 14px rgba(99,255,180,0.6)" : "none",
                 }}>
-                  {i < stampsCount ? "✓" : ""}
+                  {i < totalStamps ? "✓" : ""}
                 </div>
               ))}
             </div>
