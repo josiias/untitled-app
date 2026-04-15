@@ -114,10 +114,11 @@ const ACTIVITY = [
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 const TABS = [
-  { id: "home",     icon: "▦",  label: "Übersicht" },
-  { id: "cards",    icon: "◈",  label: "Karten" },
-  { id: "rewards",  icon: "⬡",  label: "Prämien" },
-  { id: "referral", icon: "◎",  label: "Empfehlen" },
+  { id: "home",      icon: "▦",  label: "Übersicht" },
+  { id: "cards",     icon: "◈",  label: "Karten" },
+  { id: "rewards",   icon: "⬡",  label: "Prämien" },
+  { id: "referral",  icon: "◎",  label: "Empfehlen" },
+  { id: "analytics", icon: "📈", label: "Analyse", comingSoon: true },
 ];
 
 // ── Locked Analytics Chart ────────────────────────────────────────────────────
@@ -257,19 +258,20 @@ function LockedAnalyticsChart() {
 }
 
 // ── StampDots ─────────────────────────────────────────────────────────────────
-function StampDots({ stamps = 0, required = 8, color }) {
-  const safeRequired = Number(required) || 8;
-  const safeStamps = Number(stamps) || 0;
+function StampDots({ stamps = 0, required = 8, color = "#10B981" }) {
+  const safeRequired = Math.max(1, Math.floor(Number(required) || 8));
+  const safeStamps = Math.max(0, Math.floor(Number(stamps) || 0));
+  const safeColor = color || "#10B981";
   return (
     <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(safeRequired, 8)}, 1fr)`, gap: 5 }}>
-      {Array.from({ length: safeRequired }).map((_, i) => (
+      {Array.from({ length: safeRequired }, (_, i) => (
         <div key={i} style={{
           width: "100%", aspectRatio: "1/1", borderRadius: 6,
-          background: i < safeStamps ? color : "rgba(255,255,255,0.07)",
+          background: i < safeStamps ? safeColor : "rgba(255,255,255,0.07)",
           border: i < safeStamps ? "none" : "1px solid rgba(255,255,255,0.1)",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 10, color: "#fff", fontWeight: 700,
-          boxShadow: i === safeStamps - 1 ? `0 0 10px ${color}88` : "none",
+          boxShadow: i === safeStamps - 1 ? `0 0 10px ${safeColor}88` : "none",
           transition: "all 0.3s",
         }}>
           {i < safeStamps ? "✓" : ""}
@@ -754,9 +756,6 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
 
       {/* Rangliste */}
       <RankingComingSoon />
-
-      {/* Locked Analytics Chart — ganz unten */}
-      <LockedAnalyticsChart />
     </div>
   );
 }
@@ -1129,7 +1128,10 @@ export default function CustomerDashboard() {
                       }}>
                         <span style={{ fontSize: 16 }}>{t.icon}</span>
                         {t.label}
-                        {active && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />}
+                        {t.comingSoon && (
+                          <div style={{ marginLeft: "auto", background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: 100, padding: "2px 7px", fontSize: 8, fontWeight: 800, color: "#C084FC" }}>BALD</div>
+                        )}
+                        {active && !t.comingSoon && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />}
                       </div>
                     );
                   })}
@@ -1156,10 +1158,11 @@ export default function CustomerDashboard() {
 
       {/* ── Content ── */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px 20px 110px", position: "relative", zIndex: 1 }}>
-        {tab === "home"     && <HomeTab onTabChange={setTab} appointments={appointments} onBookAppointment={handleBookAppointment} />}
-        {tab === "cards"    && <CardsTab appointments={appointments} onBookAppointment={handleBookAppointment} />}
-        {tab === "rewards"  && <RewardsTab />}
-        {tab === "referral" && <ReferralTab />}
+        {tab === "home"      && <HomeTab onTabChange={setTab} appointments={appointments} onBookAppointment={handleBookAppointment} />}
+        {tab === "cards"     && <CardsTab appointments={appointments} onBookAppointment={handleBookAppointment} />}
+        {tab === "rewards"   && <RewardsTab />}
+        {tab === "referral"  && <ReferralTab />}
+        {tab === "analytics" && <LockedAnalyticsChart />}
       </div>
 
       {/* ── Sticky Bottom Bar ── */}
