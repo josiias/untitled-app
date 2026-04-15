@@ -46,7 +46,7 @@ const DUMMY_ACTIVITY = [
   { name: "Amir S.", action: "Empfehlung gesendet", time: "vor 4 Std.", avatar: "AS" },
 ];
 
-function Tooltip({ text }) {
+function InfoTooltip({ text }) {
   const [show, setShow] = useState(false);
   return (
     <span style={{ position: "relative", display: "inline-flex", alignItems: "center", marginLeft: 6 }}>
@@ -285,7 +285,7 @@ export default function Business() {
                 <div style={{ flex: 1, paddingLeft: i === 0 ? 0 : 24, paddingRight: 24 }}>
                   <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 26, fontWeight: 800, color: "#fff" }}>{s.value}</div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 4, display: "flex", alignItems: "center" }}>
-                    {s.label}<Tooltip text={s.tooltip} />
+                    {s.label}<InfoTooltip text={s.tooltip} />
                   </div>
                 </div>
                 {i < DUMMY_STATS.length - 1 && <div className="stat-divider" style={{ width: 1, background: "rgba(255,255,255,0.12)", alignSelf: "stretch" }} />}
