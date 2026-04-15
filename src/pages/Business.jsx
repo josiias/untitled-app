@@ -1,4 +1,17 @@
 import React, { useState } from "react";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+
+const MINI_CHART_DATA = [
+  { tag: "Mo", stempel: 4 },
+  { tag: "Di", stempel: 7 },
+  { tag: "Mi", stempel: 5 },
+  { tag: "Do", stempel: 12 },
+  { tag: "Fr", stempel: 18 },
+  { tag: "Sa", stempel: 23 },
+  { tag: "So", stempel: 9 },
+  { tag: "Mo", stempel: 11 },
+  { tag: "Di", stempel: 15 },
+];
 
 // ─── Icons (inline SVG to avoid import issues) ────────────────────────────────
 const Icon = ({ d, size = 16, color = "currentColor" }) => (
@@ -426,6 +439,82 @@ export default function Business() {
             </button>
           </div>
         )}
+
+        {/* ── Mini-Chart + Online-Termine ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }} className="two-col">
+
+          {/* Mini Aktivitäts-Chart */}
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "22px 24px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>📈 Stempel diese Woche</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>Letzte 9 Tage</div>
+              </div>
+              <a href="/BusinessAnalytics" style={{ fontSize: 11, color: "#10B981", fontWeight: 700, textDecoration: "none", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 7, padding: "4px 10px" }}>
+                Vollständig →
+              </a>
+            </div>
+            <div style={{ display: "flex", gap: 20, marginBottom: 14 }}>
+              <div style={{ borderLeft: "3px solid #10B981", paddingLeft: 10 }}>
+                <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 900, color: "#10B981" }}>104</div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>Stempel gesamt</div>
+              </div>
+              <div style={{ borderLeft: "3px solid #F59E0B", paddingLeft: 10 }}>
+                <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 900, color: "#F59E0B" }}>+23%</div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>vs. letzte Woche</div>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={120}>
+              <AreaChart data={MINI_CHART_DATA} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                <defs>
+                  <linearGradient id="bizGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10B981" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <XAxis dataKey="tag" tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis hide />
+                <Tooltip contentStyle={{ background: "#1a2d3a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", fontSize: 11 }} formatter={(v) => [`${v} Stempel`]} />
+                <Area dataKey="stempel" stroke="#10B981" strokeWidth={2} fill="url(#bizGrad)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Online-Terminbuchung — gesperrt */}
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "22px 24px", position: "relative", overflow: "hidden" }}>
+            {/* Hintergrund-Preview (verschwommen) */}
+            <div style={{ opacity: 0.25, pointerEvents: "none" }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 12 }}>📅 Online-Terminbuchung</div>
+              {["Mo 14. Apr — 09:00", "Di 15. Apr — 11:30", "Mi 16. Apr — 14:00"].map((s, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ width: 32, height: 32, background: "rgba(16,185,129,0.2)", borderRadius: 8 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ height: 10, background: "rgba(255,255,255,0.2)", borderRadius: 4, marginBottom: 4, width: "70%" }} />
+                    <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 4, width: "45%" }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Lock Overlay */}
+            <div style={{ position: "absolute", inset: 0, borderRadius: 20, background: "rgba(10,22,18,0.7)", backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(168,85,247,0.2)", border: "1.5px solid rgba(168,85,247,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="20" height="22" viewBox="0 0 22 24" fill="none">
+                  <rect x="2" y="10" width="18" height="13" rx="4" fill="rgba(168,85,247,0.35)" stroke="#C084FC" strokeWidth="1.5"/>
+                  <path d="M6 10V7a5 5 0 0 1 10 0v3" stroke="#C084FC" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="11" cy="16.5" r="2" fill="#C084FC"/>
+                </svg>
+              </div>
+              <div style={{ background: "rgba(168,85,247,0.18)", border: "1px solid rgba(168,85,247,0.45)", borderRadius: 100, padding: "3px 12px", fontSize: 10, fontWeight: 800, color: "#C084FC" }}>SENSALIE PRO</div>
+              <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 16, fontWeight: 900, color: "#fff", textAlign: "center" }}>Online-Terminbuchung</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", textAlign: "center", lineHeight: 1.6, maxWidth: 200 }}>Kunden buchen direkt über deine Seite einen Termin — ohne Anruf.</div>
+              <div style={{ marginTop: 4, background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: 10, padding: "8px 18px", fontSize: 12, fontWeight: 700, color: "#C084FC", cursor: "pointer" }}>
+                Bald verfügbar · ab 4,99€/Monat
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Activity Feed */}
         <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 28 }}>
