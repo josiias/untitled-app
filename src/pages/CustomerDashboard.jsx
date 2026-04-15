@@ -360,12 +360,7 @@ function ProvisionWidget() {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&bgcolor=0d1f14&color=63FFB4&qzone=1&data=${encodeURIComponent("https://" + refLink)}`;
 
   const handleShare = () => {
-    const msg = `Hey! Ich empfehle dir Sensalie – die digitale Stempelkarte. Einfach auf meinen Link klicken und loslegen: https://${refLink} 💸`;
-    if (navigator.share) {
-      navigator.share({ title: "Sensalie empfehlen", text: msg, url: "https://" + refLink });
-    } else {
-      navigator.clipboard.writeText("https://" + refLink);
-    }
+    navigator.clipboard.writeText("https://" + refLink);
   };
 
   return (
@@ -713,12 +708,7 @@ function ReferralTab() {
   };
 
   const shareGeneric = () => {
-    const msg = `Hey! Schau dir mal Sensalie an – einfach über meinen Link registrieren und Stempel sammeln 🎁`;
-    if (navigator.share) {
-      navigator.share({ title: "Sensalie", text: msg, url: refLink });
-    } else {
-      copyLink();
-    }
+    copyLink();
   };
 
   const referrablePartners = PARTNER_BUSINESSES.filter(b => b.provision);
@@ -728,11 +718,7 @@ function ReferralTab() {
 
   const handleShareBiz = (biz) => {
     const msg = `Hey! Ich empfehle dir ${biz.name} auf Sensalie – einfach über meinen Link registrieren: ${refLink} 💸`;
-    if (navigator.share) {
-      navigator.share({ title: `${biz.name} empfehlen`, text: msg, url: refLink });
-    } else {
-      navigator.clipboard.writeText(msg);
-    }
+    navigator.clipboard.writeText(msg);
   };
 
   return (
