@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 
-
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
 
@@ -208,84 +207,75 @@ function StampCard({ card, compact = false, onBookAppointment }) {
   );
 }
 
-// ── Partner Showcase — langsam scrollende Karten-Reihe mit variablen Höhen ──
+// ── Partner Showcase — langsam scrollende Branchen-Bilder ───────────────────
 const SHOWCASE_SLIDES = [
-  { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80", label: "Barbershops", emoji: "✂️", h: 110 },
-  { img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80", label: "Pizzerien", emoji: "🍕", h: 90 },
-  { img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80", label: "Cafés", emoji: "☕", h: 120 },
-  { img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80", label: "Nagelstudios", emoji: "💅", h: 95 },
-  { img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80", label: "Friseursalons", emoji: "💇", h: 115 },
-  { img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80", label: "Massage", emoji: "💆", h: 85 },
-  { img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80", label: "Beauty Studios", emoji: "💄", h: 105 },
-  { img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80", label: "Restaurants", emoji: "🍱", h: 100 },
+  { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80", label: "Barbershops", emoji: "✂️" },
+  { img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80", label: "Pizzerien", emoji: "🍕" },
+  { img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80", label: "Cafés", emoji: "☕" },
+  { img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80", label: "Nagelstudios", emoji: "💅" },
+  { img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80", label: "Friseursalons", emoji: "💇" },
+  { img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80", label: "Massage", emoji: "💆" },
+  { img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80", label: "Beauty Studios", emoji: "💄" },
+  { img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80", label: "Restaurants", emoji: "🍱" },
 ];
 
 function PartnerShowcase() {
-  const scrollRef = useRef(null);
+  const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    let pos = 0;
-    const speed = 0.4;
-    let raf;
-
-    const step = () => {
-      pos += speed;
-      // reset when halfway through (duplicated list)
-      if (pos >= el.scrollWidth / 2) pos = 0;
-      el.scrollLeft = pos;
-      raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
+    const t = setInterval(() => setActiveSlide(i => (i + 1) % SHOWCASE_SLIDES.length), 3000);
+    return () => clearInterval(t);
   }, []);
 
-  // Duplicate slides for seamless loop
-  const doubled = [...SHOWCASE_SLIDES, ...SHOWCASE_SLIDES];
+  const slide = SHOWCASE_SLIDES[activeSlide];
 
   return (
-    <div style={{ position: "relative" }}>
-      {/* Fade edges */}
-      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 28, background: "linear-gradient(to right, #111e28, transparent)", zIndex: 2, pointerEvents: "none", borderRadius: "12px 0 0 12px" }} />
-      <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 28, background: "linear-gradient(to left, #111e28, transparent)", zIndex: 2, pointerEvents: "none", borderRadius: "0 12px 12px 0" }} />
+    <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", height: 100 }}>
+      {/* Slides */}
+      {SHOWCASE_SLIDES.map((s, i) => (
+        <img
+          key={s.img}
+          src={s.img}
+          alt={s.label}
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            objectFit: "cover",
+            opacity: i === activeSlide ? 1 : 0,
+            transition: "opacity 1.2s ease",
+          }}
+        />
+      ))}
+      {/* Overlay */}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(17,30,40,0.2) 0%, rgba(17,30,40,0.85) 100%)" }} />
 
-      <div
-        ref={scrollRef}
-        style={{
-          display: "flex", gap: 8, overflowX: "hidden",
-          alignItems: "flex-end",
-          paddingBottom: 4,
-          userSelect: "none",
-        }}
-      >
-        {doubled.map((s, i) => (
-          <div
-            key={i}
-            style={{
-              flexShrink: 0,
-              width: 90,
-              height: s.h,
-              borderRadius: 12,
-              overflow: "hidden",
-              position: "relative",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <img src={s.img} alt={s.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, rgba(10,20,28,0.85) 100%)" }} />
-            <div style={{ position: "absolute", bottom: 7, left: 0, right: 0, textAlign: "center" }}>
-              <div style={{ fontSize: 13 }}>{s.emoji}</div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginTop: 1, lineHeight: 1.2 }}>{s.label}</div>
-            </div>
-          </div>
-        ))}
+      {/* Coming Soon badge */}
+      <div style={{ position: "absolute", top: 12, right: 12, background: "rgba(168,85,247,0.25)", border: "1px solid rgba(168,85,247,0.5)", borderRadius: 100, padding: "4px 10px", display: "flex", alignItems: "center", gap: 5 }}>
+        <svg width="10" height="12" viewBox="0 0 12 14" fill="none">
+          <rect x="1" y="6" width="10" height="7" rx="2" fill="rgba(192,132,252,0.4)" stroke="#C084FC" strokeWidth="1.2"/>
+          <path d="M3 6V4a3 3 0 0 1 6 0v2" stroke="#C084FC" strokeWidth="1.2" strokeLinecap="round"/>
+        </svg>
+        <span style={{ fontSize: 9, fontWeight: 800, color: "#C084FC" }}>DEMNÄCHST</span>
       </div>
 
-      {/* "Demnächst" label below */}
-      <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 6 }}>
-        <div style={{ background: "rgba(168,85,247,0.18)", border: "1px solid rgba(168,85,247,0.35)", borderRadius: 100, padding: "3px 9px", fontSize: 9, fontWeight: 800, color: "#C084FC" }}>DEMNÄCHST</div>
-        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>Mehr Partnerbetriebe kommen bald</span>
+      {/* Label */}
+      <div style={{ position: "absolute", bottom: 12, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 2 }}>Bald bei Sensalie</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 16 }}>{slide.emoji}</span>
+            <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{slide.label}</span>
+          </div>
+        </div>
+        {/* Dot indicators */}
+        <div style={{ display: "flex", gap: 4 }}>
+          {SHOWCASE_SLIDES.map((_, i) => (
+            <div key={i} onClick={() => setActiveSlide(i)} style={{ width: 5, height: 5, borderRadius: "50%", background: i === activeSlide ? "#10B981" : "rgba(255,255,255,0.25)", transition: "background 0.4s", cursor: "pointer" }} />
+          ))}
+        </div>
+      </div>
+
+      {/* Info strip */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(16,185,129,0.08)", borderTop: "1px solid rgba(16,185,129,0.15)", padding: "0" }}>
       </div>
     </div>
   );
