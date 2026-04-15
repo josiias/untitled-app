@@ -9,28 +9,28 @@ const STAMP_CARDS = [
     stamps: 5, required: 8, reward: "10€ Gutschein",
     img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80",
     color: "#10B981",
-    nextVisit: "Nächster Besuch: Morgen",
+    appointment: { date: "Mo, 21. Apr.", time: "14:00 Uhr", confirmed: true },
   },
   {
     id: 2, name: "Café Milano", emoji: "☕", category: "Café",
     stamps: 3, required: 6, reward: "1 Kaffee gratis",
     img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80",
     color: "#F59E0B",
-    nextVisit: "Offen heute bis 20 Uhr",
+    appointment: null,
   },
   {
     id: 3, name: "Bella Nails", emoji: "💅", category: "Beauty",
     stamps: 7, required: 8, reward: "Maniküre gratis",
     img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80",
     color: "#EC4899",
-    nextVisit: "Fast geschafft! 🎉",
+    appointment: { date: "Do, 24. Apr.", time: "11:30 Uhr", confirmed: true },
   },
   {
     id: 4, name: "Massage Studio", emoji: "💆", category: "Wellness",
     stamps: 1, required: 10, reward: "1 Massage gratis",
     img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80",
     color: "#8B5CF6",
-    nextVisit: "Termin buchen",
+    appointment: null,
   },
 ];
 
@@ -144,7 +144,7 @@ function StampDots({ stamps = 0, required = 8, color }) {
 }
 
 // ── StampCard ─────────────────────────────────────────────────────────────────
-function StampCard({ card, compact = false }) {
+function StampCard({ card, compact = false, onBookAppointment }) {
   const pct = Math.round((card.stamps / card.required) * 100);
   const isAlmostDone = card.stamps >= card.required - 1;
 
@@ -188,78 +188,167 @@ function StampCard({ card, compact = false }) {
 
         {!compact && <StampDots stamps={card.stamps} required={card.required} color={card.color} />}
 
+        {/* Reward + Appointment row */}
         <div style={{ marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ fontSize: 11, color: card.color, fontWeight: 600 }}>🎁 {card.reward}</div>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{card.nextVisit}</div>
+          {card.appointment ? (
+            <div onClick={() => onBookAppointment && onBookAppointment(card)} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "4px 8px", cursor: "pointer" }}>
+              <span style={{ fontSize: 9 }}>📅</span>
+              <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{card.appointment.date} · {card.appointment.time}</span>
+            </div>
+          ) : (
+            <button onClick={() => onBookAppointment && onBookAppointment(card)} style={{ background: `${card.color}22`, border: `1px solid ${card.color}44`, borderRadius: 8, padding: "4px 10px", fontSize: 10, fontWeight: 700, color: card.color, cursor: "pointer", fontFamily: "inherit" }}>
+              + Termin
+            </button>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-// ── Partner Auto-Ticker (compact scroll with smooth animation) ───────────────
-function PartnerCarousel() {
-  const trackRef = useRef(null);
-  const containerRef = useRef(null);
-  const posRef = useRef(0);
-  const pausedRef = useRef(false);
-  const CARD_W = 62 + 6; // card width + gap
-  const totalW = PARTNER_BUSINESSES.length * CARD_W;
-  const items = [...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES, ...PARTNER_BUSINESSES];
+// ── Partner Showcase — langsam scrollende Branchen-Bilder ───────────────────
+const SHOWCASE_SLIDES = [
+  { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80", label: "Barbershops", emoji: "✂️" },
+  { img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80", label: "Pizzerien", emoji: "🍕" },
+  { img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80", label: "Cafés", emoji: "☕" },
+  { img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80", label: "Nagelstudios", emoji: "💅" },
+  { img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80", label: "Friseursalons", emoji: "💇" },
+  { img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80", label: "Massage", emoji: "💆" },
+  { img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80", label: "Beauty Studios", emoji: "💄" },
+  { img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80", label: "Restaurants", emoji: "🍱" },
+];
+
+function PartnerShowcase() {
+  const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    let raf;
-    const tick = () => {
-      if (!pausedRef.current) {
-        posRef.current += 0.15;
-        if (posRef.current >= totalW) posRef.current = 0;
-        track.style.transform = `translateX(-${posRef.current}px)`;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    const t = setInterval(() => setActiveSlide(i => (i + 1) % SHOWCASE_SLIDES.length), 3000);
+    return () => clearInterval(t);
   }, []);
 
-  const dragStart = useRef(null);
-  const onPointerDown = (e) => { pausedRef.current = true; dragStart.current = e.clientX; };
-  const onPointerMove = (e) => {
-    if (dragStart.current === null) return;
-    const dx = dragStart.current - e.clientX;
-    posRef.current = Math.max(0, Math.min(posRef.current + dx * 0.8, totalW - 1));
-    trackRef.current.style.transform = `translateX(-${posRef.current}px)`;
-    dragStart.current = e.clientX;
-  };
-  const onPointerUp = () => { dragStart.current = null; setTimeout(() => { pausedRef.current = false; }, 800); };
+  const slide = SHOWCASE_SLIDES[activeSlide];
 
   return (
-    <div style={{ margin: "0 -20px" }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, padding: "0 20px" }}>Partnerbetriebe</div>
-      <div ref={containerRef} style={{ overflow: "hidden", position: "relative", cursor: "grab", userSelect: "none" }}
-        onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp}>
-        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 15, background: "linear-gradient(to right, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 15, background: "linear-gradient(to left, #111e28, transparent)", zIndex: 2, pointerEvents: "none" }} />
-        <div ref={trackRef} style={{ display: "flex", gap: 6, willChange: "transform", transition: "none" }}>
-          {items.map((biz, idx) => (
-            <div key={idx} style={{
-              minWidth: 62, borderRadius: 10, overflow: "hidden", position: "relative",
-              height: 90, flexShrink: 0,
-              border: `1px solid ${biz.color}33`,
-            }}>
-              <img src={biz.img} alt={biz.name} draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 25%, rgba(13,20,28,0.95) 100%)" }} />
-              <div style={{ position: "absolute", top: 4, left: 4, background: `${biz.color}CC`, borderRadius: 100, padding: "1px 5px", fontSize: 6, fontWeight: 700, color: "#fff" }}>
-                {biz.type === "referral" ? "💸" : biz.type === "stamps" ? "🎁" : "💸🎁"}
-              </div>
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "4px 5px" }}>
-                <div style={{ fontSize: 10, lineHeight: 1 }}>{biz.emoji}</div>
-                <div style={{ fontSize: 7, fontWeight: 700, color: "#fff", lineHeight: 1.2, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{biz.name}</div>
-              </div>
-            </div>
+    <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", height: 140 }}>
+      {/* Slides */}
+      {SHOWCASE_SLIDES.map((s, i) => (
+        <img
+          key={s.img}
+          src={s.img}
+          alt={s.label}
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            objectFit: "cover",
+            opacity: i === activeSlide ? 1 : 0,
+            transition: "opacity 1.2s ease",
+          }}
+        />
+      ))}
+      {/* Overlay */}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(17,30,40,0.2) 0%, rgba(17,30,40,0.85) 100%)" }} />
+
+      {/* Coming Soon badge */}
+      <div style={{ position: "absolute", top: 12, right: 12, background: "rgba(168,85,247,0.25)", border: "1px solid rgba(168,85,247,0.5)", borderRadius: 100, padding: "4px 10px", display: "flex", alignItems: "center", gap: 5 }}>
+        <svg width="10" height="12" viewBox="0 0 12 14" fill="none">
+          <rect x="1" y="6" width="10" height="7" rx="2" fill="rgba(192,132,252,0.4)" stroke="#C084FC" strokeWidth="1.2"/>
+          <path d="M3 6V4a3 3 0 0 1 6 0v2" stroke="#C084FC" strokeWidth="1.2" strokeLinecap="round"/>
+        </svg>
+        <span style={{ fontSize: 9, fontWeight: 800, color: "#C084FC" }}>DEMNÄCHST</span>
+      </div>
+
+      {/* Label */}
+      <div style={{ position: "absolute", bottom: 12, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 2 }}>Bald bei Sensalie</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 16 }}>{slide.emoji}</span>
+            <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{slide.label}</span>
+          </div>
+        </div>
+        {/* Dot indicators */}
+        <div style={{ display: "flex", gap: 4 }}>
+          {SHOWCASE_SLIDES.map((_, i) => (
+            <div key={i} onClick={() => setActiveSlide(i)} style={{ width: 5, height: 5, borderRadius: "50%", background: i === activeSlide ? "#10B981" : "rgba(255,255,255,0.25)", transition: "background 0.4s", cursor: "pointer" }} />
           ))}
         </div>
+      </div>
+
+      {/* Info strip */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(16,185,129,0.08)", borderTop: "1px solid rgba(16,185,129,0.15)", padding: "0" }}>
+      </div>
+    </div>
+  );
+}
+
+// ── Appointment Booking Modal ────────────────────────────────────────────────
+const MOCK_SLOTS = ["09:00", "10:00", "11:00", "11:30", "14:00", "15:00", "16:30", "17:00"];
+const MOCK_DATES = [
+  { label: "Mo, 21. Apr.", short: "Mo" },
+  { label: "Di, 22. Apr.", short: "Di" },
+  { label: "Mi, 23. Apr.", short: "Mi" },
+  { label: "Do, 24. Apr.", short: "Do" },
+  { label: "Fr, 25. Apr.", short: "Fr" },
+];
+
+function AppointmentModal({ card, onClose, onBook }) {
+  const [selectedDate, setSelectedDate] = useState(0);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [booked, setBooked] = useState(false);
+
+  const handleBook = () => {
+    if (!selectedTime) return;
+    setBooked(true);
+    setTimeout(() => {
+      onBook(card.id, { date: MOCK_DATES[selectedDate].label, time: selectedTime + " Uhr", confirmed: true });
+      onClose();
+    }, 1200);
+  };
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 600, background: "#111e28", borderRadius: "28px 28px 0 0", border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "24px 24px 48px", boxShadow: "0 -20px 60px rgba(0,0,0,0.6)" }}>
+        {/* Handle */}
+        <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 100, margin: "0 auto 20px" }} />
+
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+          <div style={{ width: 40, height: 40, background: `${card.color}22`, border: `1px solid ${card.color}55`, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{card.emoji}</div>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Termin buchen</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{card.name}</div>
+          </div>
+        </div>
+
+        {/* Date picker */}
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Datum wählen</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {MOCK_DATES.map((d, i) => (
+              <button key={i} onClick={() => { setSelectedDate(i); setSelectedTime(null); }} style={{ flex: 1, padding: "10px 4px", background: selectedDate === i ? card.color : "rgba(255,255,255,0.06)", border: selectedDate === i ? "none" : "1px solid rgba(255,255,255,0.1)", borderRadius: 12, cursor: "pointer", fontFamily: "inherit" }}>
+                <div style={{ fontSize: 10, color: selectedDate === i ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.35)", marginBottom: 2 }}>{d.short}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: selectedDate === i ? "#fff" : "rgba(255,255,255,0.6)" }}>{d.label.split(". ")[1]?.replace("Apr", "").trim() || d.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Time slots */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Uhrzeit wählen</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+            {MOCK_SLOTS.map(slot => (
+              <button key={slot} onClick={() => setSelectedTime(slot)} style={{ padding: "10px 6px", background: selectedTime === slot ? card.color : "rgba(255,255,255,0.06)", border: selectedTime === slot ? "none" : "1px solid rgba(255,255,255,0.1)", borderRadius: 10, fontSize: 13, fontWeight: 700, color: selectedTime === slot ? "#fff" : "rgba(255,255,255,0.6)", cursor: "pointer", fontFamily: "inherit" }}>
+                {slot}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Book button */}
+        <button onClick={handleBook} disabled={!selectedTime || booked} style={{ width: "100%", padding: "14px", background: booked ? "#059669" : (!selectedTime ? "rgba(255,255,255,0.08)" : card.color), color: "#fff", border: "none", borderRadius: 14, fontSize: 15, fontWeight: 800, cursor: selectedTime && !booked ? "pointer" : "not-allowed", fontFamily: "inherit", transition: "all 0.3s" }}>
+          {booked ? "✓ Termin bestätigt!" : selectedTime ? `Termin buchen — ${MOCK_DATES[selectedDate].label} ${selectedTime}` : "Uhrzeit auswählen"}
+        </button>
       </div>
     </div>
   );
@@ -394,9 +483,12 @@ function RankingComingSoon() {
 }
 
 // ── Home Tab ──────────────────────────────────────────────────────────────────
-function HomeTab({ onTabChange }) {
+function HomeTab({ onTabChange, appointments, onBookAppointment }) {
   const [activityExpanded, setActivityExpanded] = useState(false);
   const visibleActivity = activityExpanded ? ACTIVITY : ACTIVITY.slice(0, 2);
+  const upcomingAppointments = STAMP_CARDS.filter(c => appointments[c.id])
+    .map(c => ({ ...c, appointment: appointments[c.id] }))
+    .sort((a, b) => a.appointment.date.localeCompare(b.appointment.date));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -426,8 +518,32 @@ function HomeTab({ onTabChange }) {
         </div>
       </div>
 
-      {/* Partner Businesses Carousel */}
-      <PartnerCarousel />
+      {/* Partner Showcase */}
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Partnerbetriebe</div>
+        <PartnerShowcase />
+      </div>
+
+      {/* Upcoming Appointments */}
+      {upcomingAppointments.length > 0 && (
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Deine Termine 📅</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {upcomingAppointments.map(card => (
+              <div key={card.id} onClick={() => onBookAppointment(card)} style={{ display: "flex", alignItems: "center", gap: 12, background: "#1a2530", border: `1px solid ${card.color}33`, borderRadius: 16, padding: "12px 14px", cursor: "pointer" }}>
+                <div style={{ width: 42, height: 42, borderRadius: 12, overflow: "hidden", flexShrink: 0 }}>
+                  <img src={card.img} alt={card.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{card.name}</div>
+                  <div style={{ fontSize: 11, color: card.color, fontWeight: 600, marginTop: 2 }}>📅 {card.appointment.date} · {card.appointment.time}</div>
+                </div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>ändern →</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Provision Widget */}
       <ProvisionWidget />
@@ -437,7 +553,7 @@ function HomeTab({ onTabChange }) {
         <div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Fast geschafft 🔥</div>
           {STAMP_CARDS.filter(c => c.stamps >= c.required - 1).map(card => (
-            <StampCard key={card.id} card={card} compact />
+            <StampCard key={card.id} card={{ ...card, appointment: appointments[card.id] || card.appointment }} compact onBookAppointment={onBookAppointment} />
           ))}
         </div>
       )}
@@ -494,11 +610,17 @@ function HomeTab({ onTabChange }) {
 }
 
 // ── Cards Tab ──────────────────────────────────────────────────────────────────
-function CardsTab() {
+function CardsTab({ appointments, onBookAppointment }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Deine {STAMP_CARDS.length} Stempelkarten</div>
-      {STAMP_CARDS.map(card => <StampCard key={card.id} card={card} />)}
+      {STAMP_CARDS.map(card => (
+        <StampCard
+          key={card.id}
+          card={{ ...card, appointment: appointments[card.id] || card.appointment }}
+          onBookAppointment={onBookAppointment}
+        />
+      ))}
     </div>
   );
 }
@@ -769,6 +891,18 @@ export default function CustomerDashboard() {
   const [tab, setTab] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
+  const [bookingCard, setBookingCard] = useState(null);
+
+  // appointments: { [cardId]: { date, time, confirmed } }
+  const initialAppointments = {};
+  STAMP_CARDS.forEach(c => { if (c.appointment) initialAppointments[c.id] = c.appointment; });
+  const [appointments, setAppointments] = useState(initialAppointments);
+
+  const handleBookAppointment = (card) => setBookingCard(card);
+  const handleConfirmBooking = (cardId, appt) => {
+    setAppointments(prev => ({ ...prev, [cardId]: appt }));
+    setBookingCard(null);
+  };
 
   return (
     <div style={{ minHeight: "100vh", background: "#111e28", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden", position: "relative" }}>
@@ -847,8 +981,8 @@ export default function CustomerDashboard() {
 
       {/* ── Content ── */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px 20px 110px", position: "relative", zIndex: 1 }}>
-        {tab === "home"     && <HomeTab onTabChange={setTab} />}
-        {tab === "cards"    && <CardsTab />}
+        {tab === "home"     && <HomeTab onTabChange={setTab} appointments={appointments} onBookAppointment={handleBookAppointment} />}
+        {tab === "cards"    && <CardsTab appointments={appointments} onBookAppointment={handleBookAppointment} />}
         {tab === "rewards"  && <RewardsTab />}
         {tab === "referral" && <ReferralTab />}
       </div>
@@ -890,6 +1024,15 @@ export default function CustomerDashboard() {
 
       {/* QR Modal */}
       {qrOpen && <QRModal onClose={() => setQrOpen(false)} />}
+
+      {/* Appointment Booking Modal */}
+      {bookingCard && (
+        <AppointmentModal
+          card={{ ...bookingCard, appointment: appointments[bookingCard.id] || bookingCard.appointment }}
+          onClose={() => setBookingCard(null)}
+          onBook={handleConfirmBooking}
+        />
+      )}
     </div>
   );
 }
