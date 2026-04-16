@@ -229,8 +229,7 @@ function HeroSlideshow() {
   }, []);
   const s = HERO_SLIDES[slide];
   return (
-    /* Negativer Margin links/rechts + padding kompensieren, damit Bild rand-zu-rand läuft */
-    <div style={{ margin: "-36px -36px 24px -36px", position: "relative", overflow: "hidden", height: 180 }}>
+    <div style={{ position: "relative", overflow: "hidden", height: 180, marginBottom: 0 }}>
       <style>{`
         @keyframes slowZoom {
           0%   { transform: scale(1); }
@@ -435,11 +434,14 @@ export default function Business() {
       <div className="main-pad" style={{ maxWidth: 960, margin: "0 auto", padding: "32px 24px 60px", position: "relative", zIndex: 1 }}>
 
         {/* Hero card */}
-        <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.10) 0%, transparent 60%)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 36, marginBottom: 16 }}>
-          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Guten Tag 👋</h1>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: "0 0 20px" }}>Hier ist dein Überblick für heute.</p>
+        <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.10) 0%, transparent 60%)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, marginBottom: 16, overflow: "hidden" }}>
+          <div style={{ padding: "36px 36px 0" }}>
+            <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Guten Tag 👋</h1>
+            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: "0 0 20px" }}>Hier ist dein Überblick für heute.</p>
+          </div>
           <HeroSlideshow />
 
+          <div style={{ padding: "0 36px 36px" }}>
           {/* Stats */}
           <div className="stats-row" style={{ display: "flex", alignItems: "stretch", gap: 0, marginBottom: 28 }}>
             {DUMMY_STATS.map((s, i) => (
@@ -466,6 +468,7 @@ export default function Business() {
             <button className={`ghost-btn${activeSection === 'commission' ? ' active' : ''}`} onClick={() => setActiveSection(activeSection === 'commission' ? null : 'commission')}>
               💶 Provisionsmodell
             </button>
+          </div>
           </div>
         </div>
 
