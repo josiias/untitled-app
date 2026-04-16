@@ -1,5 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+
+// ── Hero Slideshow Bilder (Branchenimpressionen) ──────────────────────────────
+const HERO_SLIDES = [
+  { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1200&q=80", label: "Barbershop · Beliebtester Service", sub: "Haarschnitt klassisch" },
+  { img: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&q=80", label: "Barbershop · Top Bewertung", sub: "Bart-Styling Deluxe" },
+  { img: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=1200&q=80", label: "Barbershop · Meistgebucht", sub: "Rasur & Pflege" },
+];
+
+// ── Rangliste Demo-Daten ───────────────────────────────────────────────────────
+const RANKING_DATA = [
+  { rank: 1, medal: "🥇", name: "Barber Palace Berlin",   city: "Berlin",   pts: 9840, color: "#F59E0B" },
+  { rank: 2, medal: "🥈", name: "Style Kings Frankfurt",  city: "Frankfurt", pts: 8720, color: "#94A3B8" },
+  { rank: 3, medal: "🥉", name: "Kings Barbershop",       city: "München",  pts: 7610, color: "#CD7F32", isYou: true },
+  { rank: 4, medal: "4",  name: "Barber Club Hamburg",    city: "Hamburg",  pts: 6340, color: "#3B82F6" },
+  { rank: 5, medal: "5",  name: "Premier Cuts Köln",      city: "Köln",     pts: 5120, color: "#8B5CF6" },
+];
 
 const MINI_CHART_DATA = [
   { tag: "Mo", stempel: 4 },
@@ -204,6 +220,121 @@ function QRCodeSection({ businessId, businessName }) {
   );
 }
 
+// ── Hero Slideshow Component ──────────────────────────────────────────────────
+function HeroSlideshow() {
+  const [slide, setSlide] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setSlide(i => (i + 1) % HERO_SLIDES.length), 3500);
+    return () => clearInterval(t);
+  }, []);
+  const s = HERO_SLIDES[slide];
+  return (
+    <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", height: 130, marginBottom: 24 }}>
+      {HERO_SLIDES.map((sl, i) => (
+        <img key={sl.img} src={sl.img} alt={sl.label} style={{
+          position: "absolute", inset: 0, width: "100%", height: "100%",
+          objectFit: "cover", objectPosition: "center 30%",
+          opacity: i === slide ? 1 : 0, transition: "opacity 1.2s ease",
+        }} />
+      ))}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.85) 0%, rgba(10,22,18,0.3) 100%)" }} />
+      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 20px", justifyContent: "space-between" }}>
+        <div>
+          <div style={{ fontSize: 10, color: "#10B981", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{s.label}</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>{s.sub}</div>
+          <div style={{ display: "flex", gap: 5, marginTop: 8 }}>
+            {HERO_SLIDES.map((_, i) => (
+              <div key={i} onClick={() => setSlide(i)} style={{ width: 20, height: 3, borderRadius: 2, background: i === slide ? "#10B981" : "rgba(255,255,255,0.25)", cursor: "pointer", transition: "background 0.4s" }} />
+            ))}
+          </div>
+        </div>
+        <div style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "8px 14px", textAlign: "center", flexShrink: 0 }}>
+          <div style={{ fontSize: 20, fontWeight: 900, color: "#10B981", fontFamily: "'Bricolage Grotesque', sans-serif" }}>⭐ 4.9</div>
+          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>Kundenbewertung</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Rangliste Component (gesperrt) ────────────────────────────────────────────
+function RankingSection() {
+  return (
+    <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 28, marginBottom: 16, position: "relative", overflow: "hidden" }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 20 }}>🏆</span>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>Deutschlandweite Rangliste</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>Bestes Unternehmen deiner Branche</div>
+          </div>
+        </div>
+        <div style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 100, padding: "4px 12px", fontSize: 10, fontWeight: 800, color: "#F59E0B" }}>
+          BALD VERFÜGBAR
+        </div>
+      </div>
+
+      {/* Preview Rows — verschwommen */}
+      <div style={{ opacity: 0.3, pointerEvents: "none" }}>
+        {/* Top 3 Podium */}
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 10, height: 100, marginBottom: 16 }}>
+          {[RANKING_DATA[1], RANKING_DATA[0], RANKING_DATA[2]].map((e, i) => {
+            const heights = [72, 100, 56];
+            return (
+              <div key={e.rank} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                <div style={{ fontSize: i === 1 ? 20 : 14 }}>{e.medal}</div>
+                <div style={{ width: "100%", height: heights[i], borderRadius: "10px 10px 0 0", background: `linear-gradient(to top, ${e.color}66, ${e.color}22)`, border: `1px solid ${e.color}44`, display: "flex", alignItems: "flex-end", justifyContent: "center", paddingBottom: 6 }}>
+                  <span style={{ fontSize: 10, fontWeight: 800, color: e.color }}>{e.pts.toLocaleString()}</span>
+                </div>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.5)", textAlign: "center", maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.name}</div>
+              </div>
+            );
+          })}
+        </div>
+        {/* Remaining rows */}
+        {RANKING_DATA.slice(3).map((e, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+            <div style={{ width: 20, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.3)", textAlign: "center" }}>{e.rank}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: e.isYou ? 800 : 600, color: e.isYou ? "#10B981" : "#fff" }}>{e.name}</div>
+              <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 100, marginTop: 4, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${Math.round(e.pts / RANKING_DATA[0].pts * 100)}%`, background: e.color, borderRadius: 100 }} />
+              </div>
+            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{e.pts.toLocaleString()} Pkt.</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Lock Overlay */}
+      <div style={{ position: "absolute", inset: 0, borderRadius: 20, background: "rgba(10,22,18,0.6)", backdropFilter: "blur(3px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24 }}>
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(245,158,11,0.15)", border: "2px solid rgba(245,158,11,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>
+          🏆
+        </div>
+        <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 18, fontWeight: 900, color: "#fff", textAlign: "center" }}>
+          Sensalie Branchen-Pokal
+        </div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", textAlign: "center", lineHeight: 1.6, maxWidth: 260 }}>
+          Die besten Unternehmen ihrer Branche in ganz Deutschland treten an — und der Sieger gewinnt den <strong style={{ color: "#F59E0B" }}>Sensalie Goldpokal</strong> 🥇
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+          <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: "8px 16px", fontSize: 12, fontWeight: 700, color: "#F59E0B" }}>
+            🏆 Goldpokal
+          </div>
+          <div style={{ background: "rgba(148,163,184,0.1)", border: "1px solid rgba(148,163,184,0.3)", borderRadius: 10, padding: "8px 16px", fontSize: 12, fontWeight: 700, color: "#94A3B8" }}>
+            🥈 Silberpokal
+          </div>
+          <div style={{ background: "rgba(205,127,50,0.1)", border: "1px solid rgba(205,127,50,0.3)", borderRadius: 10, padding: "8px 16px", fontSize: 12, fontWeight: 700, color: "#CD7F32" }}>
+            🥉 Bronzepokal
+          </div>
+        </div>
+        <div style={{ marginTop: 4, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Startet halbjährlich · Anmeldung demnächst möglich</div>
+      </div>
+    </div>
+  );
+}
+
 export default function Business() {
   const [settings, setSettings] = useState({
     minAmountForStamp: "20",
@@ -276,7 +407,8 @@ export default function Business() {
         {/* Hero card */}
         <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.10) 0%, transparent 60%)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 36, marginBottom: 16 }}>
           <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Guten Tag 👋</h1>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: "0 0 28px" }}>Hier ist dein Überblick für heute.</p>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: "0 0 20px" }}>Hier ist dein Überblick für heute.</p>
+          <HeroSlideshow />
 
           {/* Stats */}
           <div className="stats-row" style={{ display: "flex", alignItems: "stretch", gap: 0, marginBottom: 28 }}>
@@ -517,7 +649,7 @@ export default function Business() {
         </div>
 
         {/* Activity Feed */}
-        <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 28 }}>
+        <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 28, marginBottom: 16 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 16 }}>Letzte Aktivitäten</div>
           {DUMMY_ACTIVITY.map((item, i) => (
             <div key={i} className="activity-item">
@@ -530,6 +662,9 @@ export default function Business() {
             </div>
           ))}
         </div>
+
+        {/* Rangliste */}
+        <RankingSection />
 
       </div>
     </div>
