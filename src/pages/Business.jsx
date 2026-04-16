@@ -3,9 +3,9 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 
 // ── Hero Slideshow Bilder (Branchenimpressionen) ──────────────────────────────
 const HERO_SLIDES = [
-  { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1200&q=80", label: "Barbershop · Beliebtester Service", sub: "Haarschnitt klassisch" },
-  { img: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&q=80", label: "Barbershop · Top Bewertung", sub: "Bart-Styling Deluxe" },
-  { img: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=1200&q=80", label: "Barbershop · Meistgebucht", sub: "Rasur & Pflege" },
+  { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1200&q=80", sub: "Haarschnitt klassisch", rating: 4.9, reviews: 128 },
+  { img: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&q=80", sub: "Bart-Styling Deluxe", rating: 4.7, reviews: 84 },
+  { img: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=1200&q=80", sub: "Rasur & Pflege", rating: 4.8, reviews: 61 },
 ];
 
 // ── Rangliste Demo-Daten ───────────────────────────────────────────────────────
@@ -224,57 +224,64 @@ function QRCodeSection({ businessId, businessName }) {
 function HeroSlideshow() {
   const [slide, setSlide] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setSlide(i => (i + 1) % HERO_SLIDES.length), 4000);
+    const t = setInterval(() => setSlide(i => (i + 1) % HERO_SLIDES.length), 4500);
     return () => clearInterval(t);
   }, []);
   const s = HERO_SLIDES[slide];
   return (
-    <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", height: 140, marginBottom: 24 }}>
+    /* Negativer Margin links/rechts + padding kompensieren, damit Bild rand-zu-rand läuft */
+    <div style={{ margin: "-36px -36px 24px -36px", position: "relative", overflow: "hidden", height: 180 }}>
       <style>{`
         @keyframes slowZoom {
           0%   { transform: scale(1); }
-          100% { transform: scale(1.08); }
+          100% { transform: scale(1.09); }
         }
-        .hero-slide-img {
+        .hero-slide-img-biz {
           position: absolute; inset: 0; width: 100%; height: 100%;
           object-fit: cover; object-position: center 30%;
-          transition: opacity 1.4s ease;
-          animation: slowZoom 6s ease-in-out forwards;
+          transition: opacity 1.5s ease;
+          animation: slowZoom 7s ease-in-out forwards;
         }
       `}</style>
 
       {HERO_SLIDES.map((sl, i) => (
-        <img
-          key={sl.img + i}
-          src={sl.img}
-          alt={sl.label}
-          className="hero-slide-img"
+        <img key={sl.img + i} src={sl.img} alt={sl.sub}
+          className="hero-slide-img-biz"
           style={{ opacity: i === slide ? 1 : 0 }}
         />
       ))}
 
-      {/* Gradient overlay */}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.82) 0%, rgba(10,22,18,0.25) 100%)" }} />
+      {/* Gradient: links dunkel für Text, unten für Dots */}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.88) 0%, rgba(10,22,18,0.15) 60%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,22,18,0.7) 0%, transparent 50%)" }} />
 
-      {/* Top-left: label + sub */}
-      <div style={{ position: "absolute", top: 16, left: 18 }}>
+      {/* Top-left: service label + name */}
+      <div style={{ position: "absolute", top: 18, left: 22 }}>
         <div style={{ fontSize: 9, color: "#10B981", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 5 }}>
           Dein beliebtester Service
         </div>
-        <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{s.sub}</div>
+        <div style={{ fontSize: 19, fontWeight: 900, color: "#fff", lineHeight: 1.2, fontFamily: "'Bricolage Grotesque', sans-serif" }}>{s.sub}</div>
       </div>
 
-      {/* Bottom dots */}
-      <div style={{ position: "absolute", bottom: 14, left: 18, display: "flex", gap: 5 }}>
+      {/* Top-right: Bewertungs-Badge */}
+      <div style={{ position: "absolute", top: 16, right: 18, background: "rgba(10,22,18,0.65)", backdropFilter: "blur(8px)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "8px 14px", textAlign: "center" }}>
+        <div style={{ fontSize: 18, fontWeight: 900, color: "#F59E0B", fontFamily: "'Bricolage Grotesque', sans-serif", lineHeight: 1 }}>
+          ⭐ {s.rating}
+        </div>
+        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 3 }}>{s.reviews} Bewertungen</div>
+      </div>
+
+      {/* Bottom-left: dots */}
+      <div style={{ position: "absolute", bottom: 14, left: 22, display: "flex", gap: 5 }}>
         {HERO_SLIDES.map((_, i) => (
-          <div key={i} onClick={() => setSlide(i)} style={{ width: 18, height: 3, borderRadius: 2, background: i === slide ? "#10B981" : "rgba(255,255,255,0.22)", cursor: "pointer", transition: "background 0.4s" }} />
+          <div key={i} onClick={() => setSlide(i)} style={{ width: 20, height: 3, borderRadius: 2, background: i === slide ? "#10B981" : "rgba(255,255,255,0.22)", cursor: "pointer", transition: "background 0.4s" }} />
         ))}
       </div>
 
       {/* Bottom-right: Sensalie watermark */}
-      <div style={{ position: "absolute", bottom: 12, right: 16, display: "flex", alignItems: "center", gap: 4, opacity: 0.45 }}>
-        <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981" }} />
-        <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 11, fontWeight: 700, color: "#fff", letterSpacing: 0.5 }}>sensalie</span>
+      <div style={{ position: "absolute", bottom: 12, right: 18, display: "flex", alignItems: "center", gap: 4, opacity: 0.4 }}>
+        <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#10B981" }} />
+        <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 10, fontWeight: 700, color: "#fff", letterSpacing: 0.8 }}>sensalie</span>
       </div>
     </div>
   );
