@@ -488,10 +488,7 @@ export default function ScanLanding() {
             </div>
           </div>
 
-          <button onClick={() => window.location.href = "/dashboard"} style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg, #10B981, #059669)", color: "#fff", fontWeight: 800, fontSize: 15, borderRadius: 14, border: "none", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 24px rgba(16,185,129,0.35)", marginBottom: 8 }}>
-            📱 Meine Stempelkarten ansehen →
-          </button>
-          <button onClick={() => window.location.href = "/"} style={{ width: "100%", padding: "10px", background: "transparent", color: "rgba(255,255,255,0.3)", fontWeight: 500, fontSize: 12, borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+          <button onClick={() => window.location.href = "/"} style={{ width: "100%", padding: "11px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.45)", fontWeight: 600, fontSize: 12, borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", fontFamily: "inherit" }}>
             Zur Startseite
           </button>
 
