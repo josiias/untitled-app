@@ -224,34 +224,57 @@ function QRCodeSection({ businessId, businessName }) {
 function HeroSlideshow() {
   const [slide, setSlide] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setSlide(i => (i + 1) % HERO_SLIDES.length), 3500);
+    const t = setInterval(() => setSlide(i => (i + 1) % HERO_SLIDES.length), 4000);
     return () => clearInterval(t);
   }, []);
   const s = HERO_SLIDES[slide];
   return (
-    <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", height: 130, marginBottom: 24 }}>
+    <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", height: 140, marginBottom: 24 }}>
+      <style>{`
+        @keyframes slowZoom {
+          0%   { transform: scale(1); }
+          100% { transform: scale(1.08); }
+        }
+        .hero-slide-img {
+          position: absolute; inset: 0; width: 100%; height: 100%;
+          object-fit: cover; object-position: center 30%;
+          transition: opacity 1.4s ease;
+          animation: slowZoom 6s ease-in-out forwards;
+        }
+      `}</style>
+
       {HERO_SLIDES.map((sl, i) => (
-        <img key={sl.img} src={sl.img} alt={sl.label} style={{
-          position: "absolute", inset: 0, width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 30%",
-          opacity: i === slide ? 1 : 0, transition: "opacity 1.2s ease",
-        }} />
+        <img
+          key={sl.img + i}
+          src={sl.img}
+          alt={sl.label}
+          className="hero-slide-img"
+          style={{ opacity: i === slide ? 1 : 0 }}
+        />
       ))}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.85) 0%, rgba(10,22,18,0.3) 100%)" }} />
-      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 20px", justifyContent: "space-between" }}>
-        <div>
-          <div style={{ fontSize: 10, color: "#10B981", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{s.label}</div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>{s.sub}</div>
-          <div style={{ display: "flex", gap: 5, marginTop: 8 }}>
-            {HERO_SLIDES.map((_, i) => (
-              <div key={i} onClick={() => setSlide(i)} style={{ width: 20, height: 3, borderRadius: 2, background: i === slide ? "#10B981" : "rgba(255,255,255,0.25)", cursor: "pointer", transition: "background 0.4s" }} />
-            ))}
-          </div>
+
+      {/* Gradient overlay */}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,22,18,0.82) 0%, rgba(10,22,18,0.25) 100%)" }} />
+
+      {/* Top-left: label + sub */}
+      <div style={{ position: "absolute", top: 16, left: 18 }}>
+        <div style={{ fontSize: 9, color: "#10B981", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 5 }}>
+          Dein beliebtester Service
         </div>
-        <div style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "8px 14px", textAlign: "center", flexShrink: 0 }}>
-          <div style={{ fontSize: 20, fontWeight: 900, color: "#10B981", fontFamily: "'Bricolage Grotesque', sans-serif" }}>⭐ 4.9</div>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>Kundenbewertung</div>
-        </div>
+        <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{s.sub}</div>
+      </div>
+
+      {/* Bottom dots */}
+      <div style={{ position: "absolute", bottom: 14, left: 18, display: "flex", gap: 5 }}>
+        {HERO_SLIDES.map((_, i) => (
+          <div key={i} onClick={() => setSlide(i)} style={{ width: 18, height: 3, borderRadius: 2, background: i === slide ? "#10B981" : "rgba(255,255,255,0.22)", cursor: "pointer", transition: "background 0.4s" }} />
+        ))}
+      </div>
+
+      {/* Bottom-right: Sensalie watermark */}
+      <div style={{ position: "absolute", bottom: 12, right: 16, display: "flex", alignItems: "center", gap: 4, opacity: 0.45 }}>
+        <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981" }} />
+        <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 11, fontWeight: 700, color: "#fff", letterSpacing: 0.5 }}>sensalie</span>
       </div>
     </div>
   );
