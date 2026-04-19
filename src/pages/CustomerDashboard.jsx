@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import SuggestBusinessTab from "@/components/customer/SuggestBusinessTab";
 import SupportChatTab from "@/components/customer/SupportChatTab";
 import NotificationSettings, { useNotificationChecker } from "@/components/customer/NotificationSettings";
+import LevelSystem from "@/components/customer/LevelSystem";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -758,6 +759,15 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
             {activityExpanded ? "▲ Weniger anzeigen" : `▼ Alle ${ACTIVITY.length} Aktivitäten`}
           </button>
         </div>
+      </div>
+
+      {/* Level & Badges */}
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Dein Level & Badges 🏅</div>
+        <LevelSystem
+          totalStamps={STAMP_CARDS.reduce((sum, c) => sum + c.stamps, 0)}
+          totalReferrals={REFERRAL_STATS.count}
+        />
       </div>
 
       {/* Rangliste */}
