@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 
+// Redirect to login if not authenticated
+async function ensureAuth() {
+  const authed = await base44.auth.isAuthenticated();
+  if (!authed) {
+    base44.auth.redirectToLogin(window.location.href);
+  }
+}
+
 const CATEGORIES = [
   { value: "stempel",    label: "Stempel",    emoji: "⬛" },
   { value: "provision",  label: "Provision",  emoji: "💸" },
@@ -24,7 +32,9 @@ export default function KnowledgeBaseAdmin() {
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    ensureAuth().then(() => load());
+  }, []);
 
   const load = async () => {
     setLoading(true);
@@ -47,6 +57,7 @@ export default function KnowledgeBaseAdmin() {
     setShowForm(false);
     await load();
   };
+
 
   const handleEdit = (entry) => {
     setForm({ title: entry.title, content: entry.content, category: entry.category || "allgemein", active: entry.active !== false });
