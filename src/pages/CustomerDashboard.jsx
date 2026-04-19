@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import SuggestBusinessTab from "@/components/customer/SuggestBusinessTab";
 import SupportChatTab from "@/components/customer/SupportChatTab";
 import NotificationSettings, { useNotificationChecker } from "@/components/customer/NotificationSettings";
-import LevelSystem from "@/components/customer/LevelSystem";
+import LevelSystem, { calcUserStats, LEVELS } from "@/components/customer/LevelSystem";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -641,6 +641,46 @@ function RankingComingSoon() {
   );
 }
 
+// ── Level Mini Widget ─────────────────────────────────────────────────────────
+function LevelMiniWidget({ totalStamps, totalReferrals }) {
+  const { xp, currentLevel, nextLevel, pct, xpIntoLevel, xpNeeded, unlockedBadges } = calcUserStats(totalStamps, totalReferrals);
+  return (
+    <div style={{
+      borderRadius: 18, padding: "14px 16px", position: "relative", overflow: "hidden",
+      background: `linear-gradient(135deg, ${currentLevel.color}18, ${currentLevel.color}06)`,
+      border: `1.5px solid ${currentLevel.color}35`,
+    }}>
+      <div style={{ position: "absolute", top: -30, right: -30, width: 100, height: 100, background: `radial-gradient(circle, ${currentLevel.color}25 0%, transparent 65%)`, pointerEvents: "none" }} />
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+        <div style={{ width: 44, height: 44, borderRadius: 14, background: `${currentLevel.color}22`, border: `2px solid ${currentLevel.color}55`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>
+          {currentLevel.emoji}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Dein Level</div>
+          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 17, fontWeight: 900, color: "#fff" }}>{currentLevel.label}</div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: 17, fontWeight: 900, color: currentLevel.color, fontFamily: "'Bricolage Grotesque', sans-serif" }}>{xp} XP</div>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{unlockedBadges.length} Badges</div>
+        </div>
+      </div>
+      {nextLevel ? (
+        <>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>→ {nextLevel.emoji} {nextLevel.label}</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: currentLevel.color }}>{xpIntoLevel}/{xpNeeded} XP</span>
+          </div>
+          <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 100, height: 6, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${pct}%`, background: `linear-gradient(90deg, ${currentLevel.color}88, ${currentLevel.color})`, borderRadius: 100, transition: "width 0.8s ease" }} />
+          </div>
+        </>
+      ) : (
+        <div style={{ fontSize: 12, fontWeight: 700, color: currentLevel.color }}>👑 Maximales Level erreicht!</div>
+      )}
+    </div>
+  );
+}
+
 // ── Home Tab ──────────────────────────────────────────────────────────────────
 function HomeTab({ onTabChange, appointments, onBookAppointment }) {
   const [activityExpanded, setActivityExpanded] = useState(false);
@@ -761,14 +801,11 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
         </div>
       </div>
 
-      {/* Level & Badges */}
-      <div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Dein Level & Badges 🏅</div>
-        <LevelSystem
-          totalStamps={STAMP_CARDS.reduce((sum, c) => sum + c.stamps, 0)}
-          totalReferrals={REFERRAL_STATS.count}
-        />
-      </div>
+      {/* Level Mini-Widget */}
+      <LevelMiniWidget
+        totalStamps={STAMP_CARDS.reduce((sum, c) => sum + c.stamps, 0)}
+        totalReferrals={REFERRAL_STATS.count}
+      />
 
       {/* Rangliste */}
       <RankingComingSoon />
