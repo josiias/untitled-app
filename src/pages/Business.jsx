@@ -375,11 +375,15 @@ const BIZ_TIPS = [
 
 function JuliaBizBot() {
   const [open, setOpen] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [mode, setMode] = useState("tips"); // "tips" | "chat"
   const [tipIndex, setTipIndex] = useState(0);
+  const [messages, setMessages] = useState([
+    { from: "bot", text: "Hallo! 👋 Ich bin Julia, deine Sensalie Business-Assistentin. Wie kann ich dir helfen?" }
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const tip = BIZ_TIPS[tipIndex];
 
-  // Auto-show after 4 seconds, once per session
   useEffect(() => {
     const shown = sessionStorage.getItem("julia_biz_shown");
     if (shown) return;
@@ -390,7 +394,24 @@ function JuliaBizBot() {
     return () => clearTimeout(t);
   }, []);
 
-  if (dismissed) return null;
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+    setInput("");
+    const newMessages = [...messages, { from: "user", text }];
+    setMessages(newMessages);
+    setLoading(true);
+    try {
+      const { base44 } = await import("@/api/base44Client");
+      const reply = await base44.integrations.Core.InvokeLLM({
+        prompt: `Du bist Julia, die Sensalie Business-Assistentin. Du hilfst Unternehmern (Barbershops, Cafés, Nagelstudios etc.) dabei, Sensalie — eine digitale Kundenkarten- und Empfehlungsplattform — optimal zu nutzen. Antworte auf Deutsch, freundlich und knapp (max. 2-3 Sätze). Kontext: Sensalie ermöglicht Stempelkarten, Prämien und Kunden-Provisionen für Empfehlungen.\n\nNutzer-Frage: ${text}`,
+      });
+      setMessages(prev => [...prev, { from: "bot", text: typeof reply === "string" ? reply : reply?.text || "Das habe ich leider nicht verstanden." }]);
+    } catch {
+      setMessages(prev => [...prev, { from: "bot", text: "Ups, da ist etwas schiefgelaufen. Bitte versuch es nochmal! 😊" }]);
+    }
+    setLoading(false);
+  };
 
   return (
     <>
@@ -399,54 +420,102 @@ function JuliaBizBot() {
         @keyframes juliaPop { from{opacity:0;transform:scale(0.85) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
       `}</style>
 
-      {/* Floating avatar */}
-      <div style={{ position: "fixed", bottom: 28, right: 20, zIndex: 100, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-        {/* Chat panel */}
+      <div style={{ position: "fixed", bottom: 24, right: 20, zIndex: 100, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+
+        {/* Main panel */}
         {open && (
           <div style={{
             animation: "juliaPop 0.25s ease",
             background: "#0d1f14", border: "1.5px solid rgba(16,185,129,0.35)",
-            borderRadius: "16px 16px 4px 16px", padding: "14px 16px",
-            width: 250, boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+            borderRadius: 18, width: 270, boxShadow: "0 10px 40px rgba(0,0,0,0.55)",
+            overflow: "hidden",
           }}>
             {/* Header */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <div style={{ fontSize: 18 }}>🎧</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+              <div style={{ fontSize: 22 }}>👩‍💼</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Julia · Sensalie</div>
-                <div style={{ fontSize: 10, color: "#10B981", fontWeight: 600 }}>● Business-Tipp</div>
+                <div style={{ fontSize: 10, color: "#10B981", fontWeight: 600 }}>● Online</div>
               </div>
-              <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", fontSize: 14, cursor: "pointer", padding: 0 }}>✕</button>
+              <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", fontSize: 15, cursor: "pointer", padding: 0 }}>✕</button>
             </div>
 
-            {/* Tip */}
-            <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)", borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", marginBottom: 4 }}>{tip.emoji} {tip.title}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{tip.text}</div>
+            {/* Mode toggle */}
+            <div style={{ display: "flex", gap: 0, background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+              {[{ id: "tips", label: "💡 Tipps" }, { id: "chat", label: "💬 Fragen" }].map(m => (
+                <button key={m.id} onClick={() => setMode(m.id)}
+                  style={{ flex: 1, padding: "8px", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 11, fontWeight: 700,
+                    background: mode === m.id ? "rgba(16,185,129,0.15)" : "transparent",
+                    color: mode === m.id ? "#10B981" : "rgba(255,255,255,0.35)",
+                    borderBottom: mode === m.id ? "2px solid #10B981" : "2px solid transparent",
+                  }}>{m.label}</button>
+              ))}
             </div>
 
-            {/* Navigation */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{tipIndex + 1} / {BIZ_TIPS.length}</span>
-              <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => setTipIndex(i => Math.max(0, i - 1))} disabled={tipIndex === 0}
-                  style={{ padding: "4px 10px", background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 7, color: "rgba(255,255,255,0.5)", fontSize: 11, cursor: "pointer", fontFamily: "inherit", opacity: tipIndex === 0 ? 0.3 : 1 }}>←</button>
-                <button onClick={() => setTipIndex(i => Math.min(BIZ_TIPS.length - 1, i + 1))} disabled={tipIndex === BIZ_TIPS.length - 1}
-                  style={{ padding: "4px 10px", background: "#10B981", border: "none", borderRadius: 7, color: "#fff", fontSize: 11, cursor: "pointer", fontFamily: "inherit", opacity: tipIndex === BIZ_TIPS.length - 1 ? 0.3 : 1 }}>→</button>
+            {/* Tips mode */}
+            {mode === "tips" && (
+              <div style={{ padding: "12px 14px" }}>
+                <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)", borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", marginBottom: 4 }}>{tip.emoji} {tip.title}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{tip.text}</div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{tipIndex + 1} / {BIZ_TIPS.length}</span>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button onClick={() => setTipIndex(i => Math.max(0, i - 1))} disabled={tipIndex === 0}
+                      style={{ padding: "4px 10px", background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 7, color: "rgba(255,255,255,0.5)", fontSize: 11, cursor: "pointer", fontFamily: "inherit", opacity: tipIndex === 0 ? 0.3 : 1 }}>←</button>
+                    <button onClick={() => setTipIndex(i => Math.min(BIZ_TIPS.length - 1, i + 1))} disabled={tipIndex === BIZ_TIPS.length - 1}
+                      style={{ padding: "4px 10px", background: "#10B981", border: "none", borderRadius: 7, color: "#fff", fontSize: 11, cursor: "pointer", fontFamily: "inherit", opacity: tipIndex === BIZ_TIPS.length - 1 ? 0.3 : 1 }}>→</button>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Chat mode */}
+            {mode === "chat" && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ maxHeight: 180, overflowY: "auto", padding: "10px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+                  {messages.map((msg, i) => (
+                    <div key={i} style={{ display: "flex", justifyContent: msg.from === "user" ? "flex-end" : "flex-start" }}>
+                      <div style={{
+                        maxWidth: "85%", padding: "7px 10px", borderRadius: msg.from === "user" ? "12px 12px 3px 12px" : "12px 12px 12px 3px",
+                        background: msg.from === "user" ? "#10B981" : "rgba(255,255,255,0.08)",
+                        fontSize: 11, color: "#fff", lineHeight: 1.5,
+                      }}>{msg.text}</div>
+                    </div>
+                  ))}
+                  {loading && (
+                    <div style={{ display: "flex", gap: 4, padding: "6px 10px", background: "rgba(255,255,255,0.06)", borderRadius: "12px 12px 12px 3px", width: "fit-content" }}>
+                      {[0,1,2].map(i => <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981", animation: `bounce 1.2s ease-in-out ${i*0.2}s infinite` }} />)}
+                    </div>
+                  )}
+                </div>
+                <div style={{ display: "flex", gap: 6, padding: "8px 10px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                  <input
+                    value={input} onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && sendMessage()}
+                    placeholder="Frage stellen…"
+                    style={{ flex: 1, padding: "7px 10px", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, fontSize: 11, color: "#fff", fontFamily: "inherit", outline: "none" }}
+                  />
+                  <button onClick={sendMessage} disabled={!input.trim() || loading}
+                    style={{ width: 30, height: 30, background: input.trim() && !loading ? "#10B981" : "rgba(255,255,255,0.08)", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    ➤
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Avatar button */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {!open && !dismissed && (
+          {!open && (
             <div style={{
               background: "#0d1f14", border: "1px solid rgba(16,185,129,0.4)", borderRadius: "10px 10px 3px 10px",
               padding: "5px 10px", fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.8)", whiteSpace: "nowrap",
               boxShadow: "0 3px 12px rgba(0,0,0,0.35)", animation: "juliaFloat 3s ease-in-out infinite",
             }}>
-              Tipp gefällig? 💡
+              Frage oder Tipp? 💡
             </div>
           )}
           <button onClick={() => setOpen(v => !v)} style={{
@@ -455,13 +524,15 @@ function JuliaBizBot() {
             border: "2px solid rgba(16,185,129,0.5)",
             boxShadow: "0 4px 16px rgba(16,185,129,0.4)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 22, cursor: "pointer", fontFamily: "inherit",
+            fontSize: 22, cursor: "pointer",
             animation: "juliaFloat 3s ease-in-out infinite",
           }}>
-            🎧
+            👩‍💼
           </button>
         </div>
       </div>
+
+      <style>{`@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}`}</style>
     </>
   );
 }
