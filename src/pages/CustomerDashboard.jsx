@@ -1354,24 +1354,24 @@ export default function CustomerDashboard() {
 
       {/* ── Floating Julia Button ── */}
       {tab !== "support" && (
-        <div style={{ position: "fixed", bottom: 100, right: 20, zIndex: 50, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-          {/* Speech bubble */}
+        <div style={{ position: "fixed", bottom: 100, right: 16, zIndex: 50, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+          {/* Speech bubble — kompakt */}
           <div style={{
-            background: "#1a2530", border: "1px solid rgba(16,185,129,0.4)", borderRadius: "14px 14px 4px 14px",
-            padding: "8px 14px", fontSize: 12, fontWeight: 600, color: "#fff", whiteSpace: "nowrap",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+            background: "#1a2530", border: "1px solid rgba(16,185,129,0.4)", borderRadius: "10px 10px 3px 10px",
+            padding: "5px 10px", fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.85)", whiteSpace: "nowrap",
+            boxShadow: "0 3px 12px rgba(0,0,0,0.35)",
             animation: "floatBubble 3s ease-in-out infinite",
           }}>
-            💬 Frage stellen?
+            Frage? 💬
           </div>
           {/* Avatar button */}
           <button onClick={() => setTab("support")} style={{
-            width: 54, height: 54, borderRadius: "50%",
+            width: 46, height: 46, borderRadius: "50%",
             background: "linear-gradient(135deg, #10B981, #059669)",
-            border: "3px solid rgba(16,185,129,0.5)",
-            boxShadow: "0 6px 24px rgba(16,185,129,0.45)",
+            border: "2px solid rgba(16,185,129,0.5)",
+            boxShadow: "0 4px 16px rgba(16,185,129,0.4)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 26, cursor: "pointer", fontFamily: "inherit",
+            fontSize: 22, cursor: "pointer", fontFamily: "inherit",
             animation: "floatAvatar 3s ease-in-out infinite",
           }}>
             👩

@@ -364,6 +364,108 @@ function RankingSection() {
   );
 }
 
+// ── Julia Business Bot ────────────────────────────────────────────────────────
+const BIZ_TIPS = [
+  { emoji: "📍", title: "QR-Code aufstellen", text: "Drucke deinen QR-Code aus und stelle ihn gut sichtbar an der Kasse auf — das steigert die Scan-Rate um bis zu 3×." },
+  { emoji: "💬", title: "Kunden aktiv ansprechen", text: "Ein kurzes 'Hast du schon unsere Stempelkarte?' reicht — die meisten Kunden sammeln sehr gerne." },
+  { emoji: "💸", title: "Empfehlungen pushen", text: "Erinnere Stammkunden daran, Freunde zu empfehlen. Du profitierst von jedem Neukunden automatisch." },
+  { emoji: "🎁", title: "Prämie attraktiv gestalten", text: "Je wertvoller die Prämie wirkt, desto öfter kommen Kunden. Ein 'Gratis-Haarschnitt' motiviert mehr als '5% Rabatt'." },
+  { emoji: "📈", title: "Analyse nutzen", text: "Schau regelmäßig in die Analyse — du siehst welche Tage am stärksten sind und kannst gezielt Aktionen starten." },
+];
+
+function JuliaBizBot() {
+  const [open, setOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const [tipIndex, setTipIndex] = useState(0);
+  const tip = BIZ_TIPS[tipIndex];
+
+  // Auto-show after 4 seconds, once per session
+  useEffect(() => {
+    const shown = sessionStorage.getItem("julia_biz_shown");
+    if (shown) return;
+    const t = setTimeout(() => {
+      setOpen(true);
+      sessionStorage.setItem("julia_biz_shown", "1");
+    }, 4000);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (dismissed) return null;
+
+  return (
+    <>
+      <style>{`
+        @keyframes juliaFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+        @keyframes juliaPop { from{opacity:0;transform:scale(0.85) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+      `}</style>
+
+      {/* Floating avatar */}
+      <div style={{ position: "fixed", bottom: 28, right: 20, zIndex: 100, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+        {/* Chat panel */}
+        {open && (
+          <div style={{
+            animation: "juliaPop 0.25s ease",
+            background: "#0d1f14", border: "1.5px solid rgba(16,185,129,0.35)",
+            borderRadius: "16px 16px 4px 16px", padding: "14px 16px",
+            width: 250, boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+          }}>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+              <div style={{ fontSize: 18 }}>🎧</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Julia · Sensalie</div>
+                <div style={{ fontSize: 10, color: "#10B981", fontWeight: 600 }}>● Business-Tipp</div>
+              </div>
+              <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", fontSize: 14, cursor: "pointer", padding: 0 }}>✕</button>
+            </div>
+
+            {/* Tip */}
+            <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)", borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", marginBottom: 4 }}>{tip.emoji} {tip.title}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{tip.text}</div>
+            </div>
+
+            {/* Navigation */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{tipIndex + 1} / {BIZ_TIPS.length}</span>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button onClick={() => setTipIndex(i => Math.max(0, i - 1))} disabled={tipIndex === 0}
+                  style={{ padding: "4px 10px", background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 7, color: "rgba(255,255,255,0.5)", fontSize: 11, cursor: "pointer", fontFamily: "inherit", opacity: tipIndex === 0 ? 0.3 : 1 }}>←</button>
+                <button onClick={() => setTipIndex(i => Math.min(BIZ_TIPS.length - 1, i + 1))} disabled={tipIndex === BIZ_TIPS.length - 1}
+                  style={{ padding: "4px 10px", background: "#10B981", border: "none", borderRadius: 7, color: "#fff", fontSize: 11, cursor: "pointer", fontFamily: "inherit", opacity: tipIndex === BIZ_TIPS.length - 1 ? 0.3 : 1 }}>→</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Avatar button */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {!open && !dismissed && (
+            <div style={{
+              background: "#0d1f14", border: "1px solid rgba(16,185,129,0.4)", borderRadius: "10px 10px 3px 10px",
+              padding: "5px 10px", fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.8)", whiteSpace: "nowrap",
+              boxShadow: "0 3px 12px rgba(0,0,0,0.35)", animation: "juliaFloat 3s ease-in-out infinite",
+            }}>
+              Tipp gefällig? 💡
+            </div>
+          )}
+          <button onClick={() => setOpen(v => !v)} style={{
+            width: 46, height: 46, borderRadius: "50%",
+            background: "linear-gradient(135deg, #10B981, #059669)",
+            border: "2px solid rgba(16,185,129,0.5)",
+            boxShadow: "0 4px 16px rgba(16,185,129,0.4)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 22, cursor: "pointer", fontFamily: "inherit",
+            animation: "juliaFloat 3s ease-in-out infinite",
+          }}>
+            🎧
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function Business() {
   const [settings, setSettings] = useState({
     minAmountForStamp: "20",
@@ -700,6 +802,9 @@ export default function Business() {
         <RankingSection />
 
       </div>
+
+      {/* Julia Business Bot */}
+      <JuliaBizBot />
     </div>
   );
 }
