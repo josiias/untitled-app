@@ -1,25 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-const FAQ = `
-Du bist Julia, die freundliche Sensalie Support-Mitarbeiterin. Du bist warmherzig, hilfsbereit und nahbar — du klingst wie eine echte Ansprechpartnerin, nicht wie ein Bot. Sensalie ist eine digitale Kundenkarten-App für lokale Geschäfte in Deutschland.
+const SYSTEM_BASE = `Du bist Julia, die freundliche Sensalie Support-Mitarbeiterin. Du bist warmherzig, hilfsbereit und nahbar — du klingst wie eine echte Ansprechpartnerin, nicht wie ein Bot. Sensalie ist eine digitale Kundenkarten-App für lokale Geschäfte in Deutschland.
 
-Wichtige Fakten über Sensalie:
-- Kunden sammeln Stempel bei Partnerbetrieben (z.B. Barbershops, Cafés, Restaurants) und erhalten Prämien.
-- Ein Stempel pro Besuch (ab Mindesteinkauf).
-- Prämien nach X Stempeln (z.B. 10€ Gutschein nach 8 Stempeln).
-- Empfehlungsprogramm: Nutzer teilen ihren Ref-Link, Freunde registrieren sich → Provision nach X Besuchen des Neukunden.
-- App ist kostenlos für Kunden; Unternehmen zahlen eine Provision.
-- Sensalie Plus (1,99€/Monat) kommt bald: Analyse-Dashboard, Sparübersicht.
-- QR-Code an der Kasse scannen = Stempel buchen.
-- Rangliste: Jedes Halbjahr gewinnen die aktivsten Kunden echte Preise.
-- Partner können über den "Wunsch"-Tab vorgeschlagen werden; ab 20 Stimmen wird das Unternehmen kontaktiert.
-- Datenschutz: Nur Telefonnummer wird gespeichert, keine Zahlungsdaten.
-- Support: support@sensalie.app | Mo–Fr 9–18 Uhr
-
-Wenn du eine Frage nicht sicher beantworten kannst, empfehle dem Nutzer, ein Support-Ticket zu erstellen.
+Beantworte Fragen NUR auf Basis der dir bereitgestellten Wissensdatenbank. Wenn eine Frage nicht darin abgedeckt ist, sage ehrlich dass du es nicht weißt und empfehle ein Support-Ticket.
 Antworte immer auf Deutsch, freundlich, knapp und hilfreich (max. 3 Sätze).
-Wenn der Nutzer ein Ticket erstellen möchte, antworte mit dem exakten Text: "TICKET_ERSTELLEN"
-`;
+Wenn der Nutzer ein Ticket erstellen möchte, antworte mit dem exakten Text: "TICKET_ERSTELLEN"`;
 
 Deno.serve(async (req) => {
   try {
@@ -30,8 +15,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Keine Nachricht angegeben" }, { status: 400 });
     }
 
+    // Load active knowledge base entries
+    const knowledgeEntries = await base44.asServiceRole.entities.KnowledgeBase.filter({ active: true }, "-created_date", 100);
+    const knowledgeText = knowledgeEntries.length > 0
+      ? "\n\nDeine Wissensdatenbank (verwende NUR diese Infos):\n" +
+        knowledgeEntries.map(e => `[${e.category?.toUpperCase() || "ALLGEMEIN"}] ${e.title}:\n${e.content}`).join("\n\n")
+      : "\n\nHinweis: Die Wissensdatenbank ist noch leer. Bitte empfehle dem Nutzer ein Support-Ticket.";
+
+    const systemPrompt = SYSTEM_BASE + knowledgeText;
+
     const messages = [
-      { role: "system", content: FAQ },
+      { role: "system", content: systemPrompt },
       ...(history || []).slice(-6).map(m => ({ role: m.from === "user" ? "user" : "assistant", content: m.text })),
       { role: "user", content: message },
     ];

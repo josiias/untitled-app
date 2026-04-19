@@ -1,0 +1,36 @@
+{
+  "name": "KnowledgeBase",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Kurzer Titel des Eintrags (z.B. 'Wie funktioniert das Stempeln?')"
+    },
+    "content": {
+      "type": "string",
+      "description": "Detaillierter Inhalt / Antwort"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "stempel",
+        "provision",
+        "praemien",
+        "partner",
+        "app",
+        "datenschutz",
+        "allgemein"
+      ],
+      "default": "allgemein"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Ist dieser Eintrag aktiv und wird vom Bot verwendet?"
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ]
+}

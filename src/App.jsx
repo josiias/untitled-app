@@ -5,6 +5,7 @@ import ScanStamp from './pages/ScanStamp';
 import ScanLanding from './pages/ScanLanding';
 import AppLanding from './pages/AppLanding';
 import CustomerDashboard from './pages/CustomerDashboard';
+import KnowledgeBaseAdmin from './pages/KnowledgeBaseAdmin';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/scan/:businessId" element={<ScanLanding />} />
         <Route path="/app" element={<AppLanding />} />
         <Route path="/dashboard" element={<CustomerDashboard />} />
+        <Route path="/admin/knowledge" element={<KnowledgeBaseAdmin />} />
       </Routes>
     </BrowserRouter>
   )
