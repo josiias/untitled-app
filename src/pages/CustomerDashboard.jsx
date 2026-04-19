@@ -4,6 +4,7 @@ import SupportChatTab from "@/components/customer/SupportChatTab";
 import NotificationSettings, { useNotificationChecker } from "@/components/customer/NotificationSettings";
 import LevelSystem, { calcUserStats, LEVELS } from "@/components/customer/LevelSystem";
 import { WelcomeBanner, TabHint } from "@/components/customer/OnboardingTooltips";
+import ProfilePage from "@/components/customer/ProfilePage";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -1211,7 +1212,7 @@ export default function CustomerDashboard() {
 
                 {/* Settings items */}
                 {[
-                  { icon: "👤", label: "Profil", action: null },
+                  { icon: "👤", label: "Profil", action: () => { setTab("profil"); setMenuOpen(false); } },
                   { icon: "🔔", label: "Benachrichtigungen", action: () => { setShowNotifSettings(true); setMenuOpen(false); } },
                   { icon: "⚙️", label: "Einstellungen", action: null },
                   { icon: "🚪", label: "Abmelden", action: null },
@@ -1240,6 +1241,7 @@ export default function CustomerDashboard() {
         {tab === "suggest"   && <SuggestBusinessTab />}
         {tab === "support"   && <SupportChatTab />}
         {tab === "analytics" && <LockedAnalyticsChart />}
+        {tab === "profil"    && <ProfilePage onClose={() => setTab("home")} />}
       </div>
 
       {/* ── Sticky Bottom Bar ── */}
