@@ -806,6 +806,9 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
         totalStamps={STAMP_CARDS.reduce((sum, c) => sum + c.stamps, 0)}
         totalReferrals={REFERRAL_STATS.count}
       />
+
+      {/* Rangliste */}
+      <RankingComingSoon />
     </div>
   );
 }

@@ -696,6 +696,9 @@ export default function Business() {
           ))}
         </div>
 
+        {/* Rangliste */}
+        <RankingSection />
+
       </div>
     </div>
   );
