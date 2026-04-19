@@ -107,7 +107,7 @@ function TicketForm({ onClose, onSubmitted }) {
 
 export default function SupportChatTab() {
   const [messages, setMessages] = useState([
-    { from: "bot", text: "Hallo! 👋 Ich bin **Sami**, dein Sensalie-Assistent. Ich beantworte dir gerne Fragen rund um Stempel, Prämien und Empfehlungen — oder öffne ein Ticket für unser Team. Wie kann ich dir helfen?" }
+    { from: "bot", text: "Hallo! 👋 Ich bin **Julia** von Sensalie 💚 Ich helfe dir gerne bei allen Fragen rund um deine Stempelkarte, Prämien und Empfehlungen — oder ich leite dich an unser Team weiter. Wie kann ich dir helfen?" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -138,7 +138,7 @@ export default function SupportChatTab() {
         setShowTicketForm(true);
       }
     } catch (err) {
-      setMessages(prev => [...prev, { from: "bot", text: "Entschuldigung, ich hatte ein technisches Problem. Bitte versuche es nochmal oder erstelle ein Ticket." }]);
+      setMessages(prev => [...prev, { from: "bot", text: "Entschuldigung, da ist leider etwas schiefgelaufen 😕 Bitte versuche es nochmal — oder erstelle direkt ein Ticket, dann schaut unser Team persönlich drauf!" }]);
     }
     setLoading(false);
   };
@@ -146,7 +146,7 @@ export default function SupportChatTab() {
   const handleTicketSubmitted = () => {
     setShowTicketForm(false);
     setTicketSuccess(true);
-    setMessages(prev => [...prev, { from: "bot", text: "✅ Dein Ticket wurde erfolgreich an unser Team gesendet! Wir melden uns innerhalb von 24 Stunden bei dir. Gibt es noch etwas, womit ich dir helfen kann?" }]);
+    setMessages(prev => [...prev, { from: "bot", text: "✅ Perfekt, dein Ticket ist bei uns angekommen! Wir melden uns innerhalb von 24 Stunden — versprochen 💚 Kann ich dir noch bei etwas helfen?" }]);
     setTimeout(() => setTicketSuccess(false), 4000);
   };
 
@@ -161,11 +161,11 @@ export default function SupportChatTab() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 0 16px" }}>
         <div style={{ position: "relative" }}>
-          <div style={{ width: 44, height: 44, background: "linear-gradient(135deg, #10B981, #059669)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🤖</div>
+          <div style={{ width: 44, height: 44, background: "linear-gradient(135deg, #10B981, #059669)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩</div>
           <div style={{ position: "absolute", bottom: 2, right: 2, width: 10, height: 10, borderRadius: "50%", background: "#10B981", border: "2px solid #111e28" }} />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Sami — Sensalie Bot</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Julia · Sensalie Support</div>
           <div style={{ fontSize: 11, color: "#10B981", fontWeight: 600 }}>● Online · Antwortet sofort</div>
         </div>
         <button onClick={() => setShowTicketForm(v => !v)}
@@ -194,7 +194,7 @@ export default function SupportChatTab() {
           <div key={i} style={{ display: "flex", alignItems: "flex-end", gap: 8, flexDirection: msg.from === "user" ? "row-reverse" : "row" }}>
             {/* Avatar */}
             {msg.from === "bot" && (
-              <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #10B981, #059669)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>🤖</div>
+              <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #10B981, #059669)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>👩</div>
             )}
             {msg.from === "user" && (
               <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #3B82F6, #1D4ED8)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#fff", flexShrink: 0 }}>MM</div>
@@ -218,7 +218,7 @@ export default function SupportChatTab() {
         {/* Typing indicator */}
         {loading && (
           <div style={{ display: "flex", alignItems: "flex-end", gap: 8 }}>
-            <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #10B981, #059669)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🤖</div>
+            <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #10B981, #059669)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>👩</div>
             <div style={{ padding: "10px 16px", borderRadius: "18px 18px 18px 4px", background: "#1a2530", border: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: 5, alignItems: "center" }}>
               {[0, 1, 2].map(i => (
                 <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />

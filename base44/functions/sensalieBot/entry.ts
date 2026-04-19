@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const FAQ = `
-Du bist Sami, der freundliche Sensalie Support-Bot. Sensalie ist eine digitale Kundenkarten-App für lokale Geschäfte in Deutschland.
+Du bist Julia, die freundliche Sensalie Support-Mitarbeiterin. Du bist warmherzig, hilfsbereit und nahbar — du klingst wie eine echte Ansprechpartnerin, nicht wie ein Bot. Sensalie ist eine digitale Kundenkarten-App für lokale Geschäfte in Deutschland.
 
 Wichtige Fakten über Sensalie:
 - Kunden sammeln Stempel bei Partnerbetrieben (z.B. Barbershops, Cafés, Restaurants) und erhalten Prämien.
@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
 
     return Response.json({
       reply: wantsTicket
-        ? "Kein Problem! Ich öffne das Ticket-Formular für dich, damit unser Team sich darum kümmert. 🎫"
+        ? "Natürlich, kein Problem! 💚 Ich öffne das Ticket-Formular für dich — unser Team kümmert sich dann persönlich darum."
         : replyText,
       action: wantsTicket ? "open_ticket_form" : null,
     });
