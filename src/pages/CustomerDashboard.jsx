@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import SuggestBusinessTab from "@/components/customer/SuggestBusinessTab";
+import SupportChatTab from "@/components/customer/SupportChatTab";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -120,6 +121,7 @@ const TABS = [
   { id: "rewards",   icon: "⬡",  label: "Prämien" },
   { id: "referral",  icon: "◎",  label: "Empfehlen" },
   { id: "suggest",   icon: "💡", label: "Wunsch" },
+  { id: "support",   icon: "💬", label: "Support" },
   { id: "analytics", icon: "📈", label: "Analyse", comingSoon: true },
 ];
 
@@ -1186,6 +1188,7 @@ export default function CustomerDashboard() {
         {tab === "rewards"   && <RewardsTab />}
         {tab === "referral"  && <ReferralTab />}
         {tab === "suggest"   && <SuggestBusinessTab />}
+        {tab === "support"   && <SupportChatTab />}
         {tab === "analytics" && <LockedAnalyticsChart />}
       </div>
 

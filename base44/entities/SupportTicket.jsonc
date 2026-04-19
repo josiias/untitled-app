@@ -1,0 +1,51 @@
+{
+  "name": "SupportTicket",
+  "type": "object",
+  "properties": {
+    "user_name": {
+      "type": "string"
+    },
+    "user_phone": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "offen",
+        "in_bearbeitung",
+        "gel\u00f6st"
+      ],
+      "default": "offen"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "niedrig",
+        "mittel",
+        "hoch"
+      ],
+      "default": "mittel"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "stempel",
+        "provision",
+        "partner",
+        "app",
+        "sonstiges"
+      ],
+      "default": "sonstiges"
+    }
+  },
+  "required": [
+    "message",
+    "subject"
+  ]
+}
