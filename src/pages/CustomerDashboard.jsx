@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import SuggestBusinessTab from "@/components/customer/SuggestBusinessTab";
 import SupportChatTab from "@/components/customer/SupportChatTab";
+import NotificationSettings, { useNotificationChecker } from "@/components/customer/NotificationSettings";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -1072,6 +1073,9 @@ export default function CustomerDashboard() {
   const [qrOpen, setQrOpen] = useState(false);
   const [bookingCard, setBookingCard] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState(null);
+  const [showNotifSettings, setShowNotifSettings] = useState(false);
+
+  useNotificationChecker(STAMP_CARDS, REWARDS);
 
   // appointments: { [cardId]: { date, time, confirmed } }
   const initialAppointments = {};
@@ -1163,16 +1167,17 @@ export default function CustomerDashboard() {
 
                 {/* Settings items */}
                 {[
-                  { icon: "👤", label: "Profil" },
-                  { icon: "🔔", label: "Benachrichtigungen" },
-                  { icon: "⚙️", label: "Einstellungen" },
-                  { icon: "🚪", label: "Abmelden" },
+                  { icon: "👤", label: "Profil", action: null },
+                  { icon: "🔔", label: "Benachrichtigungen", action: () => { setShowNotifSettings(true); setMenuOpen(false); } },
+                  { icon: "⚙️", label: "Einstellungen", action: null },
+                  { icon: "🚪", label: "Abmelden", action: null },
                 ].map((item, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 18px", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.6)", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.04)" : "none" }}
+                  <div key={i} onClick={item.action || undefined} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 18px", cursor: item.action ? "pointer" : "default", fontSize: 13, color: "rgba(255,255,255,0.6)", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.04)" : "none" }}
                     onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     <span style={{ fontSize: 15 }}>{item.icon}</span>
                     {item.label}
+                    {item.action && <span style={{ marginLeft: "auto", fontSize: 10, color: "rgba(255,255,255,0.25)" }}>→</span>}
                   </div>
                 ))}
               </div>
@@ -1229,6 +1234,16 @@ export default function CustomerDashboard() {
 
       {/* QR Modal */}
       {qrOpen && <QRModal onClose={() => setQrOpen(false)} />}
+
+      {/* Notification Settings Modal */}
+      {showNotifSettings && (
+        <div onClick={() => setShowNotifSettings(false)} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 600, background: "#111e28", borderRadius: "28px 28px 0 0", border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "24px 24px 48px", boxShadow: "0 -20px 60px rgba(0,0,0,0.6)" }}>
+            <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 100, margin: "0 auto 20px" }} />
+            <NotificationSettings onClose={() => setShowNotifSettings(false)} />
+          </div>
+        </div>
+      )}
 
       {/* Appointment Booking Modal */}
       {bookingCard && (
