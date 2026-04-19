@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import BusinessMap from "@/components/customer/BusinessMap";
 
 const CATEGORIES = [
   { name: "Barbershop", emoji: "✂️" },
@@ -35,7 +36,9 @@ function BusinessBrowseTab({ businesses, loadingBiz }) {
   const [selectedCat, setSelectedCat] = useState(null);
   const [cityFilter, setCityFilter] = useState(null);
   const [userCity, setUserCity] = useState(null);
+  const [userCoords, setUserCoords] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
+  const [viewMode, setViewMode] = useState("list"); // "list" | "map"
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -44,6 +47,7 @@ function BusinessBrowseTab({ businesses, loadingBiz }) {
       async (pos) => {
         try {
           const { latitude, longitude } = pos.coords;
+          setUserCoords([latitude, longitude]);
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=de`
           );
@@ -71,6 +75,19 @@ function BusinessBrowseTab({ businesses, loadingBiz }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+
+      {/* List / Map toggle */}
+      <div style={{ display: "flex", gap: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: 4 }}>
+        {[{ id: "list", label: "☰ Liste" }, { id: "map", label: "🗺️ Karte" }].map(v => (
+          <button key={v.id} onClick={() => setViewMode(v.id)}
+            style={{ flex: 1, padding: "8px", borderRadius: 9, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 700, transition: "all 0.2s",
+              background: viewMode === v.id ? "#10B981" : "transparent",
+              color: viewMode === v.id ? "#fff" : "rgba(255,255,255,0.4)",
+            }}>
+            {v.label}
+          </button>
+        ))}
+      </div>
 
       {/* Location strip */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "10px 14px" }}>
@@ -139,20 +156,30 @@ function BusinessBrowseTab({ businesses, loadingBiz }) {
         </div>
       </div>
 
-      {/* Results */}
-      <div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>
-          {filtered.length} Partner{activeCatObj ? ` · ${activeCatObj.emoji} ${activeCatObj.name}` : ""}
-          {cityFilter ? ` · ${cityFilter}` : " · Ganz Deutschland"}
-        </div>
+      {/* Results label */}
+      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: 1 }}>
+        {filtered.length} Partner{activeCatObj ? ` · ${activeCatObj.emoji} ${activeCatObj.name}` : ""}
+        {cityFilter ? ` · ${cityFilter}` : " · Ganz Deutschland"}
+      </div>
 
-        {loadingBiz ? (
+      {/* MAP VIEW */}
+      {viewMode === "map" && (
+        <BusinessMap
+          businesses={filtered}
+          userCoords={userCoords}
+          userCity={userCity}
+        />
+      )}
+
+      {/* LIST VIEW */}
+      {viewMode === "list" && (
+        loadingBiz ? (
           <div style={{ textAlign: "center", padding: "28px", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>Lädt…</div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "28px", background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 20 }}>
             <div style={{ fontSize: 28, marginBottom: 8 }}>{activeCatObj?.emoji || "🏪"}</div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>
-              Noch keine Partner{selectedCat ? ` in ${selectedCat}` : ""}{cityFilter ? ` in ${cityFilter}` : ""}
+              Noch keine Partner{selectedCat ? ` für ${selectedCat}` : ""}{cityFilter ? ` in ${cityFilter}` : ""}
             </div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", marginTop: 4 }}>Schlage ein Unternehmen vor → Wunsch-Tab</div>
           </div>
@@ -162,21 +189,17 @@ function BusinessBrowseTab({ businesses, loadingBiz }) {
               const catObj = CATEGORIES.find(c => c.name === biz.category);
               return (
                 <div key={biz.id} style={{ display: "flex", alignItems: "center", gap: 12, background: "#1a2530", border: `1px solid ${biz.color ? biz.color + "33" : "rgba(255,255,255,0.07)"}`, borderRadius: 16, overflow: "hidden" }}>
-                  {/* Color bar */}
                   <div style={{ width: 4, alignSelf: "stretch", background: biz.color || "#10B981", flexShrink: 0 }} />
-                  {/* Emoji icon */}
                   <div style={{ width: 40, height: 40, background: (biz.color || "#10B981") + "22", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
                     {biz.emoji || catObj?.emoji || "🏪"}
                   </div>
                   <div style={{ flex: 1, padding: "12px 0" }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{biz.name}</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
-                      {biz.category} {biz.city ? `· 📍 ${biz.city}` : ""}
+                      {biz.category}{biz.city ? ` · 📍 ${biz.city}` : ""}
                     </div>
                     {biz.reward_description && (
-                      <div style={{ fontSize: 11, color: biz.color || "#10B981", fontWeight: 600, marginTop: 4 }}>
-                        🎁 {biz.reward_description}
-                      </div>
+                      <div style={{ fontSize: 11, color: biz.color || "#10B981", fontWeight: 600, marginTop: 4 }}>🎁 {biz.reward_description}</div>
                     )}
                   </div>
                   <div style={{ paddingRight: 14 }}>
@@ -188,8 +211,8 @@ function BusinessBrowseTab({ businesses, loadingBiz }) {
               );
             })}
           </div>
-        )}
-      </div>
+        )
+      )}
     </div>
   );
 }
