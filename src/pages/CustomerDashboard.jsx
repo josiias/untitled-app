@@ -3,6 +3,7 @@ import SuggestBusinessTab from "@/components/customer/SuggestBusinessTab";
 import SupportChatTab from "@/components/customer/SupportChatTab";
 import NotificationSettings, { useNotificationChecker } from "@/components/customer/NotificationSettings";
 import LevelSystem, { calcUserStats, LEVELS } from "@/components/customer/LevelSystem";
+import { WelcomeBanner, TabHint } from "@/components/customer/OnboardingTooltips";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -1108,56 +1109,7 @@ function QRModal({ onClose }) {
 }
 
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
-// ── Onboarding Intro ──────────────────────────────────────────────────────────
-const ONBOARDING_KEY = "sensalie_onboarding_done";
-
-const ONBOARDING_STEPS = [
-  { emoji: "👋", title: "Willkommen bei Sensalie!", desc: "Deine digitale Kundenkarte — stempel sammeln, Prämien sichern und Freunde empfehlen." },
-  { emoji: "⬛", title: "Stempel sammeln", desc: "Besuche deine Lieblings-Geschäfte und zeig den QR-Code an der Kasse. Jeder Besuch bringt dich näher zur Prämie!" },
-  { emoji: "💸", title: "Geld verdienen", desc: "Empfehle Freunde und verdiene echte Provision — automatisch, ohne Aufwand." },
-  { emoji: "💬", title: "Julia hilft dir!", desc: "Hast du Fragen? Julia, unsere Support-Assistentin, ist immer für dich da. Tippe einfach auf den Chat-Button." },
-];
-
-function OnboardingModal({ onDone }) {
-  const [step, setStep] = useState(0);
-  const current = ONBOARDING_STEPS[step];
-  const isLast = step === ONBOARDING_STEPS.length - 1;
-
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-      <div style={{ width: "100%", maxWidth: 600, background: "#111e28", borderRadius: "28px 28px 0 0", border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "28px 24px 48px" }}>
-        {/* Handle */}
-        <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 100, margin: "0 auto 28px" }} />
-
-        {/* Step dots */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 28 }}>
-          {ONBOARDING_STEPS.map((_, i) => (
-            <div key={i} style={{ width: i === step ? 20 : 6, height: 6, borderRadius: 100, background: i === step ? "#10B981" : "rgba(255,255,255,0.15)", transition: "all 0.3s" }} />
-          ))}
-        </div>
-
-        {/* Content */}
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>{current.emoji}</div>
-          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 22, fontWeight: 900, color: "#fff", marginBottom: 10 }}>{current.title}</div>
-          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 300, margin: "0 auto" }}>{current.desc}</div>
-        </div>
-
-        {/* Buttons */}
-        <div style={{ display: "flex", gap: 10 }}>
-          {!isLast && (
-            <button onClick={onDone} style={{ flex: 1, padding: "13px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", border: "none", borderRadius: 14, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-              Überspringen
-            </button>
-          )}
-          <button onClick={() => isLast ? onDone() : setStep(s => s + 1)} style={{ flex: 2, padding: "13px", background: "linear-gradient(135deg, #10B981, #059669)", color: "#fff", border: "none", borderRadius: 14, fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
-            {isLast ? "Los geht's! 🚀" : "Weiter →"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+// Onboarding Modal removed — replaced by inline WelcomeBanner + TabHint system
 
 export default function CustomerDashboard() {
   const [tab, setTab] = useState("home");
@@ -1166,12 +1118,6 @@ export default function CustomerDashboard() {
   const [bookingCard, setBookingCard] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState(null);
   const [showNotifSettings, setShowNotifSettings] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem(ONBOARDING_KEY));
-
-  const handleOnboardingDone = () => {
-    localStorage.setItem(ONBOARDING_KEY, "1");
-    setShowOnboarding(false);
-  };
 
   useNotificationChecker(STAMP_CARDS, REWARDS);
 
@@ -1286,7 +1232,8 @@ export default function CustomerDashboard() {
 
       {/* ── Content ── */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px 20px 110px", position: "relative", zIndex: 1 }}>
-        {tab === "home"      && <HomeTab onTabChange={setTab} appointments={appointments} onBookAppointment={handleBookAppointment} />}
+        <TabHint tabId={tab} />
+        {tab === "home"      && <><WelcomeBanner userName={USER.name} /><HomeTab onTabChange={setTab} appointments={appointments} onBookAppointment={handleBookAppointment} /></>}
         {tab === "cards"     && <CardsTab appointments={appointments} onBookAppointment={handleBookAppointment} />}
         {tab === "rewards"   && <RewardsTab />}
         {tab === "referral"  && <ReferralTab />}
@@ -1379,8 +1326,7 @@ export default function CustomerDashboard() {
         </div>
       )}
 
-      {/* Onboarding */}
-      {showOnboarding && <OnboardingModal onDone={handleOnboardingDone} />}
+
 
       <style>{`
         @keyframes floatAvatar {
