@@ -1185,7 +1185,7 @@ export default function CustomerDashboard() {
         {tab === "cards"     && <CardsTab appointments={appointments} onBookAppointment={handleBookAppointment} />}
         {tab === "rewards"   && <RewardsTab />}
         {tab === "referral"  && <ReferralTab />}
-        {tab === "suggest"   && <SuggestBusinessTab categoryFilter={categoryFilter} onCategoryChange={setCategoryFilter} />}
+        {tab === "suggest"   && <SuggestBusinessTab />}
         {tab === "analytics" && <LockedAnalyticsChart />}
       </div>
 
