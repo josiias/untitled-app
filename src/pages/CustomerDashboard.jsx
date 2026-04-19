@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import SuggestBusinessTab from "@/components/customer/SuggestBusinessTab";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -118,6 +119,7 @@ const TABS = [
   { id: "cards",     icon: "◈",  label: "Karten" },
   { id: "rewards",   icon: "⬡",  label: "Prämien" },
   { id: "referral",  icon: "◎",  label: "Empfehlen" },
+  { id: "suggest",   icon: "💡", label: "Wunsch" },
   { id: "analytics", icon: "📈", label: "Analyse", comingSoon: true },
 ];
 
@@ -1067,6 +1069,7 @@ export default function CustomerDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [bookingCard, setBookingCard] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState(null);
 
   // appointments: { [cardId]: { date, time, confirmed } }
   const initialAppointments = {};
@@ -1137,6 +1140,25 @@ export default function CustomerDashboard() {
                     );
                   })}
                 </div>
+                {/* Category filter */}
+                <div style={{ padding: "10px 10px 6px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 1, textTransform: "uppercase", paddingLeft: 8, marginBottom: 8 }}>Kategorie-Filter</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, paddingLeft: 4 }}>
+                    {["Alle", "Barbershop", "Café", "Restaurant", "Beauty", "Fitness"].map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => { setCategoryFilter(cat === "Alle" ? null : cat); setTab("suggest"); setMenuOpen(false); }}
+                        style={{
+                          padding: "5px 11px", borderRadius: 100, fontSize: 11, fontWeight: 600,
+                          border: "none", cursor: "pointer", fontFamily: "inherit",
+                          background: (categoryFilter === cat || (!categoryFilter && cat === "Alle")) ? "#10B981" : "rgba(255,255,255,0.07)",
+                          color: (categoryFilter === cat || (!categoryFilter && cat === "Alle")) ? "#fff" : "rgba(255,255,255,0.45)",
+                        }}
+                      >{cat}</button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Settings items */}
                 {[
                   { icon: "👤", label: "Profil" },
@@ -1163,6 +1185,7 @@ export default function CustomerDashboard() {
         {tab === "cards"     && <CardsTab appointments={appointments} onBookAppointment={handleBookAppointment} />}
         {tab === "rewards"   && <RewardsTab />}
         {tab === "referral"  && <ReferralTab />}
+        {tab === "suggest"   && <SuggestBusinessTab categoryFilter={categoryFilter} onCategoryChange={setCategoryFilter} />}
         {tab === "analytics" && <LockedAnalyticsChart />}
       </div>
 

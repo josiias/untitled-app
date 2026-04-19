@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "properties": {
+    "business_name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "visit_frequency": {
+      "type": "string",
+      "enum": [
+        "t\u00e4glich",
+        "w\u00f6chentlich",
+        "monatlich",
+        "selten"
+      ]
+    },
+    "votes": {
+      "type": "integer",
+      "default": 1
+    },
+    "voted_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "offen",
+        "in_bearbeitung",
+        "gewonnen"
+      ],
+      "default": "offen"
+    },
+    "suggested_by_phone": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "business_name",
+    "category",
+    "city",
+    "visit_frequency"
+  ],
+  "name": "BusinessSuggestion"
+}
