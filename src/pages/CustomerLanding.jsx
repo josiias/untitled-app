@@ -83,8 +83,8 @@ function PhoneMockup() {
           </div>
           <div style={{ fontSize: 11, fontWeight: 800, color: c.color }}>{c.stamps}/{c.total}</div>
         </div>
-        <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-          {Array.from({ length: c.total }).map((_, i) => (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: 4 }}>
+          {Array.from({ length: Math.min(c.total, 8) }).map((_, i) => (
             <div key={i} style={{
               width: 18, height: 18, borderRadius: "50%",
               background: i < c.stamps ? c.color : "rgba(255,255,255,0.08)",
