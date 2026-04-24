@@ -596,7 +596,6 @@ export default function CustomerLanding() {
           opacity: heroVisible ? 1 : 0,
           transition: "opacity 0.8s ease 0.3s",
         }}>
-          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 300, height: 300, background: "radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 65%)", pointerEvents: "none" }} />
           <PhoneMockup />
 
           {/* 3 checkmarks below phone */}
@@ -651,9 +650,7 @@ export default function CustomerLanding() {
         background: "linear-gradient(135deg, #0d2318 0%, #0f2d1c 40%, #162d1e 100%)",
         padding: "100px 20px",
       }}>
-        {/* Decorative glows */}
-        <div style={{ position: "absolute", top: "-20%", left: "-10%", width: 500, height: 500, background: "radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 60%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: "-20%", right: "-10%", width: 400, height: 400, background: "radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 60%)", pointerEvents: "none" }} />
+
         {/* Grid pattern */}
         <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.04 }} xmlns="http://www.w3.org/2000/svg">
           <defs>
