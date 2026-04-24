@@ -515,7 +515,7 @@ export default function CustomerLanding() {
         {HERO_SLIDES.map((s, i) => (
           <img key={s.img} src={s.img} alt="" style={{
             position: "absolute", inset: 0, width: "100%", height: "100%",
-            objectFit: "cover", opacity: i === heroSlide ? 0.22 : 0,
+            objectFit: "cover", opacity: i === heroSlide ? 0.45 : 0,
             transition: "opacity 1.5s ease",
           }} />
         ))}
