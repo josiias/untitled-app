@@ -344,20 +344,18 @@ function MapSection() {
 
         {/* Static map image — non-interactive */}
         <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(16,185,129,0.25)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", height: 380 }}>
-          {/* Static map screenshot — non-interactive */}
-          <img
-            src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80"
-            alt="Stadtkarte"
-            draggable={false}
-            style={{
-              position: "absolute", inset: 0, width: "100%", height: "100%",
-              objectFit: "cover", objectPosition: "center",
-              pointerEvents: "none", userSelect: "none",
-              filter: "saturate(0.5) brightness(0.55) hue-rotate(100deg)",
-            }}
-          />
-          {/* Dark green tint overlay */}
-          <div style={{ position: "absolute", inset: 0, background: "rgba(8,22,14,0.45)", pointerEvents: "none" }} />
+          {/* Static map — Stamen Toner tile stitched, non-interactive */}
+          <div style={{
+            position: "absolute", inset: 0,
+            backgroundImage: `url("https://tile.openstreetmap.org/15/17601/10742.png"), url("https://tile.openstreetmap.org/15/17602/10742.png"), url("https://tile.openstreetmap.org/15/17601/10743.png"), url("https://tile.openstreetmap.org/15/17602/10743.png")`,
+            backgroundSize: "50% 50%",
+            backgroundPosition: "0 0, 50% 0, 0 50%, 50% 50%",
+            backgroundRepeat: "no-repeat",
+            filter: "invert(1) hue-rotate(155deg) saturate(0.4) brightness(0.55)",
+            pointerEvents: "none", userSelect: "none",
+          }} />
+          {/* Overlay */}
+          <div style={{ position: "absolute", inset: 0, background: "rgba(8,20,12,0.42)", pointerEvents: "none" }} />
           {/* Example pins overlay */}
           {[
             { top: "28%", left: "34%", emoji: "✂️", label: "Kings Barbershop", color: "#10B981" },
