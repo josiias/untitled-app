@@ -344,36 +344,20 @@ function MapSection() {
 
         {/* Static map image — non-interactive */}
         <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(16,185,129,0.25)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", height: 380 }}>
-          {/* Static SVG street map illustration */}
-          <svg width="100%" height="380" viewBox="0 0 900 380" style={{ display: "block", pointerEvents: "none", userSelect: "none" }}>
-            <rect width="900" height="380" fill="#131f17"/>
-            {/* Water */}
-            <ellipse cx="680" cy="310" rx="180" ry="55" fill="#0d1f2a" opacity="0.9"/>
-            {/* Parks */}
-            <rect x="60" y="40" width="140" height="90" rx="10" fill="#162b1e" opacity="0.8"/>
-            <rect x="550" y="80" width="100" height="70" rx="8" fill="#162b1e" opacity="0.7"/>
-            <rect x="300" y="260" width="80" height="60" rx="6" fill="#162b1e" opacity="0.7"/>
-            {/* Major roads */}
-            <line x1="0" y1="190" x2="900" y2="190" stroke="#243d2c" strokeWidth="18"/>
-            <line x1="450" y1="0" x2="450" y2="380" stroke="#243d2c" strokeWidth="18"/>
-            <line x1="0" y1="100" x2="900" y2="280" stroke="#1e3326" strokeWidth="12"/>
-            <line x1="200" y1="0" x2="700" y2="380" stroke="#1e3326" strokeWidth="10"/>
-            {/* Minor roads */}
-            <line x1="0" y1="130" x2="900" y2="130" stroke="#1a2e22" strokeWidth="6"/>
-            <line x1="0" y1="250" x2="900" y2="250" stroke="#1a2e22" strokeWidth="6"/>
-            <line x1="150" y1="0" x2="150" y2="380" stroke="#1a2e22" strokeWidth="6"/>
-            <line x1="300" y1="0" x2="300" y2="380" stroke="#1a2e22" strokeWidth="6"/>
-            <line x1="600" y1="0" x2="600" y2="380" stroke="#1a2e22" strokeWidth="6"/>
-            <line x1="750" y1="0" x2="750" y2="380" stroke="#1a2e22" strokeWidth="6"/>
-            {/* City blocks */}
-            {[[30,30,100,60],[170,30,110,80],[320,30,90,70],[430,15,100,80],[560,15,110,60],[680,20,100,70],[800,30,80,60],
-              [30,150,100,60],[170,155,110,60],[320,155,90,60],[560,155,110,60],[680,155,100,60],
-              [30,280,100,70],[170,270,110,80],[320,270,90,60],[560,270,110,70],[680,275,80,60]].map(([x,y,w,h],i) => (
-              <rect key={i} x={x} y={y} width={w} height={h} rx="4" fill="#1c2f22" opacity="0.7"/>
-            ))}
-          </svg>
-          {/* Subtle overlay */}
-          <div style={{ position: "absolute", inset: 0, background: "rgba(10,18,13,0.3)", pointerEvents: "none" }} />
+          {/* Static map screenshot — non-interactive */}
+          <img
+            src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80"
+            alt="Stadtkarte"
+            draggable={false}
+            style={{
+              position: "absolute", inset: 0, width: "100%", height: "100%",
+              objectFit: "cover", objectPosition: "center",
+              pointerEvents: "none", userSelect: "none",
+              filter: "saturate(0.5) brightness(0.55) hue-rotate(100deg)",
+            }}
+          />
+          {/* Dark green tint overlay */}
+          <div style={{ position: "absolute", inset: 0, background: "rgba(8,22,14,0.45)", pointerEvents: "none" }} />
           {/* Example pins overlay */}
           {[
             { top: "28%", left: "34%", emoji: "✂️", label: "Kings Barbershop", color: "#10B981" },
