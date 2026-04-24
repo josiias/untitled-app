@@ -354,6 +354,47 @@ function MapSection() {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />
+          {/* Example pins overlay */}
+          {[
+            { top: "28%", left: "34%", emoji: "✂️", label: "Kings Barbershop", color: "#10B981" },
+            { top: "42%", left: "55%", emoji: "☕", label: "Café Milano", color: "#F59E0B" },
+            { top: "58%", left: "42%", emoji: "💅", label: "Bella Nails", color: "#EC4899" },
+            { top: "35%", left: "68%", emoji: "💆", label: "Lotus Massage", color: "#8B5CF6" },
+            { top: "65%", left: "62%", emoji: "🍕", label: "Pizza Roma", color: "#F97316" },
+          ].map((pin, i) => (
+            <div key={i} style={{
+              position: "absolute", top: pin.top, left: pin.left,
+              transform: "translate(-50%, -50%)", zIndex: 4,
+            }}>
+              {/* Pulse ring */}
+              <div style={{
+                position: "absolute", top: "50%", left: "50%",
+                transform: "translate(-50%,-50%)",
+                width: 40, height: 40, borderRadius: "50%",
+                background: `${pin.color}25`,
+                border: `1.5px solid ${pin.color}50`,
+                animation: `pulseMap 2.2s ease-in-out ${i * 0.4}s infinite`,
+              }} />
+              {/* Pin bubble */}
+              <div style={{
+                display: "flex", alignItems: "center", gap: 5,
+                background: "rgba(8,20,12,0.92)", backdropFilter: "blur(10px)",
+                border: `1.5px solid ${pin.color}99`,
+                borderRadius: 100, padding: "5px 10px 5px 6px",
+                boxShadow: `0 4px 16px rgba(0,0,0,0.5), 0 0 10px ${pin.color}33`,
+                whiteSpace: "nowrap",
+                cursor: "default",
+              }}>
+                <div style={{
+                  width: 26, height: 26, borderRadius: "50%",
+                  background: `linear-gradient(135deg, ${pin.color}cc, ${pin.color}88)`,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0,
+                }}>{pin.emoji}</div>
+                <span style={{ fontSize: 10, fontWeight: 700, color: "#fff" }}>{pin.label}</span>
+              </div>
+            </div>
+          ))}
+
           {/* Badge overlay */}
           <div style={{
             position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)",
@@ -479,7 +520,7 @@ export default function CustomerLanding() {
           }} />
         ))}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(20,46,30,0.78) 0%, rgba(20,46,30,0.45) 50%, rgba(20,46,30,0.82) 100%)" }} />
-        <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: 500, height: 300, background: "radial-gradient(ellipse, rgba(16,185,129,0.18) 0%, transparent 65%)", pointerEvents: "none" }} />
+        
 
         {/* Hero Text */}
         <div style={{
