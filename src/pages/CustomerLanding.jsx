@@ -255,120 +255,74 @@ function CarouselSection() {
   );
 }
 
-// ── Animated Steps "Video" ────────────────────────────────────────────────────
+// ── 4 Steps Grid ──────────────────────────────────────────────────────────────
 function StepsSection() {
-  const [active, setActive] = useState(0);
-  const [animKey, setAnimKey] = useState(0);
+  const [visible, setVisible] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    const t = setInterval(() => {
-      setActive(i => (i + 1) % HOW_STEPS.length);
-      setAnimKey(k => k + 1);
-    }, 3200);
-    return () => clearInterval(t);
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
   }, []);
-
-  const handleClick = (i) => {
-    setActive(i);
-    setAnimKey(k => k + 1);
-  };
-
-  const s = HOW_STEPS[active];
 
   return (
     <div ref={ref} style={{ padding: "70px 20px", background: "linear-gradient(180deg, #0a1a10 0%, #0d2318 50%, #0a1a10 100%)", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", width: 600, height: 400, background: "radial-gradient(ellipse, rgba(16,185,129,0.07) 0%, transparent 65%)", pointerEvents: "none" }} />
-      <div style={{ maxWidth: 700, margin: "0 auto", position: "relative" }}>
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
+      <div style={{ maxWidth: 860, margin: "0 auto", position: "relative" }}>
+        <div style={{ textAlign: "center", marginBottom: 44 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>SO EINFACH GEHT'S</div>
           <h2 style={{ fontSize: "clamp(24px,5vw,40px)", fontWeight: 900, margin: "0 0 8px" }}>In 4 Schritten durchstarten</h2>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>Tippe auf einen Schritt — oder schau einfach zu.</p>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>Einfach. Schnell. Lohnenswert.</p>
         </div>
 
-        {/* Animated "video" preview card */}
-        <div style={{
-          borderRadius: 24, overflow: "hidden", position: "relative",
-          border: "1px solid rgba(16,185,129,0.25)",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
-          marginBottom: 20,
-          minHeight: 200,
-        }}>
-          {/* BG image with transition */}
-          <img
-            key={`img-${animKey}`}
-            src={s.img}
-            alt=""
-            style={{
-              position: "absolute", inset: 0, width: "100%", height: "100%",
-              objectFit: "cover",
-              animation: "stepImgIn 0.6s ease forwards",
-            }}
-          />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(8,20,12,0.7) 0%, rgba(8,20,12,0.4) 100%)" }} />
-
-          {/* Progress bar */}
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.1)" }}>
+        {/* 2×2 Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          {HOW_STEPS.map((step, i) => (
             <div
-              key={`bar-${animKey}`}
+              key={i}
               style={{
-                height: "100%", background: "#10B981", borderRadius: 100,
-                animation: "progressBar 3.2s linear forwards",
+                borderRadius: 22, overflow: "hidden", position: "relative",
+                border: "1px solid rgba(16,185,129,0.2)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+                opacity: visible ? 1 : 0,
+                transform: visible ? "translateY(0)" : "translateY(20px)",
+                transition: `opacity 0.55s ease ${i * 0.1}s, transform 0.55s ease ${i * 0.1}s`,
               }}
-            />
-          </div>
+            >
+              {/* Photo */}
+              <div style={{ height: 160, position: "relative", overflow: "hidden" }}>
+                <img
+                  src={step.img}
+                  alt={step.title}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%)" }} />
+                {/* Step number badge */}
+                <div style={{
+                  position: "absolute", top: 14, left: 14,
+                  width: 36, height: 36, borderRadius: 12,
+                  background: "rgba(16,185,129,0.9)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 14, fontWeight: 900, color: "#fff",
+                  boxShadow: "0 4px 14px rgba(16,185,129,0.5)",
+                }}>{step.num}</div>
+                {/* Emoji top-right */}
+                <div style={{
+                  position: "absolute", top: 14, right: 14,
+                  width: 36, height: 36, borderRadius: 12,
+                  background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
+                }}>{step.emoji}</div>
+              </div>
 
-          {/* Content */}
-          <div
-            key={`content-${animKey}`}
-            style={{
-              position: "relative", zIndex: 1,
-              padding: "28px 28px 24px",
-              animation: "stepContentIn 0.5s ease forwards",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 12 }}>
-              <div style={{
-                width: 56, height: 56, borderRadius: 16,
-                background: "rgba(16,185,129,0.25)", border: "2px solid rgba(16,185,129,0.5)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 26, boxShadow: "0 4px 20px rgba(16,185,129,0.3)",
-              }}>{s.emoji}</div>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 1, marginBottom: 3 }}>SCHRITT {s.num} / 04</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{s.title}</div>
+              {/* Text body */}
+              <div style={{ background: "rgba(255,255,255,0.04)", padding: "18px 20px 20px" }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", marginBottom: 8 }}>{step.title}</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.65 }}>{step.desc}</div>
+                <div style={{ marginTop: 14, height: 2, borderRadius: 100, background: "linear-gradient(to right, #10B981, transparent)" }} />
               </div>
             </div>
-            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, maxWidth: 480 }}>{s.desc}</div>
-          </div>
-
-          {/* Step indicator dots */}
-          <div style={{ position: "absolute", bottom: 18, right: 20, display: "flex", gap: 6, zIndex: 2 }}>
-            {HOW_STEPS.map((_, i) => (
-              <div key={i} onClick={() => handleClick(i)} style={{
-                width: i === active ? 22 : 7, height: 7, borderRadius: 100,
-                background: i === active ? "#10B981" : "rgba(255,255,255,0.25)",
-                transition: "all 0.3s", cursor: "pointer",
-              }} />
-            ))}
-          </div>
-        </div>
-
-        {/* Step buttons row */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-          {HOW_STEPS.map((step, i) => (
-            <button key={i} onClick={() => handleClick(i)} style={{
-              padding: "12px 8px", borderRadius: 16, border: "none",
-              cursor: "pointer", fontFamily: "inherit",
-              background: active === i ? "rgba(16,185,129,0.18)" : "rgba(255,255,255,0.05)",
-              border: active === i ? "1.5px solid rgba(16,185,129,0.5)" : "1px solid rgba(255,255,255,0.08)",
-              transition: "all 0.25s",
-              transform: active === i ? "scale(1.04)" : "scale(1)",
-            }}>
-              <div style={{ fontSize: 22, marginBottom: 5 }}>{step.emoji}</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: active === i ? "#10B981" : "rgba(255,255,255,0.4)" }}>SCHRITT {step.num}</div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: active === i ? "#fff" : "rgba(255,255,255,0.45)", marginTop: 2, lineHeight: 1.3 }}>{step.title}</div>
-            </button>
           ))}
         </div>
       </div>
@@ -376,115 +330,53 @@ function StepsSection() {
   );
 }
 
-// ── Google Maps-style Map ─────────────────────────────────────────────────────
-function BerlinMap({ activePin, setActivePin, visible }) {
-  return (
-    <div style={{ position: "relative", width: "100%", height: 340, borderRadius: 20, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
-      {/* Real Google Maps-style tile — satellite/streets view of a city */}
-      <img
-        src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80"
-        alt="Stadtansicht"
-        style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center" }}
-      />
-      {/* Light overlay so pins pop but map stays visible */}
-      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
-
-      {/* Pins */}
-      {MAP_PINS.map((pin, i) => (
-        <div
-          key={i}
-          onClick={() => setActivePin(activePin === i ? null : i)}
-          style={{
-            position: "absolute",
-            left: `${pin.x}%`, top: `${pin.y}%`,
-            transform: "translate(-50%, -50%)",
-            cursor: "pointer",
-            animation: visible ? `pinPop 0.5s ease ${i * 0.14}s both` : "none",
-            zIndex: activePin === i ? 10 : 2,
-          }}>
-          {/* Pulse */}
-          <div style={{
-            position: "absolute", top: "50%", left: "50%",
-            transform: "translate(-50%,-50%)",
-            width: 44, height: 44, borderRadius: "50%",
-            background: `${pin.color}18`,
-            border: `1.5px solid ${pin.color}55`,
-            animation: "pulseMap 2s ease-in-out infinite",
-            animationDelay: `${i * 0.4}s`,
-          }} />
-          {/* Pin */}
-          <div style={{
-            width: 34, height: 34, borderRadius: "50%",
-            background: `linear-gradient(135deg, ${pin.color}ee, ${pin.color}99)`,
-            border: "2px solid #fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 15, boxShadow: `0 4px 18px ${pin.color}88, 0 2px 8px rgba(0,0,0,0.5)`,
-            transition: "transform 0.2s",
-            transform: activePin === i ? "scale(1.3)" : "scale(1)",
-          }}>{pin.emoji}</div>
-          {/* Tooltip */}
-          {activePin === i && (
-            <div style={{
-              position: "absolute", bottom: "calc(100% + 10px)", left: "50%",
-              transform: "translateX(-50%)",
-              background: "rgba(8,20,12,0.97)", border: `1.5px solid ${pin.color}88`,
-              backdropFilter: "blur(12px)",
-              borderRadius: 12, padding: "7px 14px", whiteSpace: "nowrap",
-              fontSize: 11, fontWeight: 700, color: "#fff",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
-              animation: "stepFade 0.2s ease",
-            }}>
-              <span style={{ marginRight: 5 }}>{pin.emoji}</span>{pin.label}
-            </div>
-          )}
-        </div>
-      ))}
-
-      {/* Badge */}
-      <div style={{
-        position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)",
-        background: "rgba(8,20,12,0.9)", border: "1px solid rgba(16,185,129,0.4)",
-        backdropFilter: "blur(12px)",
-        borderRadius: 100, padding: "9px 22px", fontSize: 12, fontWeight: 700,
-        color: "#10B981", whiteSpace: "nowrap", zIndex: 5,
-        display: "flex", alignItems: "center", gap: 7,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
-      }}>
-        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 6px #10B981" }} />
-        Demnächst in deiner Stadt
-      </div>
-
-      {/* Top-left: Berlin label */}
-      <div style={{ position: "absolute", top: 16, left: 18, display: "flex", alignItems: "center", gap: 6, background: "rgba(8,20,12,0.7)", borderRadius: 100, padding: "5px 12px", backdropFilter: "blur(8px)" }}>
-        <span style={{ fontSize: 14 }}>🇩🇪</span>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>Berlin</span>
-      </div>
-    </div>
-  );
-}
-
 // ── Map Section ───────────────────────────────────────────────────────────────
 function MapSection() {
-  const [activePin, setActivePin] = useState(null);
-  const [visible, setVisible] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.2 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-
   return (
-    <div ref={ref} style={{ padding: "70px 20px", background: "linear-gradient(180deg, #0d2318 0%, #0a1a10 100%)", position: "relative", overflow: "hidden" }}>
+    <div style={{ padding: "70px 20px", background: "linear-gradient(180deg, #0d2318 0%, #0a1a10 100%)", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", bottom: "0%", right: "-10%", width: 400, height: 400, background: "radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ maxWidth: 900, margin: "0 auto", position: "relative" }}>
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>BALD VERFÜGBAR</div>
           <h2 style={{ fontSize: "clamp(24px,5vw,40px)", fontWeight: 900, margin: "0 0 8px" }}>Entdecke Partner in deiner Nähe</h2>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>Tippe auf einen Pin — komm vorbei, scanne, sammle.</p>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>Komm vorbei, scanne, sammle.</p>
         </div>
-        <BerlinMap activePin={activePin} setActivePin={setActivePin} visible={visible} />
+
+        {/* Google Maps embed — Berlin */}
+        <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(16,185,129,0.25)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", height: 380 }}>
+          <iframe
+            title="Berlin Karte"
+            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d38994.48!2d13.405!3d52.52!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sde!2sde!4v1700000000000!5m2!1sde!2sde"
+            width="100%"
+            height="380"
+            style={{ border: 0, display: "block", filter: "invert(0.9) hue-rotate(135deg) saturate(0.7)" }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+          {/* Badge overlay */}
+          <div style={{
+            position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)",
+            background: "rgba(8,20,12,0.92)", border: "1px solid rgba(16,185,129,0.45)",
+            backdropFilter: "blur(14px)", borderRadius: 100, padding: "10px 24px",
+            fontSize: 12, fontWeight: 700, color: "#10B981", whiteSpace: "nowrap",
+            display: "flex", alignItems: "center", gap: 8,
+            boxShadow: "0 4px 24px rgba(0,0,0,0.5)", zIndex: 5,
+          }}>
+            <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 8px #10B981" }} />
+            Demnächst in deiner Stadt
+          </div>
+          {/* City label */}
+          <div style={{
+            position: "absolute", top: 16, left: 18,
+            background: "rgba(8,20,12,0.8)", backdropFilter: "blur(10px)",
+            borderRadius: 100, padding: "6px 14px",
+            display: "flex", alignItems: "center", gap: 6, zIndex: 5,
+          }}>
+            <span style={{ fontSize: 14 }}>🇩🇪</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)" }}>Berlin</span>
+          </div>
+        </div>
       </div>
     </div>
   );
