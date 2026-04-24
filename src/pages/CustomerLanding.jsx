@@ -344,18 +344,20 @@ function MapSection() {
 
         {/* Static map image — non-interactive */}
         <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(16,185,129,0.25)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", height: 380 }}>
-          {/* Static map — Stamen Toner tile stitched, non-interactive */}
-          <div style={{
-            position: "absolute", inset: 0,
-            backgroundImage: `url("https://tile.openstreetmap.org/15/17601/10742.png"), url("https://tile.openstreetmap.org/15/17602/10742.png"), url("https://tile.openstreetmap.org/15/17601/10743.png"), url("https://tile.openstreetmap.org/15/17602/10743.png")`,
-            backgroundSize: "50% 50%",
-            backgroundPosition: "0 0, 50% 0, 0 50%, 50% 50%",
-            backgroundRepeat: "no-repeat",
-            filter: "invert(1) hue-rotate(155deg) saturate(0.4) brightness(0.55)",
-            pointerEvents: "none", userSelect: "none",
-          }} />
-          {/* Overlay */}
-          <div style={{ position: "absolute", inset: 0, background: "rgba(8,20,12,0.42)", pointerEvents: "none" }} />
+          {/* Leaflet-rendered static map snapshot via iframe — pointer events disabled */}
+          <iframe
+            title="Karte"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=13.38,52.51,13.43,52.535&layer=mapnik"
+            style={{
+              position: "absolute", inset: 0, width: "100%", height: "100%",
+              border: "none", display: "block",
+              pointerEvents: "none",
+              filter: "invert(0.88) hue-rotate(135deg) saturate(0.5) brightness(0.65)",
+            }}
+            scrolling="no"
+          />
+          {/* Overlay blocks all interaction */}
+          <div style={{ position: "absolute", inset: 0, background: "rgba(8,20,12,0.35)", pointerEvents: "all", cursor: "default" }} />
           {/* Example pins overlay */}
           {[
             { top: "28%", left: "34%", emoji: "✂️", label: "Kings Barbershop", color: "#10B981" },
