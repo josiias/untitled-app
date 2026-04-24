@@ -21,9 +21,9 @@ const CATEGORIES = [
 ];
 
 const STAMP_CARDS = [
-  { name: "Kings Barbershop", emoji: "✂️", stamps: 5, total: 8, color: "#10B981" },
-  { name: "Café Milano", emoji: "☕", stamps: 3, total: 6, color: "#F59E0B" },
-  { name: "Bella Nails", emoji: "💅", stamps: 7, total: 8, color: "#EC4899" },
+  { name: "Kings Barbershop", emoji: "✂️", stamps: 5, total: 8, color: "#10B981", appointment: "Mo, 28. Apr · 14:00" },
+  { name: "Café Milano", emoji: "☕", stamps: 3, total: 6, color: "#F59E0B", appointment: null },
+  { name: "Bella Nails", emoji: "💅", stamps: 7, total: 8, color: "#EC4899", appointment: "Do, 01. Mai · 11:30" },
 ];
 
 const MAP_PINS = [
@@ -35,10 +35,10 @@ const MAP_PINS = [
 ];
 
 const HOW_STEPS = [
-  { emoji: "📱", num: "01", title: "QR-Code scannen", desc: "Beim nächsten Besuch einfach den QR-Code an der Kasse scannen — kein Download, kein Aufwand." },
-  { emoji: "⭐", num: "02", title: "Stempel sammeln", desc: "Mit jedem Einkauf einen Stempel. Bald hast du deine Belohnung verdient." },
-  { emoji: "🎁", num: "03", title: "Prämie einlösen", desc: "Wenn die Karte voll ist, löse deine Prämie direkt beim nächsten Besuch ein." },
-  { emoji: "💸", num: "04", title: "Geld verdienen", desc: "Empfehle Freunde und kassiere automatisch Provision — passiv und ohne Aufwand." },
+  { emoji: "📱", num: "01", title: "QR-Code scannen", desc: "Beim nächsten Besuch einfach den QR-Code an der Kasse scannen — kein Aufwand, keine Registrierung vor Ort.", img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80" },
+  { emoji: "⭐", num: "02", title: "Stempel sammeln", desc: "Mit jedem Einkauf einen Stempel. Bald hast du deine Belohnung verdient.", img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80" },
+  { emoji: "🎁", num: "03", title: "Prämie einlösen", desc: "Wenn die Karte voll ist, löse deine Prämie direkt beim nächsten Besuch ein.", img: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&q=80" },
+  { emoji: "💸", num: "04", title: "Geld verdienen", desc: "Empfehle Freunde und kassiere automatisch Provision — passiv und ohne Aufwand.", img: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&q=80" },
 ];
 
 function PhoneMockup() {
@@ -115,8 +115,20 @@ function PhoneMockup() {
         </div>
       ))}
 
+      {/* Next appointment */}
+      {STAMP_CARDS.filter(c => c.appointment)[0] && (
+        <div style={{ background: "rgba(236,72,153,0.1)", border: "1px solid rgba(236,72,153,0.25)", borderRadius: 12, padding: "8px 12px", marginTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 13 }}>📅</span>
+          <div>
+            <div style={{ fontSize: 8, color: "rgba(255,255,255,0.4)" }}>Nächster Termin</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#fff" }}>{STAMP_CARDS.filter(c => c.appointment)[0].name}</div>
+            <div style={{ fontSize: 9, color: "#EC4899", fontWeight: 600 }}>{STAMP_CARDS.filter(c => c.appointment)[0].appointment}</div>
+          </div>
+        </div>
+      )}
+
       {/* Earnings */}
-      <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 14, padding: "10px 12px", marginTop: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 14, padding: "10px 12px", marginTop: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)" }}>💸 Provision verdient</div>
           <div style={{ fontSize: 22, fontWeight: 900, color: "#10B981" }}>42,50 €</div>
@@ -156,7 +168,7 @@ function CarouselSection() {
   const doubled = [...CATEGORIES, ...CATEGORIES];
 
   return (
-    <div style={{ padding: "70px 0", background: "#060d09", overflow: "hidden" }}>
+    <div style={{ padding: "70px 0", background: "linear-gradient(180deg, #060d09 0%, #0a1a12 50%, #060d09 100%)", overflow: "hidden" }}>
       <div style={{ textAlign: "center", marginBottom: 36, padding: "0 20px" }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>PARTNER-KATEGORIEN</div>
         <h2 style={{ fontSize: "clamp(24px,5vw,40px)", fontWeight: 900, margin: "0 0 8px" }}>Überall in deiner Stadt</h2>
@@ -201,8 +213,10 @@ function MapSection() {
   }, []);
 
   return (
-    <div ref={ref} style={{ padding: "70px 20px", background: "#080f0b" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+    <div ref={ref} style={{ padding: "70px 20px", background: "linear-gradient(180deg, #0a1a12 0%, #080f0b 100%)", position: "relative", overflow: "hidden" }}>
+      {/* bg texture glow */}
+      <div style={{ position: "absolute", bottom: "0%", right: "-10%", width: 400, height: 400, background: "radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)", pointerEvents: "none" }} />
+      <div style={{ maxWidth: 900, margin: "0 auto", position: "relative" }}>
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>BALD VERFÜGBAR</div>
           <h2 style={{ fontSize: "clamp(24px,5vw,40px)", fontWeight: 900, margin: "0 0 8px" }}>Entdecke Partner in deiner Nähe</h2>
@@ -212,11 +226,11 @@ function MapSection() {
         {/* Map mockup */}
         <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
         <div style={{ height: 340, position: "relative" }}>
-          {/* Real aerial/map photo */}
+          {/* Real street-level city photo */}
           <img
-            src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80"
+            src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=80"
             alt="Stadtplan"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%" }}
           />
           {/* Dark overlay so pins pop */}
           <div style={{ position: "absolute", inset: 0, background: "rgba(8,15,11,0.55)" }} />
@@ -304,14 +318,14 @@ function FeaturesSection() {
   }, []);
 
   const features = [
-    { emoji: "🎁", title: "Prämien sammeln", desc: "Mit jedem Einkauf näher zur Belohnung — Rabatte, Freigetränke & mehr.", color: "#10B981", img: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=80" },
-    { emoji: "💸", title: "100 € + verdienen", desc: "Empfehle Freunde und kassiere automatisch. Passiv, ohne Aufwand.", color: "#F59E0B", img: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=600&q=80" },
-    { emoji: "📱", title: "Immer dabei", desc: "Alles digital. Kein Papierchaos. Kein App-Download nötig.", color: "#EC4899", img: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&q=80" },
-    { emoji: "🤝", title: "Fair & sicher", desc: "Deine Daten gehören dir. Transparent, sicher, ohne Abo.", color: "#8B5CF6", img: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&q=80" },
+    { emoji: "🎫", title: "Digitale Stempelkarten", desc: "Sammel bei Barbershops, Cafés, Nagelstudios & Co. — alles auf einem Blick, immer dabei.", color: "#10B981", img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80" },
+    { emoji: "💸", title: "100 € + verdienen", desc: "Empfehle deine Lieblingsgeschäfte an Freunde und kassiere automatisch Provision.", color: "#F59E0B", img: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=600&q=80" },
+    { emoji: "📅", title: "Termine verwalten", desc: "Buche und verwalte Termine bei deinen Partnerbetrieben direkt über Sensalie.", color: "#EC4899", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&q=80" },
+    { emoji: "⚡", title: "Alles an einem Ort", desc: "Stempelkarten, Prämien, Termine und Provision — alles digital, alles übersichtlich.", color: "#8B5CF6", img: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&q=80" },
   ];
 
   return (
-    <div ref={ref} style={{ padding: "70px 20px", background: "#060d09" }}>
+    <div ref={ref} style={{ padding: "70px 20px", background: "linear-gradient(180deg, #080f0b 0%, #060d09 100%)", position: "relative" }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>DEIN MEHRWERT</div>
@@ -364,8 +378,10 @@ function StepsSection() {
   const step = HOW_STEPS[active];
 
   return (
-    <div ref={ref} style={{ padding: "70px 20px", background: "#080f0b" }}>
-      <div style={{ maxWidth: 700, margin: "0 auto" }}>
+    <div ref={ref} style={{ padding: "70px 20px", background: "linear-gradient(180deg, #060d09 0%, #0d1f14 50%, #080f0b 100%)", position: "relative", overflow: "hidden" }}>
+      {/* Subtle bg glow */}
+      <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", width: 600, height: 400, background: "radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, transparent 65%)", pointerEvents: "none" }} />
+      <div style={{ maxWidth: 700, margin: "0 auto", position: "relative" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>SO EINFACH GEHT'S</div>
           <h2 style={{ fontSize: "clamp(24px,5vw,40px)", fontWeight: 900, margin: "0 0 8px" }}>In 4 Schritten durchstarten</h2>
@@ -386,16 +402,26 @@ function StepsSection() {
           ))}
         </div>
 
-        {/* Step cards — all visible, active highlighted */}
+        {/* Step cards — all visible, active highlighted, with bg image */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {HOW_STEPS.map((s, i) => (
             <div key={i} onClick={() => setActive(i)} style={{
               borderRadius: 18, overflow: "hidden", cursor: "pointer",
-              border: i === active ? "1.5px solid rgba(16,185,129,0.45)" : "1px solid rgba(255,255,255,0.07)",
-              background: i === active ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.03)",
+              border: i === active ? "1.5px solid rgba(16,185,129,0.5)" : "1px solid rgba(255,255,255,0.07)",
               transition: "all 0.3s",
+              position: "relative",
             }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px" }}>
+              {/* BG image only for active */}
+              {i === active && (
+                <>
+                  <img src={s.img} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.18, transition: "opacity 0.4s" }} />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(8,15,11,0.7) 100%)" }} />
+                </>
+              )}
+              {i !== active && (
+                <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.03)" }} />
+              )}
+              <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 14, padding: "16px 18px" }}>
                 <div style={{
                   width: 46, height: 46, borderRadius: 14, flexShrink: 0,
                   background: i === active ? "#10B981" : "rgba(255,255,255,0.07)",
@@ -404,18 +430,16 @@ function StepsSection() {
                   boxShadow: i === active ? "0 4px 16px rgba(16,185,129,0.4)" : "none",
                 }}>{s.emoji}</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: i === active ? "#10B981" : "rgba(255,255,255,0.3)", letterSpacing: 1 }}>SCHRITT {s.num}</span>
-                  </div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: i === active ? "#fff" : "rgba(255,255,255,0.5)" }}>{s.title}</div>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: i === active ? "#10B981" : "rgba(255,255,255,0.3)", letterSpacing: 1 }}>SCHRITT {s.num}</span>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: i === active ? "#fff" : "rgba(255,255,255,0.5)", marginTop: 2 }}>{s.title}</div>
                   {i === active && (
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.6, marginTop: 4, animation: "stepFade 0.3s ease" }}>{s.desc}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.6, marginTop: 4, animation: "stepFade 0.3s ease" }}>{s.desc}</div>
                   )}
                 </div>
                 <div style={{ fontSize: 16, color: i === active ? "#10B981" : "rgba(255,255,255,0.2)" }}>{i === active ? "✓" : "→"}</div>
               </div>
               {i === active && (
-                <div style={{ height: 3, background: "linear-gradient(to right, #10B981, transparent)" }} />
+                <div style={{ position: "relative", zIndex: 1, height: 3, background: "linear-gradient(to right, #10B981, transparent)" }} />
               )}
             </div>
           ))}
@@ -602,7 +626,7 @@ export default function CustomerLanding() {
             Bereit für mehr<br /><span style={{ color: "#10B981" }}>aus jedem Besuch?</span>
           </h2>
           <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, marginBottom: 32, maxWidth: 380, margin: "0 auto 32px" }}>
-            Kostenlos starten. Kein Abo. Keine versteckten Kosten.
+            Kostenlos starten. Deine Lieblingsgeschäfte. Deine Prämien.
           </div>
           <Link to="/dashboard" style={{
             display: "inline-block", background: "#10B981", color: "#fff",
