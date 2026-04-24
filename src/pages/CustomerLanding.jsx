@@ -342,18 +342,38 @@ function MapSection() {
           <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>Komm vorbei, scanne, sammle.</p>
         </div>
 
-        {/* Google Maps embed — Berlin */}
+        {/* Static map image — non-interactive */}
         <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(16,185,129,0.25)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", height: 380 }}>
-          <iframe
-            title="Berlin Karte"
-            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d38994.48!2d13.405!3d52.52!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sde!2sde!4v1700000000000!5m2!1sde!2sde"
-            width="100%"
-            height="380"
-            style={{ border: 0, display: "block", filter: "invert(0.9) hue-rotate(135deg) saturate(0.7)" }}
-            allowFullScreen=""
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+          {/* Static SVG street map illustration */}
+          <svg width="100%" height="380" viewBox="0 0 900 380" style={{ display: "block", pointerEvents: "none", userSelect: "none" }}>
+            <rect width="900" height="380" fill="#131f17"/>
+            {/* Water */}
+            <ellipse cx="680" cy="310" rx="180" ry="55" fill="#0d1f2a" opacity="0.9"/>
+            {/* Parks */}
+            <rect x="60" y="40" width="140" height="90" rx="10" fill="#162b1e" opacity="0.8"/>
+            <rect x="550" y="80" width="100" height="70" rx="8" fill="#162b1e" opacity="0.7"/>
+            <rect x="300" y="260" width="80" height="60" rx="6" fill="#162b1e" opacity="0.7"/>
+            {/* Major roads */}
+            <line x1="0" y1="190" x2="900" y2="190" stroke="#243d2c" strokeWidth="18"/>
+            <line x1="450" y1="0" x2="450" y2="380" stroke="#243d2c" strokeWidth="18"/>
+            <line x1="0" y1="100" x2="900" y2="280" stroke="#1e3326" strokeWidth="12"/>
+            <line x1="200" y1="0" x2="700" y2="380" stroke="#1e3326" strokeWidth="10"/>
+            {/* Minor roads */}
+            <line x1="0" y1="130" x2="900" y2="130" stroke="#1a2e22" strokeWidth="6"/>
+            <line x1="0" y1="250" x2="900" y2="250" stroke="#1a2e22" strokeWidth="6"/>
+            <line x1="150" y1="0" x2="150" y2="380" stroke="#1a2e22" strokeWidth="6"/>
+            <line x1="300" y1="0" x2="300" y2="380" stroke="#1a2e22" strokeWidth="6"/>
+            <line x1="600" y1="0" x2="600" y2="380" stroke="#1a2e22" strokeWidth="6"/>
+            <line x1="750" y1="0" x2="750" y2="380" stroke="#1a2e22" strokeWidth="6"/>
+            {/* City blocks */}
+            {[[30,30,100,60],[170,30,110,80],[320,30,90,70],[430,15,100,80],[560,15,110,60],[680,20,100,70],[800,30,80,60],
+              [30,150,100,60],[170,155,110,60],[320,155,90,60],[560,155,110,60],[680,155,100,60],
+              [30,280,100,70],[170,270,110,80],[320,270,90,60],[560,270,110,70],[680,275,80,60]].map(([x,y,w,h],i) => (
+              <rect key={i} x={x} y={y} width={w} height={h} rx="4" fill="#1c2f22" opacity="0.7"/>
+            ))}
+          </svg>
+          {/* Subtle overlay */}
+          <div style={{ position: "absolute", inset: 0, background: "rgba(10,18,13,0.3)", pointerEvents: "none" }} />
           {/* Example pins overlay */}
           {[
             { top: "28%", left: "34%", emoji: "✂️", label: "Kings Barbershop", color: "#10B981" },
