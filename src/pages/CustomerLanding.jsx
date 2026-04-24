@@ -257,73 +257,145 @@ function CarouselSection() {
 
 // ── 4 Steps Grid ──────────────────────────────────────────────────────────────
 function StepsSection() {
-  const [visible, setVisible] = useState(false);
-  const ref = useRef(null);
+  const [activeStep, setActiveStep] = useState(0);
+  const [visibleSteps, setVisibleSteps] = useState([]);
+  const stepRefs = useRef([]);
 
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.1 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
+    const observers = HOW_STEPS.map((_, i) => {
+      const obs = new IntersectionObserver(
+        ([e]) => { if (e.isIntersecting) setVisibleSteps(prev => prev.includes(i) ? prev : [...prev, i]); },
+        { threshold: 0.25 }
+      );
+      if (stepRefs.current[i]) obs.observe(stepRefs.current[i]);
+      return obs;
+    });
+    return () => observers.forEach(o => o.disconnect());
+  }, []);
+
+  // Auto-cycle active step
+  useEffect(() => {
+    const t = setInterval(() => setActiveStep(i => (i + 1) % HOW_STEPS.length), 2200);
+    return () => clearInterval(t);
   }, []);
 
   return (
-    <div ref={ref} style={{ padding: "70px 20px", background: "linear-gradient(180deg, #0a1a10 0%, #0d2318 50%, #0a1a10 100%)", position: "relative", overflow: "hidden" }}>
+    <div style={{ padding: "70px 20px", background: "linear-gradient(180deg, #0a1a10 0%, #0d2318 50%, #0a1a10 100%)", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", width: 600, height: 400, background: "radial-gradient(ellipse, rgba(16,185,129,0.07) 0%, transparent 65%)", pointerEvents: "none" }} />
       <div style={{ maxWidth: 860, margin: "0 auto", position: "relative" }}>
         <div style={{ textAlign: "center", marginBottom: 44 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>SO EINFACH GEHT'S</div>
           <h2 style={{ fontSize: "clamp(24px,5vw,40px)", fontWeight: 900, margin: "0 0 8px" }}>In 4 Schritten durchstarten</h2>
           <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>Einfach. Schnell. Lohnenswert.</p>
+
+          {/* Step dots indicator */}
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 20 }}>
+            {HOW_STEPS.map((_, i) => (
+              <div
+                key={i}
+                onClick={() => setActiveStep(i)}
+                style={{
+                  width: activeStep === i ? 28 : 8, height: 8, borderRadius: 100,
+                  background: activeStep === i ? "#10B981" : "rgba(255,255,255,0.15)",
+                  transition: "all 0.4s ease", cursor: "pointer",
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         {/* 2×2 Grid */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          {HOW_STEPS.map((step, i) => (
-            <div
-              key={i}
-              style={{
-                borderRadius: 22, overflow: "hidden", position: "relative",
-                border: "1px solid rgba(16,185,129,0.2)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
-                opacity: visible ? 1 : 0,
-                transform: visible ? "translateY(0)" : "translateY(20px)",
-                transition: `opacity 0.55s ease ${i * 0.1}s, transform 0.55s ease ${i * 0.1}s`,
-              }}
-            >
-              {/* Photo */}
-              <div style={{ height: 160, position: "relative", overflow: "hidden" }}>
-                <img
-                  src={step.img}
-                  alt={step.title}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%)" }} />
-                {/* Step number badge */}
+          {HOW_STEPS.map((step, i) => {
+            const isActive = activeStep === i;
+            const isVisible = visibleSteps.includes(i);
+            const directions = ["translateX(-24px)", "translateX(24px)", "translateX(-24px)", "translateX(24px)"];
+            return (
+              <div
+                key={i}
+                ref={el => stepRefs.current[i] = el}
+                onMouseEnter={() => setActiveStep(i)}
+                style={{
+                  borderRadius: 22, overflow: "hidden", position: "relative",
+                  border: isActive ? "1.5px solid rgba(16,185,129,0.6)" : "1px solid rgba(16,185,129,0.15)",
+                  boxShadow: isActive
+                    ? "0 16px 48px rgba(0,0,0,0.5), 0 0 30px rgba(16,185,129,0.15)"
+                    : "0 8px 32px rgba(0,0,0,0.35)",
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? "none" : directions[i],
+                  transition: `opacity 0.6s ease ${i * 0.12}s, transform 0.6s ease ${i * 0.12}s, box-shadow 0.35s ease, border-color 0.35s ease`,
+                  cursor: "default",
+                }}
+              >
+                {/* Active glow top bar */}
                 <div style={{
-                  position: "absolute", top: 14, left: 14,
-                  width: 36, height: 36, borderRadius: 12,
-                  background: "rgba(16,185,129,0.9)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 14, fontWeight: 900, color: "#fff",
-                  boxShadow: "0 4px 14px rgba(16,185,129,0.5)",
-                }}>{step.num}</div>
-                {/* Emoji top-right */}
-                <div style={{
-                  position: "absolute", top: 14, right: 14,
-                  width: 36, height: 36, borderRadius: 12,
-                  background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)",
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-                }}>{step.emoji}</div>
-              </div>
+                  position: "absolute", top: 0, left: 0, right: 0, height: 3, zIndex: 10,
+                  background: isActive ? "linear-gradient(90deg, #10B981, #34D399, #10B981)" : "transparent",
+                  backgroundSize: "200% 100%",
+                  animation: isActive ? "shimmer 2s linear infinite" : "none",
+                  transition: "background 0.35s",
+                }} />
 
-              {/* Text body */}
-              <div style={{ background: "rgba(255,255,255,0.04)", padding: "18px 20px 20px" }}>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.65 }}>{step.desc}</div>
-                <div style={{ marginTop: 14, height: 2, borderRadius: 100, background: "linear-gradient(to right, #10B981, transparent)" }} />
+                {/* Photo */}
+                <div style={{ height: 160, position: "relative", overflow: "hidden" }}>
+                  <img
+                    src={step.img}
+                    alt={step.title}
+                    style={{
+                      width: "100%", height: "100%", objectFit: "cover",
+                      transform: isActive ? "scale(1.06)" : "scale(1)",
+                      transition: "transform 0.6s ease",
+                    }}
+                  />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%)" }} />
+
+                  {/* Step number badge */}
+                  <div style={{
+                    position: "absolute", top: 14, left: 14,
+                    width: 36, height: 36, borderRadius: 12,
+                    background: isActive ? "#10B981" : "rgba(16,185,129,0.7)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 14, fontWeight: 900, color: "#fff",
+                    boxShadow: isActive ? "0 4px 18px rgba(16,185,129,0.7)" : "0 4px 14px rgba(16,185,129,0.3)",
+                    transform: isActive ? "scale(1.1)" : "scale(1)",
+                    transition: "all 0.35s ease",
+                  }}>{step.num}</div>
+
+                  {/* Emoji top-right */}
+                  <div style={{
+                    position: "absolute", top: 14, right: 14,
+                    width: 36, height: 36, borderRadius: 12,
+                    background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: isActive ? 22 : 18,
+                    transition: "font-size 0.3s ease",
+                  }}>{step.emoji}</div>
+                </div>
+
+                {/* Text body */}
+                <div style={{
+                  background: isActive ? "rgba(16,185,129,0.06)" : "rgba(255,255,255,0.04)",
+                  padding: "18px 20px 20px",
+                  transition: "background 0.35s ease",
+                }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: isActive ? "#fff" : "rgba(255,255,255,0.85)", marginBottom: 8, transition: "color 0.3s" }}>{step.title}</div>
+                  <div style={{
+                    fontSize: 13, color: isActive ? "rgba(255,255,255,0.65)" : "rgba(255,255,255,0.4)",
+                    lineHeight: 1.65, transition: "color 0.3s",
+                  }}>{step.desc}</div>
+                  <div style={{
+                    marginTop: 14, height: 2, borderRadius: 100,
+                    background: isActive
+                      ? "linear-gradient(to right, #10B981, #34D399, transparent)"
+                      : "linear-gradient(to right, rgba(16,185,129,0.3), transparent)",
+                    backgroundSize: isActive ? "200% 100%" : "100% 100%",
+                    animation: isActive ? "shimmer 2s linear infinite" : "none",
+                    transition: "background 0.4s",
+                  }} />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
