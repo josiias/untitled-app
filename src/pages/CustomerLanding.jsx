@@ -147,54 +147,74 @@ export default function CustomerLanding() {
       {/* Hero */}
       <div style={{ position: "relative", minHeight: "90vh", display: "flex", alignItems: "center", overflow: "hidden" }}>
         {HERO_SLIDES.map((s, i) => (
-          <img key={s.img} src={s.img} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: i === heroSlide ? 0.3 : 0, transition: "opacity 1.5s ease" }} />
+          <img key={s.img} src={s.img} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: i === heroSlide ? 0.45 : 0, transition: "opacity 1.5s ease" }} />
         ))}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(8,15,11,0.95) 40%, rgba(8,15,11,0.4) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(5,10,8,0.92) 35%, rgba(5,10,8,0.5) 100%)" }} />
 
         <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto", padding: "80px 24px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
           <div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100, padding: "6px 14px", fontSize: 12, fontWeight: 700, color: "#10B981", marginBottom: 28 }}>
-              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#10B981" }} /> Das neue Loyalitätsprogramm
-            </div>
-            <h1 style={{ fontSize: "clamp(36px, 6vw, 60px)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 24px" }}>
-              Sammel digitale <br /><span style={{ color: "#10B981" }}>Stempelkarten</span>
+            <h1 style={{ fontSize: "clamp(38px, 6vw, 64px)", fontWeight: 900, lineHeight: 1.05, margin: "0 0 10px" }}>
+              Sammel digitale <span style={{ color: "#10B981" }}>Stempelkarten</span>
             </h1>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
-              <div style={{ fontSize: "clamp(16px, 2.5vw, 22px)", fontWeight: 700 }}>🎁 Hol dir großartige Prämien</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginLeft: 30 }}>Rabatte, Gratisleistungen & mehr</div>
-              <div style={{ fontSize: "clamp(16px, 2.5vw, 22px)", fontWeight: 700 }}>💸 Verdiene 100 € und mehr</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginLeft: 30 }}>Einfach durch Empfehlungen. Passiv. Automatisch.</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 40, marginTop: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ fontSize: 22 }}>🎁</span>
+                <div>
+                  <div style={{ fontSize: "clamp(17px, 2.5vw, 22px)", fontWeight: 800 }}>Hol dir großartige Prämien</div>
+                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>Rabatte, Gratisleistungen & mehr</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ fontSize: 22 }}>💸</span>
+                <div>
+                  <div style={{ fontSize: "clamp(17px, 2.5vw, 22px)", fontWeight: 800 }}>
+                    Verdiene <span style={{ color: "#10B981" }}>100 €</span> und mehr
+                  </div>
+                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>Einfach durch Empfehlungen. Passiv. Automatisch.</div>
+                </div>
+              </div>
             </div>
             <Link to="/dashboard" style={{ display: "inline-block", background: "#10B981", color: "#fff", fontWeight: 800, fontSize: 16, padding: "16px 36px", borderRadius: 100, textDecoration: "none", boxShadow: "0 8px 30px rgba(16,185,129,0.4)" }}>
               Kostenlos registrieren
             </Link>
           </div>
 
-          {/* Phone mockup */}
+          {/* Phone mockup with stamp dots */}
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <div style={{ background: "#1a1a2e", borderRadius: 36, padding: 20, width: 240, border: "2px solid rgba(255,255,255,0.08)", boxShadow: "0 40px 80px rgba(0,0,0,0.6)" }}>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 16, textAlign: "center" }}>9:41 ···</div>
-              <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 14 }}>Meine Karten</div>
+            <div style={{ background: "#111827", borderRadius: 40, padding: "20px 16px", width: 240, border: "2px solid rgba(255,255,255,0.1)", boxShadow: "0 40px 80px rgba(0,0,0,0.7)" }}>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginBottom: 14, textAlign: "center", letterSpacing: 1 }}>9:41 ···</div>
+              <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 12, color: "#fff" }}>Meine Karten</div>
               {[
                 { name: "Kings Barbershop", emoji: "✂️", stamps: 5, total: 8, color: "#10B981" },
                 { name: "Café Milano", emoji: "☕", stamps: 3, total: 8, color: "#F59E0B" },
                 { name: "Bella Nails", emoji: "💅", stamps: 7, total: 8, color: "#EC4899" },
               ].map(c => (
-                <div key={c.name} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 12, padding: 12, marginBottom: 10 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#fff", marginBottom: 6 }}>
-                    <span>{c.emoji} {c.name}</span><span style={{ color: c.color }}>{c.stamps}/{c.total}</span>
+                <div key={c.name} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 14, padding: "10px 12px", marginBottom: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#fff", marginBottom: 8 }}>
+                    <span style={{ fontWeight: 700 }}>{c.emoji} {c.name}</span>
+                    <span style={{ color: c.color, fontWeight: 700, fontSize: 10 }}>{c.stamps}/{c.total}</span>
                   </div>
-                  <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 100 }}>
-                    <div style={{ height: "100%", width: `${(c.stamps/c.total)*100}%`, background: c.color, borderRadius: 100 }} />
+                  {/* Stamp dots */}
+                  <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                    {Array.from({ length: c.total }).map((_, i) => (
+                      <div key={i} style={{
+                        width: 16, height: 16, borderRadius: "50%",
+                        background: i < c.stamps ? c.color : "rgba(255,255,255,0.1)",
+                        border: i < c.stamps ? "none" : "1px solid rgba(255,255,255,0.2)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 8, color: "#fff",
+                        boxShadow: i === c.stamps - 1 ? `0 0 8px ${c.color}88` : "none",
+                      }}>
+                        {i < c.stamps ? "✓" : ""}
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
-              <div style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 12, padding: 12, marginTop: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>💸 Verdient</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: "#10B981" }}>42,50 €</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>3 Empfehlungen</div>
-                </div>
+              <div style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 12, padding: "10px 12px", marginTop: 4 }}>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)" }}>💸 Verdient</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "#10B981" }}>42,50 €</div>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)" }}>3 Empfehlungen</div>
               </div>
             </div>
           </div>
