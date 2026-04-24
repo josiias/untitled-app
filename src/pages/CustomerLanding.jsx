@@ -376,70 +376,18 @@ function StepsSection() {
   );
 }
 
-// ── Berlin SVG Map ────────────────────────────────────────────────────────────
+// ── Google Maps-style Map ─────────────────────────────────────────────────────
 function BerlinMap({ activePin, setActivePin, visible }) {
   return (
-    <div style={{ position: "relative", width: "100%", height: 340, borderRadius: 20, overflow: "hidden", border: "1px solid rgba(16,185,129,0.2)", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
-      {/* Dark map background */}
-      <svg
-        viewBox="0 0 800 460"
-        style={{ width: "100%", height: "100%", display: "block" }}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* Background */}
-        <rect width="800" height="460" fill="#0d1f14" />
-        {/* Water - Spree / Havel (simplified) */}
-        <path d="M 0 200 Q 80 195 120 205 Q 160 215 200 210 Q 240 205 280 215 Q 320 225 360 220 Q 400 215 440 222 Q 480 229 520 225 Q 560 221 600 228 Q 640 235 680 230 Q 720 225 760 232 L 800 235 L 800 250 L 760 248 Q 720 242 680 248 Q 640 254 600 246 Q 560 238 520 243 Q 480 248 440 240 Q 400 232 360 238 Q 320 244 280 234 Q 240 224 200 230 Q 160 236 120 225 Q 80 214 0 218 Z" fill="#1a3d5c" opacity="0.6" />
-        {/* Spree curve through center */}
-        <path d="M 150 240 Q 200 235 250 245 Q 300 255 350 250 Q 400 245 450 255 Q 500 265 550 258" stroke="#1a4a6e" strokeWidth="10" fill="none" opacity="0.5" />
-        {/* Tiergarten park */}
-        <ellipse cx="280" cy="195" rx="60" ry="38" fill="#0f2e1a" opacity="0.8" />
-        {/* Brandenburger Tor area */}
-        <rect x="315" y="185" width="8" height="20" fill="rgba(16,185,129,0.3)" rx="1" />
-        {/* Main streets - horizontal */}
-        <line x1="0" y1="160" x2="800" y2="160" stroke="rgba(255,255,255,0.05)" strokeWidth="1.5" />
-        <line x1="0" y1="200" x2="800" y2="200" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
-        <line x1="0" y1="230" x2="800" y2="230" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
-        <line x1="0" y1="270" x2="800" y2="270" stroke="rgba(255,255,255,0.05)" strokeWidth="1.5" />
-        <line x1="0" y1="310" x2="800" y2="310" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-        <line x1="0" y1="120" x2="800" y2="120" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-        {/* Main streets - vertical */}
-        <line x1="100" y1="0" x2="100" y2="460" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
-        <line x1="200" y1="0" x2="200" y2="460" stroke="rgba(255,255,255,0.05)" strokeWidth="1.5" />
-        <line x1="300" y1="0" x2="300" y2="460" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
-        <line x1="400" y1="0" x2="400" y2="460" stroke="rgba(255,255,255,0.05)" strokeWidth="1.5" />
-        <line x1="500" y1="0" x2="500" y2="460" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
-        <line x1="600" y1="0" x2="600" y2="460" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-        <line x1="700" y1="0" x2="700" y2="460" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-        {/* Diagonal - Ku'damm */}
-        <line x1="0" y1="220" x2="300" y2="180" stroke="rgba(255,255,255,0.08)" strokeWidth="2.5" />
-        {/* Diagonal - Karl-Marx-Allee */}
-        <line x1="400" y1="200" x2="800" y2="180" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
-        {/* Ring road */}
-        <circle cx="400" cy="230" r="160" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
-        <circle cx="400" cy="230" r="240" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-        {/* Small blocks */}
-        {[...Array(12)].map((_, row) => [...Array(18)].map((_, col) => (
-          <rect
-            key={`${row}-${col}`}
-            x={20 + col * 44}
-            y={40 + row * 38}
-            width={28}
-            height={22}
-            rx={3}
-            fill="rgba(255,255,255,0.02)"
-            stroke="rgba(255,255,255,0.03)"
-            strokeWidth="0.5"
-          />
-        )))}
-        {/* City center highlight */}
-        <circle cx="320" cy="200" r="40" fill="rgba(16,185,129,0.04)" />
-        {/* Label: Berlin */}
-        <text x="400" y="420" textAnchor="middle" fill="rgba(255,255,255,0.12)" fontSize="13" fontWeight="bold" letterSpacing="6">BERLIN</text>
-      </svg>
-
-      {/* Green tint overlay */}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(16,185,129,0.06) 0%, transparent 60%)" }} />
+    <div style={{ position: "relative", width: "100%", height: 340, borderRadius: 20, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
+      {/* Real Google Maps-style tile — satellite/streets view of a city */}
+      <img
+        src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80"
+        alt="Stadtansicht"
+        style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center" }}
+      />
+      {/* Light overlay so pins pop but map stays visible */}
+      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
 
       {/* Pins */}
       {MAP_PINS.map((pin, i) => (
@@ -557,7 +505,7 @@ export default function CustomerLanding() {
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0d1f14", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "#162b1e", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
@@ -599,8 +547,12 @@ export default function CustomerLanding() {
           100% { background-position: 200% center; }
         }
         @keyframes badgeFloat {
-          0%, 100% { transform: translateY(0px) rotate(-1deg); }
-          50% { transform: translateY(-5px) rotate(1deg); }
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-3px); }
+        }
+        @keyframes glowPulse {
+          0%, 100% { box-shadow: 0 0 12px rgba(16,185,129,0.3), 0 4px 20px rgba(0,0,0,0.2); }
+          50% { box-shadow: 0 0 24px rgba(16,185,129,0.5), 0 4px 20px rgba(0,0,0,0.2); }
         }
       `}</style>
 
@@ -625,7 +577,7 @@ export default function CustomerLanding() {
       </nav>
 
       {/* ── HERO ── */}
-      <div style={{ position: "relative", minHeight: "100svh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "60px 20px 40px", background: "linear-gradient(180deg, #0d1f14 0%, #0a1810 100%)" }}>
+      <div style={{ position: "relative", minHeight: "100svh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "60px 20px 40px", background: "linear-gradient(180deg, #1a3826 0%, #142e1e 100%)" }}>
         {/* BG slideshow */}
         {HERO_SLIDES.map((s, i) => (
           <img key={s.img} src={s.img} alt="" style={{
@@ -634,7 +586,7 @@ export default function CustomerLanding() {
             transition: "opacity 1.5s ease",
           }} />
         ))}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(13,31,20,0.85) 0%, rgba(13,31,20,0.55) 50%, rgba(13,31,20,0.88) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(20,46,30,0.78) 0%, rgba(20,46,30,0.45) 50%, rgba(20,46,30,0.82) 100%)" }} />
         <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: 500, height: 300, background: "radial-gradient(ellipse, rgba(16,185,129,0.18) 0%, transparent 65%)", pointerEvents: "none" }} />
 
         {/* Hero Text */}
@@ -656,7 +608,7 @@ export default function CustomerLanding() {
             Stempelkarten
           </h1>
 
-          {/* Animated badges */}
+          {/* Badges — subtle glow, no float animation */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32, alignItems: "center" }}>
             {[
               { emoji: "🎁", text: "Hol dir großartige Prämien", sub: "Rabatte, Gratisleistungen & mehr", delay: "0.2s" },
@@ -666,13 +618,13 @@ export default function CustomerLanding() {
                 opacity: heroVisible ? 1 : 0, transform: heroVisible ? "translateY(0)" : "translateY(16px)",
                 transition: `opacity 0.7s ease ${item.delay}, transform 0.7s ease ${item.delay}`,
                 textAlign: "center",
-                animation: heroVisible ? `badgeFloat ${3.5 + i * 0.5}s ease-in-out ${i * 0.8}s infinite` : "none",
               }}>
                 <div style={{
                   display: "inline-flex", alignItems: "center", gap: 10,
                   background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
                   borderRadius: 100, padding: "10px 20px", marginBottom: 5,
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+                  animation: "glowPulse 3s ease-in-out infinite",
+                  animationDelay: `${i * 1.2}s`,
                 }}>
                   <span style={{ fontSize: 18 }}>{item.emoji}</span>
                   <span style={{ fontSize: "clamp(14px, 2vw, 16px)", fontWeight: 700 }}>{item.text}</span>
@@ -729,7 +681,6 @@ export default function CustomerLanding() {
                 display: "flex", alignItems: "center", gap: 5,
                 background: "rgba(255,255,255,0.06)", border: `1px solid ${item.color}44`,
                 borderRadius: 100, padding: "6px 12px",
-                animation: heroVisible ? `badgeFloat ${3 + i * 0.4}s ease-in-out ${i * 0.5}s infinite` : "none",
               }}>
                 <div style={{
                   width: 18, height: 18, borderRadius: "50%",
@@ -796,7 +747,7 @@ export default function CustomerLanding() {
           </Link>
           {/* 3 checks under CTA */}
           <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 24 }}>
-            {["Kostenlos", "Sofort aktiv", "Kein Abo"].map((t) => (
+            {["Kostenlos", "Sofort aktiv", "In 1 Minute angemeldet"].map((t) => (
               <div key={t} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
                 <span style={{ color: "#10B981", fontWeight: 800 }}>✓</span> {t}
               </div>
