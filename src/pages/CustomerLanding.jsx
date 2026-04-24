@@ -140,7 +140,7 @@ function CarouselSection() {
     const track = trackRef.current;
     if (!track) return;
     let x = 0;
-    const speed = 0.5;
+    const speed = 0.28;
     let raf;
     const animate = () => {
       x -= speed;
@@ -211,89 +211,82 @@ function MapSection() {
 
         {/* Map mockup */}
         <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
-          {/* Map bg */}
-          <div style={{
-            height: 320,
-            background: "linear-gradient(135deg, #0d1b12 0%, #0a1a1f 50%, #0d1320 100%)",
-            position: "relative",
-          }}>
-            {/* Grid lines */}
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} style={{ position: "absolute", left: 0, right: 0, top: `${i * 14}%`, height: 1, background: "rgba(255,255,255,0.04)" }} />
-            ))}
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} style={{ position: "absolute", top: 0, bottom: 0, left: `${i * 11}%`, width: 1, background: "rgba(255,255,255,0.04)" }} />
-            ))}
+        <div style={{ height: 340, position: "relative" }}>
+          {/* Real aerial/map photo */}
+          <img
+            src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80"
+            alt="Stadtplan"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+          {/* Dark overlay so pins pop */}
+          <div style={{ position: "absolute", inset: 0, background: "rgba(8,15,11,0.55)" }} />
+          {/* Green tint overlay */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(16,185,129,0.08) 0%, transparent 60%)" }} />
 
-            {/* Fake streets */}
-            <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path d="M10 50 Q30 30 50 50 Q70 70 90 50" stroke="rgba(255,255,255,0.06)" strokeWidth="1.5" fill="none" />
-              <path d="M20 10 L20 90" stroke="rgba(255,255,255,0.05)" strokeWidth="1" fill="none" />
-              <path d="M50 5 L50 95" stroke="rgba(255,255,255,0.05)" strokeWidth="1" fill="none" />
-              <path d="M75 15 L75 85" stroke="rgba(255,255,255,0.05)" strokeWidth="1" fill="none" />
-              <path d="M5 30 Q40 25 60 40 Q80 55 95 45" stroke="rgba(255,255,255,0.06)" strokeWidth="1.5" fill="none" />
-              <path d="M5 70 L95 70" stroke="rgba(255,255,255,0.05)" strokeWidth="1" fill="none" />
-            </svg>
-
-            {/* Pins */}
-            {MAP_PINS.map((pin, i) => (
-              <div key={i}
-                onClick={() => setActivePin(activePin === i ? null : i)}
-                style={{
-                  position: "absolute",
-                  left: `${pin.x}%`, top: `${pin.y}%`,
-                  transform: "translate(-50%, -50%)",
-                  cursor: "pointer",
-                  animation: visible ? `pinPop 0.5s ease ${i * 0.12}s both` : "none",
-                  zIndex: activePin === i ? 10 : 1,
+          {/* Pins */}
+          {MAP_PINS.map((pin, i) => (
+            <div key={i}
+              onClick={() => setActivePin(activePin === i ? null : i)}
+              style={{
+                position: "absolute",
+                left: `${pin.x}%`, top: `${pin.y}%`,
+                transform: "translate(-50%, -50%)",
+                cursor: "pointer",
+                animation: visible ? `pinPop 0.5s ease ${i * 0.12}s both` : "none",
+                zIndex: activePin === i ? 10 : 2,
+              }}>
+              {/* Pulse ring */}
+              <div style={{
+                position: "absolute", top: "50%", left: "50%",
+                transform: "translate(-50%,-50%)",
+                width: 44, height: 44, borderRadius: "50%",
+                background: `${pin.color}22`,
+                border: `1.5px solid ${pin.color}66`,
+                animation: "pulse 2s ease-in-out infinite",
+                animationDelay: `${i * 0.35}s`,
+              }} />
+              {/* Pin */}
+              <div style={{
+                width: 34, height: 34, borderRadius: "50%",
+                background: `linear-gradient(135deg, ${pin.color}ee, ${pin.color}99)`,
+                border: `2px solid #fff`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 15, boxShadow: `0 4px 20px ${pin.color}88, 0 2px 8px rgba(0,0,0,0.5)`,
+                transition: "transform 0.2s",
+                transform: activePin === i ? "scale(1.3)" : "scale(1)",
+              }}>{pin.emoji}</div>
+              {/* Tooltip */}
+              {activePin === i && (
+                <div style={{
+                  position: "absolute", bottom: "calc(100% + 10px)", left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "rgba(10,18,8,0.95)", border: `1.5px solid ${pin.color}77`,
+                  backdropFilter: "blur(12px)",
+                  borderRadius: 12, padding: "7px 14px", whiteSpace: "nowrap",
+                  fontSize: 11, fontWeight: 700, color: "#fff",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
+                  animation: "stepFade 0.2s ease",
                 }}>
-                {/* Pulse ring */}
-                <div style={{
-                  position: "absolute", top: "50%", left: "50%",
-                  transform: "translate(-50%,-50%)",
-                  width: 36, height: 36, borderRadius: "50%",
-                  background: `${pin.color}22`,
-                  border: `1px solid ${pin.color}55`,
-                  animation: "pulse 2s ease-in-out infinite",
-                  animationDelay: `${i * 0.3}s`,
-                }} />
-                {/* Pin */}
-                <div style={{
-                  width: 32, height: 32, borderRadius: "50%",
-                  background: `linear-gradient(135deg, ${pin.color}, ${pin.color}aa)`,
-                  border: `2px solid ${pin.color}`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 14, boxShadow: `0 4px 16px ${pin.color}66`,
-                  transition: "transform 0.2s",
-                  transform: activePin === i ? "scale(1.25)" : "scale(1)",
-                }}>{pin.emoji}</div>
-                {/* Tooltip */}
-                {activePin === i && (
-                  <div style={{
-                    position: "absolute", bottom: "calc(100% + 8px)", left: "50%",
-                    transform: "translateX(-50%)",
-                    background: "#111e28", border: `1px solid ${pin.color}55`,
-                    borderRadius: 10, padding: "6px 12px", whiteSpace: "nowrap",
-                    fontSize: 11, fontWeight: 700, color: "#fff",
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
-                  }}>{pin.label}</div>
-                )}
-              </div>
-            ))}
-
-            {/* Coming soon badge */}
-            <div style={{
-              position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)",
-              background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.4)",
-              backdropFilter: "blur(8px)",
-              borderRadius: 100, padding: "8px 20px", fontSize: 12, fontWeight: 700,
-              color: "#10B981", whiteSpace: "nowrap", zIndex: 5,
-              display: "flex", alignItems: "center", gap: 6,
-            }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", animation: "pulse 1.5s infinite" }} />
-              Demnächst in deiner Stadt
+                  <span style={{ marginRight: 4 }}>{pin.emoji}</span>{pin.label}
+                </div>
+              )}
             </div>
+          ))}
+
+          {/* Coming soon badge */}
+          <div style={{
+            position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)",
+            background: "rgba(10,18,8,0.85)", border: "1px solid rgba(16,185,129,0.4)",
+            backdropFilter: "blur(12px)",
+            borderRadius: 100, padding: "9px 22px", fontSize: 12, fontWeight: 700,
+            color: "#10B981", whiteSpace: "nowrap", zIndex: 5,
+            display: "flex", alignItems: "center", gap: 7,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+          }}>
+            <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 6px #10B981", animation: "pulse 1.5s infinite" }} />
+            Demnächst in deiner Stadt
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -311,10 +304,10 @@ function FeaturesSection() {
   }, []);
 
   const features = [
-    { emoji: "🎁", title: "Prämien sammeln", desc: "Mit jedem Einkauf näher zur Belohnung — Rabatte, Freigetränke & mehr.", color: "#10B981" },
-    { emoji: "💸", title: "100 € + verdienen", desc: "Empfehle Freunde und kassiere automatisch. Passiv, ohne Aufwand.", color: "#F59E0B" },
-    { emoji: "📱", title: "Immer dabei", desc: "Alles digital. Kein Papierchaos. Kein App-Download nötig.", color: "#EC4899" },
-    { emoji: "🤝", title: "Fair & sicher", desc: "Deine Daten gehören dir. Transparent, sicher, ohne Abo.", color: "#8B5CF6" },
+    { emoji: "🎁", title: "Prämien sammeln", desc: "Mit jedem Einkauf näher zur Belohnung — Rabatte, Freigetränke & mehr.", color: "#10B981", img: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=80" },
+    { emoji: "💸", title: "100 € + verdienen", desc: "Empfehle Freunde und kassiere automatisch. Passiv, ohne Aufwand.", color: "#F59E0B", img: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=600&q=80" },
+    { emoji: "📱", title: "Immer dabei", desc: "Alles digital. Kein Papierchaos. Kein App-Download nötig.", color: "#EC4899", img: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&q=80" },
+    { emoji: "🤝", title: "Fair & sicher", desc: "Deine Daten gehören dir. Transparent, sicher, ohne Abo.", color: "#8B5CF6", img: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&q=80" },
   ];
 
   return (
@@ -328,23 +321,22 @@ function FeaturesSection() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: 14 }}>
           {features.map((f, i) => (
             <div key={f.title} style={{
-              background: "rgba(255,255,255,0.04)",
+              borderRadius: 22, overflow: "hidden",
               border: "1px solid rgba(255,255,255,0.09)",
-              borderRadius: 22, padding: "28px 22px",
-              opacity: 1,
-              transform: "translateY(0)",
-              transition: `opacity 0.6s ease ${i * 0.12}s, transform 0.6s ease ${i * 0.12}s`,
-              position: "relative", overflow: "hidden",
+              position: "relative",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
             }}>
-              <div style={{ position: "absolute", top: -30, right: -30, width: 100, height: 100, background: `radial-gradient(circle, ${f.color}18 0%, transparent 70%)`, pointerEvents: "none" }} />
-              <div style={{
-                width: 52, height: 52, borderRadius: 16,
-                background: `${f.color}18`, border: `1px solid ${f.color}35`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 24, marginBottom: 16,
-              }}>{f.emoji}</div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", marginBottom: 8 }}>{f.title}</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>{f.desc}</div>
+              {/* Real photo background */}
+              <div style={{ height: 130, position: "relative", overflow: "hidden" }}>
+                <img src={f.img} alt={f.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%)` }} />
+                <div style={{ position: "absolute", top: 14, left: 14, width: 42, height: 42, borderRadius: 12, background: `${f.color}dd`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: `0 4px 14px ${f.color}66` }}>{f.emoji}</div>
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.04)", padding: "16px 18px" }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 6 }}>{f.title}</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>{f.desc}</div>
+                <div style={{ marginTop: 10, height: 2, borderRadius: 100, background: `linear-gradient(to right, ${f.color}, transparent)` }} />
+              </div>
             </div>
           ))}
         </div>
@@ -394,29 +386,39 @@ function StepsSection() {
           ))}
         </div>
 
-        {/* Active step content */}
-        <div style={{
-          background: "linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.03))",
-          border: "1px solid rgba(16,185,129,0.2)", borderRadius: 24,
-          padding: "32px 28px",
-          opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)",
-          transition: "opacity 0.5s, transform 0.5s",
-          animation: "stepFade 0.4s ease",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
-            <div style={{ width: 56, height: 56, borderRadius: 18, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>{step.emoji}</div>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 1 }}>SCHRITT {step.num}</div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{step.title}</div>
+        {/* Step cards — all visible, active highlighted */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {HOW_STEPS.map((s, i) => (
+            <div key={i} onClick={() => setActive(i)} style={{
+              borderRadius: 18, overflow: "hidden", cursor: "pointer",
+              border: i === active ? "1.5px solid rgba(16,185,129,0.45)" : "1px solid rgba(255,255,255,0.07)",
+              background: i === active ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.03)",
+              transition: "all 0.3s",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px" }}>
+                <div style={{
+                  width: 46, height: 46, borderRadius: 14, flexShrink: 0,
+                  background: i === active ? "#10B981" : "rgba(255,255,255,0.07)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 20, transition: "all 0.3s",
+                  boxShadow: i === active ? "0 4px 16px rgba(16,185,129,0.4)" : "none",
+                }}>{s.emoji}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: i === active ? "#10B981" : "rgba(255,255,255,0.3)", letterSpacing: 1 }}>SCHRITT {s.num}</span>
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: i === active ? "#fff" : "rgba(255,255,255,0.5)" }}>{s.title}</div>
+                  {i === active && (
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.6, marginTop: 4, animation: "stepFade 0.3s ease" }}>{s.desc}</div>
+                  )}
+                </div>
+                <div style={{ fontSize: 16, color: i === active ? "#10B981" : "rgba(255,255,255,0.2)" }}>{i === active ? "✓" : "→"}</div>
+              </div>
+              {i === active && (
+                <div style={{ height: 3, background: "linear-gradient(to right, #10B981, transparent)" }} />
+              )}
             </div>
-          </div>
-          <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>{step.desc}</div>
-          {/* Progress bar */}
-          <div style={{ marginTop: 20, display: "flex", gap: 6 }}>
-            {HOW_STEPS.map((_, i) => (
-              <div key={i} style={{ flex: 1, height: 3, borderRadius: 100, background: i === active ? "#10B981" : "rgba(255,255,255,0.1)", transition: "background 0.3s" }} />
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     </div>
@@ -437,7 +439,7 @@ export default function CustomerLanding() {
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a1208", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "#060e07", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
@@ -519,18 +521,23 @@ export default function CustomerLanding() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32, alignItems: "center" }}>
             {[
-              { emoji: "🎁", text: "Hol dir großartige Prämien" },
-              { emoji: "💸", text: <span>Verdiene <span style={{ color: "#10B981", fontWeight: 900 }}>100 €</span> und mehr</span> },
+              { emoji: "🎁", text: "Hol dir großartige Prämien", sub: "Rabatte, Gratisleistungen & mehr" },
+              { emoji: "💸", text: <span>Verdiene <span style={{ color: "#10B981", fontWeight: 900 }}>100 €</span> und mehr</span>, sub: "Einfach durch Empfehlungen. Passiv. Automatisch." },
             ].map((item, i) => (
               <div key={i} style={{
-                display: "inline-flex", alignItems: "center", gap: 10,
-                background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 100, padding: "9px 18px",
                 opacity: heroVisible ? 1 : 0, transform: heroVisible ? "translateY(0)" : "translateY(16px)",
                 transition: `opacity 0.8s ease ${0.2 + i * 0.15}s, transform 0.8s ease ${0.2 + i * 0.15}s`,
+                textAlign: "center",
               }}>
-                <span style={{ fontSize: 18 }}>{item.emoji}</span>
-                <span style={{ fontSize: "clamp(14px, 2vw, 16px)", fontWeight: 700 }}>{item.text}</span>
+                <div style={{
+                  display: "inline-flex", alignItems: "center", gap: 10,
+                  background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: 100, padding: "9px 18px", marginBottom: 6,
+                }}>
+                  <span style={{ fontSize: 18 }}>{item.emoji}</span>
+                  <span style={{ fontSize: "clamp(14px, 2vw, 16px)", fontWeight: 700 }}>{item.text}</span>
+                </div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.38)", lineHeight: 1.5 }}>{item.sub}</div>
               </div>
             ))}
           </div>
