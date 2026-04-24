@@ -510,7 +510,7 @@ export default function CustomerLanding() {
       </nav>
 
       {/* ── HERO ── */}
-      <div style={{ position: "relative", minHeight: "100svh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "60px 20px 40px", background: "linear-gradient(180deg, #1a3826 0%, #142e1e 100%)" }}>
+      <div style={{ position: "relative", minHeight: "100svh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "60px 20px 40px", background: "#0d1410" }}>
         {/* BG slideshow */}
         {HERO_SLIDES.map((s, i) => (
           <img key={s.img} src={s.img} alt="" style={{
@@ -519,7 +519,7 @@ export default function CustomerLanding() {
             transition: "opacity 1.5s ease",
           }} />
         ))}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(20,46,30,0.78) 0%, rgba(20,46,30,0.45) 50%, rgba(20,46,30,0.82) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(13,20,16,0.72)" }} />
         
 
         {/* Hero Text */}
