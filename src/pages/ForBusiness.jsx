@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 const HERO_SLIDES = [
@@ -34,7 +34,8 @@ const PLANS = [
       { ok: false, text: "Credits für Sichtbarkeit" },
     ],
     cta: "Kostenlos starten",
-    ctaStyle: { background: "transparent", border: "1.5px solid rgba(255,255,255,0.3)", color: "#fff" },
+    ctaStyle: { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)" },
+    cardStyle: { background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" },
   },
   {
     name: "Plus",
@@ -42,6 +43,7 @@ const PLANS = [
     period: "/Monat",
     badge: "Beliebt",
     badgeColor: "#10B981",
+    pulse: "green",
     features: [
       { ok: true, text: "2 Stempelkarten" },
       { ok: true, text: "QR-Code Generator" },
@@ -51,11 +53,11 @@ const PLANS = [
       { ok: true, text: "WhatsApp Integration" },
       { ok: true, text: "Basis-Statistiken" },
       { ok: false, text: "Mehrere Provisionen gleichzeitig" },
-      { ok: false, text: "Sonderprovisionen für Aktionszeiträume" },
       { ok: false, text: "Credits für Sichtbarkeit" },
     ],
     cta: "Jetzt starten",
     ctaStyle: { background: "#10B981", color: "#fff" },
+    cardStyle: { background: "rgba(16,185,129,0.07)", border: "1.5px solid rgba(16,185,129,0.4)" },
   },
   {
     name: "Pro",
@@ -63,6 +65,7 @@ const PLANS = [
     period: "/Monat",
     badge: "Premium",
     badgeColor: "#F59E0B",
+    pulse: "amber",
     features: [
       { ok: true, text: "Unbegrenzte Stempelkarten" },
       { ok: true, text: "QR-Code Generator" },
@@ -76,27 +79,86 @@ const PLANS = [
     ],
     cta: "Jetzt starten",
     ctaStyle: { background: "#F59E0B", color: "#fff" },
+    cardStyle: { background: "rgba(245,158,11,0.06)", border: "1.5px solid rgba(245,158,11,0.35)" },
   },
 ];
 
-// Dashboard preview component
+// ── Counter Hook ───────────────────────────────────────────────────────────────
+function useCounter(target, duration = 1800, started = false) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (!started) return;
+    let start = null;
+    const isFloat = target % 1 !== 0;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setVal(isFloat ? parseFloat((eased * target).toFixed(1)) : Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [started, target, duration]);
+  return val;
+}
+
+// ── Stats Section with animated counters ─────────────────────────────────────
+function StatsSection() {
+  const [started, setStarted] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStarted(true); }, { threshold: 0.4 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const v81 = useCounter(81, 1600, started);
+  const v87 = useCounter(87, 1800, started);
+
+  return (
+    <div ref={ref} style={{ padding: "80px 32px", background: "#0d1a10" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 50 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>WARUM SENSALIE?</div>
+          <h2 style={{ fontSize: "clamp(24px,4vw,38px)", fontWeight: 900, margin: 0, color: "#fff" }}>Wachstum durch Kunden, die wirklich hinter dir stehen.</h2>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))", gap: 20 }}>
+          {[
+            { emoji: "🤝", value: v81, suffix: "%", desc: "Vertrauen Empfehlungen von Freunden" },
+            { emoji: "📈", value: v87, suffix: "%", prefix: "+", desc: "Mehr Gewinn durch Stammkunden" },
+            { emoji: "🛡️", value: 0, suffix: "€", desc: "Vorab-Risiko für dich", static: true },
+          ].map((s, i) => (
+            <div key={i} style={{ background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.18)", borderRadius: 20, padding: "30px 24px", textAlign: "center" }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>{s.emoji}</div>
+              <div style={{ fontSize: 44, fontWeight: 900, color: "#10B981", marginBottom: 8, fontVariantNumeric: "tabular-nums" }}>
+                {s.static ? "0€" : `${s.prefix || ""}${s.value}${s.suffix}`}
+              </div>
+              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>{s.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Dashboard Preview ──────────────────────────────────────────────────────────
 function DashboardPreview({ highlightText }) {
   return (
     <div style={{ background: "#111e28", borderRadius: 20, border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden", boxShadow: "0 40px 80px rgba(0,0,0,0.6)", maxWidth: 560, margin: "0 auto" }}>
-      {/* Window chrome */}
       <div style={{ background: "#0a1612", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
         <div style={{ display: "flex", gap: 6 }}>
           {["#FF5F57","#FFBD2E","#28CA41"].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />)}
         </div>
-        <div style={{ flex: 1, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.35)" }}>app.sensalie.com/dashboard</div>
+        <div style={{ flex: 1, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.35)" }}>app.sensalie.com/business</div>
         <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100, padding: "3px 10px" }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />
           <span style={{ fontSize: 10, fontWeight: 700, color: "#10B981" }}>LIVE</span>
         </div>
       </div>
-      {/* Sidebar + content */}
       <div style={{ display: "flex" }}>
-        <div style={{ width: 140, background: "rgba(255,255,255,0.03)", borderRight: "1px solid rgba(255,255,255,0.06)", padding: "16px 12px" }}>
+        <div style={{ width: 130, background: "rgba(255,255,255,0.03)", borderRight: "1px solid rgba(255,255,255,0.06)", padding: "16px 12px" }}>
           {["📋 Übersicht", "👥 Kunden", "💸 Empfehlungen", "⬛ Stempelkarten", "⚙️ Einstellungen"].map((item, i) => (
             <div key={i} style={{ padding: "8px 10px", borderRadius: 8, fontSize: 11, fontWeight: i === 0 ? 700 : 400, color: i === 0 ? "#10B981" : "rgba(255,255,255,0.35)", background: i === 0 ? "rgba(16,185,129,0.1)" : "transparent", marginBottom: 4 }}>{item}</div>
           ))}
@@ -111,20 +173,15 @@ function DashboardPreview({ highlightText }) {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
             {[
-              { icon: "📈", label: "Umsatz", value: "€4.280", change: "+23%", tooltip: "Dein Umsatz wächst automatisch — durch Stammkunden & Empfehlungen." },
-              { icon: "👥", label: "Kunden", value: "847", change: "+18%", tooltip: null },
-              { icon: "💸", label: "Empfehlungen", value: "234", change: "+31%", tooltip: "Provisionen werden automatisch abgerechnet. Null Aufwand für dich." },
-              { icon: "💰", label: "Provision", value: "€1.120", change: "+21%", tooltip: null },
+              { icon: "📈", label: "Umsatz", value: "€4.280", change: "+23%", highlight: true },
+              { icon: "👥", label: "Kunden", value: "847", change: "+18%" },
+              { icon: "💸", label: "Empfehlungen", value: "234", change: "+31%", highlight: true },
+              { icon: "💰", label: "Provision", value: "€1.120", change: "+21%" },
             ].map((s, i) => (
-              <div key={i} style={{ background: i === 0 || i === 2 ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${i === 0 || i === 2 ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: 12, position: "relative" }}>
+              <div key={i} style={{ background: s.highlight ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${s.highlight ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: 12 }}>
                 <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>{s.icon} {s.label}</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{s.value}</div>
                 <div style={{ fontSize: 10, color: "#10B981", fontWeight: 600 }}>{s.change}</div>
-                {s.tooltip && highlightText && (
-                  <div style={{ position: "absolute", right: -8, top: "50%", transform: "translateY(-50%)", background: "#10B981", borderRadius: 8, padding: "6px 10px", fontSize: 9, fontWeight: 700, color: "#fff", maxWidth: 140, lineHeight: 1.4, zIndex: 10 }}>
-                    {s.tooltip}
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -134,8 +191,130 @@ function DashboardPreview({ highlightText }) {
               <div key={i} style={{ flex: 1, background: "#10B981", borderRadius: "3px 3px 0 0", height: `${h}%`, opacity: 0.6 + i * 0.06 }} />
             ))}
           </div>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>● Live-Aktivität</div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Steps Section with scroll-triggered slide-in ───────────────────────────────
+function StepsSlideSection() {
+  const [visibleSteps, setVisibleSteps] = useState([]);
+  const stepRefs = useRef([]);
+
+  useEffect(() => {
+    const observers = STEPS.map((_, i) => {
+      const obs = new IntersectionObserver(
+        ([e]) => { if (e.isIntersecting) setVisibleSteps(prev => prev.includes(i) ? prev : [...prev, i]); },
+        { threshold: 0.3 }
+      );
+      if (stepRefs.current[i]) obs.observe(stepRefs.current[i]);
+      return obs;
+    });
+    return () => observers.forEach(o => o.disconnect());
+  }, []);
+
+  return (
+    <div id="how" style={{ padding: "80px 20px", background: "#0d1a10" }}>
+      <div style={{ maxWidth: 700, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 50 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>SO GEHT'S</div>
+          <h2 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 900, margin: "0 0 10px", color: "#fff" }}>In 6 Schritten zum Wachstum.</h2>
+          <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 14 }}>Scroll dich durch — und sieh sofort, was passiert.</div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {STEPS.map((step, i) => {
+            const isVisible = visibleSteps.includes(i);
+            const fromLeft = i % 2 === 0;
+            return (
+              <div
+                key={step.num}
+                ref={el => stepRefs.current[i] = el}
+                style={{
+                  borderRadius: 20, overflow: "hidden", position: "relative",
+                  border: isVisible ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.06)",
+                  minHeight: 140,
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? "translateX(0)" : `translateX(${fromLeft ? "-60px" : "60px"})`,
+                  transition: `opacity 0.7s ease ${i * 0.05}s, transform 0.7s ease ${i * 0.05}s, border-color 0.5s ease`,
+                  boxShadow: isVisible ? "0 8px 32px rgba(0,0,0,0.35), 0 0 0 0 rgba(16,185,129,0)" : "none",
+                }}
+              >
+                <img src={step.img} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.22 }} />
+                <div style={{ position: "absolute", inset: 0, background: "rgba(8,20,10,0.55)" }} />
+                {/* Active highlight bar */}
+                {isVisible && (
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, #10B981, #34D399, transparent)" }} />
+                )}
+                <div style={{ position: "relative", zIndex: 1, padding: "24px 24px", display: "flex", alignItems: "center", gap: 20 }}>
+                  <div style={{ flexShrink: 0, textAlign: "center" }}>
+                    <div style={{
+                      width: 50, height: 50, borderRadius: 16,
+                      background: "rgba(16,185,129,0.15)", border: "1.5px solid rgba(16,185,129,0.4)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 22, marginBottom: 6,
+                      boxShadow: isVisible ? "0 0 14px rgba(16,185,129,0.25)" : "none",
+                      transition: "box-shadow 0.5s",
+                    }}>{step.icon}</div>
+                    <div style={{ fontSize: 11, fontWeight: 900, color: "#10B981" }}>{step.num}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", marginBottom: 7 }}>{step.title}</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.58)", lineHeight: 1.6 }}>{step.desc}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── CTA with parallax image ────────────────────────────────────────────────────
+function CtaForBusiness() {
+  const [scrollY, setScrollY] = useState(0);
+  const ref = useRef(null);
+  const [offsetTop, setOffsetTop] = useState(9999);
+
+  useEffect(() => {
+    if (ref.current) setOffsetTop(ref.current.offsetTop);
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const parallax = (scrollY - offsetTop) * 0.15;
+
+  return (
+    <div ref={ref} style={{ position: "relative", overflow: "hidden", padding: "100px 32px", textAlign: "center" }}>
+      <img
+        src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=1400&q=80"
+        alt=""
+        style={{
+          position: "absolute", inset: 0, width: "100%", height: "120%", objectFit: "cover",
+          top: "-10%",
+          transform: `translateY(${parallax}px)`,
+          transition: "transform 0.05s linear",
+          willChange: "transform",
+        }}
+      />
+      <div style={{ position: "absolute", inset: 0, background: "rgba(6,13,9,0.72)" }} />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <h2 style={{ fontSize: "clamp(32px,6vw,60px)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 16px", color: "#fff" }}>
+          Kostenlos starten.<br /><span style={{ color: "#10B981" }}>Kein Risiko. Kein Vertrag.</span>
+        </h2>
+        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginBottom: 36 }}>
+          Starte noch heute — in 2 Minuten eingerichtet. Deine Kunden werden es lieben.
+        </div>
+        <Link to="/Business" style={{
+          display: "inline-block", background: "#10B981", color: "#fff", fontWeight: 800, fontSize: 17,
+          padding: "18px 44px", borderRadius: 100, textDecoration: "none",
+          animation: "bizCtaPulse 2.5s ease-in-out infinite",
+        }}>
+          Jetzt kostenlos registrieren →
+        </Link>
       </div>
     </div>
   );
@@ -156,11 +335,30 @@ export default function ForBusiness() {
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080f0b", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap'); * { box-sizing: border-box; }`}</style>
+    <div style={{ minHeight: "100vh", background: "#0a1410", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        * { box-sizing: border-box; }
+        @keyframes bizCtaPulse {
+          0%, 100% { box-shadow: 0 8px 30px rgba(16,185,129,0.4), 0 0 0 0 rgba(16,185,129,0.25); }
+          50% { box-shadow: 0 8px 50px rgba(16,185,129,0.6), 0 0 0 14px rgba(16,185,129,0); }
+        }
+        @keyframes plusPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.35), 0 12px 40px rgba(0,0,0,0.4); }
+          50% { box-shadow: 0 0 0 10px rgba(16,185,129,0), 0 12px 40px rgba(0,0,0,0.4); }
+        }
+        @keyframes proPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.25), 0 8px 32px rgba(0,0,0,0.35); }
+          50% { box-shadow: 0 0 0 8px rgba(245,158,11,0), 0 8px 32px rgba(0,0,0,0.35); }
+        }
+        @media(max-width:640px){
+          .biz-plans-grid { grid-template-columns: 1fr !important; }
+          .biz-hero-btns { flex-direction: column !important; align-items: center !important; }
+        }
+      `}</style>
 
       {/* Navbar */}
-      <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(8,15,11,0.9)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 32px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(10,20,16,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>Sensalie<span style={{ color: "#10B981" }}>.</span></div>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           <Link to="/Business" style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", textDecoration: "none", fontWeight: 500 }}>Login</Link>
@@ -173,17 +371,17 @@ export default function ForBusiness() {
         {HERO_SLIDES.map((s, i) => (
           <div key={s.img} style={{ position: "absolute", inset: 0, transition: "opacity 1.5s ease", opacity: i === heroSlide ? 1 : 0 }}>
             <img src={s.img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            <div style={{ position: "absolute", inset: 0, background: "rgba(8,15,11,0.75)" }} />
+            <div style={{ position: "absolute", inset: 0, background: "rgba(8,15,11,0.72)" }} />
             <div style={{ position: "absolute", top: 24, left: "50%", transform: "translateX(-50%)", background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 100, padding: "6px 16px", fontSize: 12, fontWeight: 700, color: "#10B981", whiteSpace: "nowrap" }}>
               ● {s.label}
             </div>
           </div>
         ))}
-        <div style={{ position: "relative", zIndex: 2, maxWidth: 900, margin: "0 auto", padding: "100px 32px", textAlign: "center" }}>
-          <h1 style={{ fontSize: "clamp(40px, 7vw, 72px)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 32px" }}>
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 900, margin: "0 auto", padding: "100px 24px", textAlign: "center" }}>
+          <h1 style={{ fontSize: "clamp(36px, 7vw, 68px)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 32px" }}>
             Wachstum durch Kunden,<br />die wirklich hinter dir<br /><span style={{ color: "#10B981" }}>stehen.</span>
           </h1>
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+          <div className="biz-hero-btns" style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/Business" style={{ background: "#10B981", color: "#fff", fontWeight: 800, fontSize: 16, padding: "16px 34px", borderRadius: 100, textDecoration: "none", boxShadow: "0 8px 30px rgba(16,185,129,0.4)" }}>
               Kostenlos starten →
             </Link>
@@ -194,31 +392,11 @@ export default function ForBusiness() {
         </div>
       </div>
 
-      {/* Stats / Why */}
-      <div style={{ padding: "80px 32px", background: "#060d09" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 50 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>WARUM SENSALIE?</div>
-            <h2 style={{ fontSize: "clamp(24px,4vw,38px)", fontWeight: 900, margin: 0 }}>Wachstum durch Kunden, die wirklich hinter dir stehen.</h2>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px,1fr))", gap: 20 }}>
-            {[
-              { emoji: "🤝", value: "81%", desc: "Vertrauen Empfehlungen von Freunden" },
-              { emoji: "📈", value: "+87%", desc: "Mehr Gewinn durch Stammkunden" },
-              { emoji: "🛡️", value: "0€", desc: "Vorab-Risiko für dich" },
-            ].map(s => (
-              <div key={s.value} style={{ background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.15)", borderRadius: 20, padding: "30px 24px", textAlign: "center" }}>
-                <div style={{ fontSize: 32, marginBottom: 12 }}>{s.emoji}</div>
-                <div style={{ fontSize: 40, fontWeight: 900, color: "#10B981", marginBottom: 8 }}>{s.value}</div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>{s.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Stats with counters */}
+      <StatsSection />
 
       {/* Live Dashboard */}
-      <div style={{ padding: "80px 32px", background: "#080f0b" }}>
+      <div style={{ padding: "80px 24px", background: "#0a1410" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>LIVE-DASHBOARD</div>
@@ -229,51 +407,11 @@ export default function ForBusiness() {
         </div>
       </div>
 
-      {/* How it works — 6 steps */}
-      <div id="how" style={{ padding: "80px 32px", background: "#060d09" }}>
-        <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 50 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>SO GEHT'S</div>
-            <h2 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 900, margin: "0 0 10px" }}>In 6 Schritten zum Wachstum.</h2>
-            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Scroll dich durch — und sieh sofort, was passiert.</div>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {STEPS.map((step, i) => (
-              <div key={step.num} style={{ borderRadius: 20, overflow: "hidden", position: "relative", border: "1px solid rgba(255,255,255,0.08)", minHeight: 140 }}>
-                <img src={step.img} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.25 }} />
-                <div style={{ position: "absolute", inset: 0, background: "rgba(8,15,11,0.5)" }} />
-                <div style={{ position: "relative", zIndex: 1, padding: "28px 28px", display: "flex", alignItems: "center", gap: 20 }}>
-                  <div style={{ flexShrink: 0 }}>
-                    <div style={{ fontSize: 32, marginBottom: 4 }}>{step.icon}</div>
-                    <div style={{ fontSize: 13, fontWeight: 900, color: "#10B981" }}>{step.num}</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", marginBottom: 8 }}>{step.title}</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>{step.desc}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Video section */}
-      <div style={{ padding: "80px 32px", background: "#080f0b" }}>
-        <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>SO FUNKTIONIERT SENSALIE</div>
-          <h2 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 900, margin: "0 0 36px" }}>Sieh es in Aktion.</h2>
-          <div style={{ background: "url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80') center/cover", borderRadius: 24, aspectRatio: "16/9", position: "relative", overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)" }}>
-            <div style={{ position: "absolute", inset: 0, background: "rgba(8,15,11,0.5)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
-              <div style={{ width: 70, height: 70, background: "#10B981", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, boxShadow: "0 0 40px rgba(16,185,129,0.5)", cursor: "pointer" }}>▶</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)" }}>2 Minuten — alles erklärt.</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* 6 Steps with slide-in */}
+      <StepsSlideSection />
 
       {/* Pricing */}
-      <div style={{ padding: "80px 32px", background: "#060d09" }}>
+      <div style={{ padding: "80px 24px", background: "#0a1410" }}>
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 50 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>PREISE</div>
@@ -283,32 +421,32 @@ export default function ForBusiness() {
               🐦 Early-Bird-Aktion — jetzt bis zu 50% günstiger!
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px,1fr))", gap: 20 }}>
+          <div className="biz-plans-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
             {PLANS.map(plan => (
               <div key={plan.name} style={{
-                background: plan.badge === "Beliebt" ? "rgba(16,185,129,0.06)" : plan.badge === "Premium" ? "rgba(245,158,11,0.06)" : "rgba(255,255,255,0.03)",
-                border: plan.badge === "Beliebt" ? "1.5px solid rgba(16,185,129,0.35)" : plan.badge === "Premium" ? "1.5px solid rgba(245,158,11,0.35)" : "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 24, padding: "28px 24px", position: "relative",
+                ...plan.cardStyle,
+                borderRadius: 24, padding: "28px 22px", position: "relative",
+                animation: plan.pulse === "green" ? "plusPulse 3s ease-in-out infinite" : plan.pulse === "amber" ? "proPulse 3.5s ease-in-out infinite" : "none",
               }}>
                 {plan.badge && (
                   <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", background: plan.badgeColor, borderRadius: 100, padding: "4px 16px", fontSize: 11, fontWeight: 800, color: "#fff", whiteSpace: "nowrap" }}>
                     {plan.badge}
                   </div>
                 )}
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", marginBottom: 8 }}>{plan.name}</div>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
-                  <span style={{ fontSize: 40, fontWeight: 900, color: plan.badge === "Premium" ? "#F59E0B" : "#fff" }}>{plan.price}</span>
-                  <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>{plan.period}</span>
+                <div style={{ fontSize: 18, fontWeight: 900, color: plan.badge ? "#fff" : "rgba(255,255,255,0.45)", marginBottom: 8 }}>{plan.name}</div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 22 }}>
+                  <span style={{ fontSize: 38, fontWeight: 900, color: plan.badge === "Premium" ? "#F59E0B" : plan.badge === "Beliebt" ? "#10B981" : "rgba(255,255,255,0.35)" }}>{plan.price}</span>
+                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)" }}>{plan.period}</span>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24 }}>
                   {plan.features.map(f => (
-                    <div key={f.text} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: f.ok ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.25)" }}>
-                      <span style={{ color: f.ok ? "#10B981" : "#EF4444", flexShrink: 0 }}>{f.ok ? "✓" : "✕"}</span>
+                    <div key={f.text} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: f.ok ? (plan.badge ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.35)") : "rgba(255,255,255,0.2)" }}>
+                      <span style={{ color: f.ok ? (plan.badge ? "#10B981" : "rgba(255,255,255,0.3)") : "rgba(255,255,255,0.15)", flexShrink: 0 }}>{f.ok ? "✓" : "✕"}</span>
                       {f.text}
                     </div>
                   ))}
                 </div>
-                <button style={{ width: "100%", padding: "14px", borderRadius: 100, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 14, fontWeight: 800, ...plan.ctaStyle }}>
+                <button style={{ width: "100%", padding: "13px", borderRadius: 100, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 14, fontWeight: 800, ...plan.ctaStyle }}>
                   {plan.cta}
                 </button>
               </div>
@@ -317,22 +455,8 @@ export default function ForBusiness() {
         </div>
       </div>
 
-      {/* CTA */}
-      <div style={{ position: "relative", overflow: "hidden" }}>
-        <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=1400&q=80" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(8,15,11,0.8)" }} />
-        <div style={{ position: "relative", zIndex: 1, padding: "100px 32px", textAlign: "center" }}>
-          <h2 style={{ fontSize: "clamp(32px,6vw,60px)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 16px" }}>
-            Kostenlos starten.<br /><span style={{ color: "#10B981" }}>Kein Risiko. Kein Vertrag.</span>
-          </h2>
-          <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginBottom: 36 }}>
-            Starte noch heute — in 2 Minuten eingerichtet. Deine Kunden werden es lieben.
-          </div>
-          <Link to="/Business" style={{ display: "inline-block", background: "#10B981", color: "#fff", fontWeight: 800, fontSize: 17, padding: "18px 44px", borderRadius: 100, textDecoration: "none", boxShadow: "0 8px 30px rgba(16,185,129,0.4)" }}>
-            Jetzt kostenlos registrieren →
-          </Link>
-        </div>
-      </div>
+      {/* CTA with parallax */}
+      <CtaForBusiness />
     </div>
   );
 }

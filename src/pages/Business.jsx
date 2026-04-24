@@ -596,10 +596,10 @@ export default function Business() {
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Business Dashboard</div>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <a href="/BusinessAnalytics" style={{ fontSize: 13, color: "#10B981", textDecoration: "none", fontWeight: 600, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 8, padding: "5px 12px" }}>📈 Analyse</a>
-            <a href="/dashboard" style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textDecoration: "none", fontWeight: 500 }}>👤 Kunden-Dashboard</a>
             <a href="/" style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textDecoration: "none", fontWeight: 500 }}>← Zurück</a>
+            <button onClick={() => setActiveSection(activeSection === 'profile' ? null : 'profile')} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "5px 12px", fontSize: 13, color: "rgba(255,255,255,0.6)", cursor: "pointer", fontFamily: "inherit" }}>⚙️ Profil</button>
           </div>
         </div>
       </div>
@@ -775,6 +775,41 @@ export default function Business() {
             <button onClick={() => { setCommissionSaved(true); setTimeout(() => setCommissionSaved(false), 2000); }} style={{ background: commissionSaved ? "#059669" : "#10B981", color: "#fff", fontWeight: 700, fontSize: 14, padding: "11px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "inherit" }}>
               {commissionSaved ? "✓ Gespeichert!" : "Einstellungen speichern"}
             </button>
+          </div>
+        )}
+
+        {/* Profile Settings */}
+        {activeSection === 'profile' && (
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 28, marginBottom: 16 }}>
+            <div style={{ fontWeight: 700, color: "#fff", fontSize: 16, marginBottom: 4 }}>Profil & Einstellungen</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 20 }}>Verwalte deinen Account</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[
+                { icon: "✂️", label: "Kings Barbershop", sub: "Dein Unternehmen", action: null },
+                { icon: "📧", label: "info@kings-barbershop.de", sub: "E-Mail-Adresse", action: "Ändern" },
+                { icon: "🔑", label: "••••••••••", sub: "Passwort", action: "Ändern" },
+                { icon: "📱", label: "+49 151 234 5678", sub: "Telefonnummer", action: "Ändern" },
+              ].map((item, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "14px 18px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ fontSize: 18 }}>{item.icon}</span>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{item.label}</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{item.sub}</div>
+                    </div>
+                  </div>
+                  {item.action && <button style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 8, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#10B981", cursor: "pointer", fontFamily: "inherit" }}>{item.action}</button>}
+                </div>
+              ))}
+            </div>
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 18, paddingTop: 18, display: "flex", gap: 10 }}>
+              <button style={{ flex: 1, padding: "11px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, color: "rgba(239,68,68,0.7)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                🚪 Abmelden
+              </button>
+              <button style={{ flex: 1, padding: "11px", background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.12)", borderRadius: 12, color: "rgba(239,68,68,0.4)", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                🗑️ Konto löschen
+              </button>
+            </div>
           </div>
         )}
 

@@ -138,12 +138,19 @@ function PhoneMockup() {
 function FeaturesSection() {
   const [visible, setVisible] = useState(false);
   const [hovered, setHovered] = useState(null);
+  const [scrollY, setScrollY] = useState(0);
   const ref = useRef(null);
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.15 });
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const features = [
@@ -181,8 +188,10 @@ function FeaturesSection() {
               <div style={{ height: 130, position: "relative", overflow: "hidden" }}>
                 <img src={f.img} alt={f.title} style={{
                   width: "100%", height: "100%", objectFit: "cover",
-                  transform: hovered === i ? "scale(1.08)" : "scale(1)",
-                  transition: "transform 0.5s ease",
+                  transform: hovered === i
+                    ? `scale(1.08) translateY(${scrollY * 0.018}px)`
+                    : `scale(1.03) translateY(${scrollY * 0.018}px)`,
+                  transition: hovered === i ? "transform 0.5s ease" : "transform 0.8s ease",
                 }} />
                 <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%)` }} />
                 <div style={{ position: "absolute", top: 14, left: 14, width: 42, height: 42, borderRadius: 12, background: `${f.color}dd`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: `0 4px 14px ${f.color}66` }}>{f.emoji}</div>
@@ -273,9 +282,9 @@ function StepsSection() {
     return () => observers.forEach(o => o.disconnect());
   }, []);
 
-  // Auto-cycle active step
+  // Auto-cycle active step — slower
   useEffect(() => {
-    const t = setInterval(() => setActiveStep(i => (i + 1) % HOW_STEPS.length), 2200);
+    const t = setInterval(() => setActiveStep(i => (i + 1) % HOW_STEPS.length), 4000);
     return () => clearInterval(t);
   }, []);
 
@@ -389,13 +398,82 @@ function StepsSection() {
                       ? "linear-gradient(to right, #10B981, #34D399, transparent)"
                       : "linear-gradient(to right, rgba(16,185,129,0.3), transparent)",
                     backgroundSize: isActive ? "200% 100%" : "100% 100%",
-                    animation: isActive ? "shimmer 2s linear infinite" : "none",
-                    transition: "background 0.4s",
+                    animation: isActive ? "shimmer 4s linear infinite" : "none",
+                    transition: "background 0.6s",
                   }} />
                 </div>
               </div>
             );
           })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── CTA Section ───────────────────────────────────────────────────────────────
+function CtaSection() {
+  const [scrollY, setScrollY] = useState(0);
+  const ref = useRef(null);
+  const [offsetTop, setOffsetTop] = useState(0);
+
+  useEffect(() => {
+    if (ref.current) setOffsetTop(ref.current.offsetTop);
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const parallax = (scrollY - offsetTop) * 0.18;
+
+  return (
+    <div ref={ref} style={{ position: "relative", overflow: "hidden", padding: "100px 20px" }}>
+      {/* Parallax background image */}
+      <img
+        src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1400&q=80"
+        alt=""
+        style={{
+          position: "absolute", inset: 0, width: "100%", height: "120%",
+          objectFit: "cover", top: "-10%",
+          transform: `translateY(${parallax}px)`,
+          transition: "transform 0.05s linear",
+          willChange: "transform",
+        }}
+      />
+      <div style={{ position: "absolute", inset: 0, background: "rgba(8,20,12,0.78)" }} />
+
+      {/* Grid pattern */}
+      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.04 }} xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+      </svg>
+
+      <div style={{ position: "relative", zIndex: 1, textAlign: "center", maxWidth: 560, margin: "0 auto" }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>JETZT STARTEN</div>
+        <h2 style={{ fontSize: "clamp(28px,6vw,52px)", fontWeight: 900, lineHeight: 1.15, margin: "0 0 14px" }}>
+          Bereit für mehr<br /><span style={{ color: "#10B981" }}>aus jedem Besuch?</span>
+        </h2>
+        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginBottom: 36, maxWidth: 380, margin: "0 auto 36px" }}>
+          Kostenlos starten. Deine Lieblingsgeschäfte. Deine Prämien.
+        </div>
+        <Link to="/dashboard" style={{
+          display: "inline-block", background: "#10B981", color: "#fff",
+          fontWeight: 800, fontSize: 16, padding: "16px 44px", borderRadius: 100,
+          textDecoration: "none",
+          animation: "ctaPulse 2.5s ease-in-out infinite",
+        }}>
+          Jetzt kostenlos registrieren →
+        </Link>
+        <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 24 }}>
+          {["Kostenlos", "Sofort aktiv", "In 1 Minute angemeldet"].map((t) => (
+            <div key={t} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
+              <span style={{ color: "#10B981", fontWeight: 800 }}>✓</span> {t}
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -563,6 +641,10 @@ export default function CustomerLanding() {
           0%, 100% { box-shadow: 0 0 12px rgba(16,185,129,0.3), 0 4px 20px rgba(0,0,0,0.2); }
           50% { box-shadow: 0 0 24px rgba(16,185,129,0.5), 0 4px 20px rgba(0,0,0,0.2); }
         }
+        @keyframes ctaPulse {
+          0%, 100% { box-shadow: 0 8px 30px rgba(16,185,129,0.45), 0 0 0 0 rgba(16,185,129,0.3); }
+          50% { box-shadow: 0 8px 50px rgba(16,185,129,0.65), 0 0 0 12px rgba(16,185,129,0); }
+        }
       `}</style>
 
       {/* Navbar */}
@@ -721,46 +803,7 @@ export default function CustomerLanding() {
       <MapSection />
 
       {/* ── CTA ── */}
-      <div style={{
-        position: "relative", overflow: "hidden",
-        background: "linear-gradient(135deg, #0d2318 0%, #0f2d1c 40%, #162d1e 100%)",
-        padding: "100px 20px",
-      }}>
-
-        {/* Grid pattern */}
-        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.04 }} xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-        <div style={{ position: "relative", zIndex: 1, textAlign: "center", maxWidth: 560, margin: "0 auto" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>JETZT STARTEN</div>
-          <h2 style={{ fontSize: "clamp(28px,6vw,52px)", fontWeight: 900, lineHeight: 1.15, margin: "0 0 14px" }}>
-            Bereit für mehr<br /><span style={{ color: "#10B981" }}>aus jedem Besuch?</span>
-          </h2>
-          <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginBottom: 36, maxWidth: 380, margin: "0 auto 36px" }}>
-            Kostenlos starten. Deine Lieblingsgeschäfte. Deine Prämien.
-          </div>
-          <Link to="/dashboard" style={{
-            display: "inline-block", background: "#10B981", color: "#fff",
-            fontWeight: 800, fontSize: 16, padding: "16px 44px", borderRadius: 100,
-            textDecoration: "none", boxShadow: "0 8px 40px rgba(16,185,129,0.5)",
-          }}>
-            Jetzt kostenlos registrieren →
-          </Link>
-          {/* 3 checks under CTA */}
-          <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 24 }}>
-            {["Kostenlos", "Sofort aktiv", "In 1 Minute angemeldet"].map((t) => (
-              <div key={t} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
-                <span style={{ color: "#10B981", fontWeight: 800 }}>✓</span> {t}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <CtaSection />
     </div>
   );
 }
