@@ -6,12 +6,17 @@ import ScanLanding from './pages/ScanLanding';
 import AppLanding from './pages/AppLanding';
 import CustomerDashboard from './pages/CustomerDashboard';
 import KnowledgeBaseAdmin from './pages/KnowledgeBaseAdmin';
+import Landing from './pages/Landing';
+import CustomerLanding from './pages/CustomerLanding';
+import ForBusiness from './pages/ForBusiness';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/Business" replace />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/customer" element={<CustomerLanding />} />
+        <Route path="/for-business" element={<ForBusiness />} />
         <Route path="/Business" element={<Business />} />
         <Route path="/BusinessAnalytics" element={<BusinessAnalytics />} />
         <Route path="/ScanStamp" element={<ScanStamp />} />
