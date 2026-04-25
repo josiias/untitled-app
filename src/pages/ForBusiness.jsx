@@ -147,52 +147,205 @@ function StatsSection() {
 }
 
 // ── Dashboard Preview ──────────────────────────────────────────────────────────
-function DashboardPreview({ highlightText }) {
+const DASHBOARD_FEATURES = [
+  { icon: "📊", title: "Echtzeit-Statistiken", desc: "Sieh sofort, wie viele Kunden heute gestempelt haben — live, ohne Verzögerung." },
+  { icon: "💸", title: "Empfehlungs-Tracking", desc: "Verfolge jeden Kunden, der durch eine Empfehlung zu dir kam, und wie viel Provision ausgelöst wurde." },
+  { icon: "🔔", title: "Automatische Benachrichtigungen", desc: "Du wirst informiert, wenn eine Provision fällig wird — kein manueller Aufwand." },
+  { icon: "📈", title: "Wachstumsverlauf", desc: "Sieh auf einen Blick, wie sich Umsatz und Kundenzahl Woche für Woche entwickeln." },
+];
+
+function DashboardPreview() {
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [visible, setVisible] = useState(false);
+  const [barHeights, setBarHeights] = useState([30,50,45,70,85,65,90]);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.3 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  // Cycle through features
+  useEffect(() => {
+    const t = setInterval(() => setActiveFeature(i => (i + 1) % DASHBOARD_FEATURES.length), 3000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Animate bars when visible
+  useEffect(() => {
+    if (!visible) return;
+    const t = setInterval(() => {
+      setBarHeights(prev => prev.map(h => {
+        const delta = (Math.random() - 0.5) * 20;
+        return Math.max(20, Math.min(95, h + delta));
+      }));
+    }, 2200);
+    return () => clearInterval(t);
+  }, [visible]);
+
+  const f = DASHBOARD_FEATURES[activeFeature];
+
   return (
-    <div style={{ background: "#111e28", borderRadius: 20, border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden", boxShadow: "0 40px 80px rgba(0,0,0,0.6)", maxWidth: 560, margin: "0 auto" }}>
-      <div style={{ background: "#0a1612", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-        <div style={{ display: "flex", gap: 6 }}>
-          {["#FF5F57","#FFBD2E","#28CA41"].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />)}
+    <div ref={ref} style={{ maxWidth: 880, margin: "0 auto" }}>
+      <div style={{
+        display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center",
+      }}
+        className="dash-grid"
+      >
+        {/* Left: explanation text */}
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>LIVE-DASHBOARD</div>
+          <h2 style={{ fontSize: "clamp(26px,4vw,40px)", fontWeight: 900, margin: "0 0 16px", lineHeight: 1.2 }}>
+            Alles im Blick.<br /><span style={{ color: "#10B981" }}>Jederzeit. Echtzeit.</span>
+          </h2>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: "0 0 32px" }}>
+            Dein persönliches Business-Dashboard zeigt dir auf einen Blick, was gerade passiert — Kunden, Umsatz, Empfehlungen und Provisionen, alles live.
+          </p>
+
+          {/* Feature tabs */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {DASHBOARD_FEATURES.map((feat, i) => {
+              const isActive = i === activeFeature;
+              return (
+                <div
+                  key={i}
+                  onClick={() => setActiveFeature(i)}
+                  style={{
+                    display: "flex", alignItems: "flex-start", gap: 14, padding: "14px 16px",
+                    borderRadius: 14, cursor: "pointer",
+                    background: isActive ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)",
+                    border: isActive ? "1px solid rgba(16,185,129,0.35)" : "1px solid rgba(255,255,255,0.06)",
+                    transition: "all 0.35s ease",
+                  }}
+                >
+                  <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{feat.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: isActive ? "#fff" : "rgba(255,255,255,0.5)", marginBottom: isActive ? 4 : 0, transition: "color 0.3s" }}>{feat.title}</div>
+                    <div style={{
+                      fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.55,
+                      maxHeight: isActive ? 60 : 0, overflow: "hidden",
+                      transition: "max-height 0.4s ease",
+                    }}>{feat.desc}</div>
+                  </div>
+                  {isActive && (
+                    <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#10B981", flexShrink: 0, marginTop: 6 }} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div style={{ flex: 1, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.35)" }}>app.sensalie.com/business</div>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100, padding: "3px 10px" }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />
-          <span style={{ fontSize: 10, fontWeight: 700, color: "#10B981" }}>LIVE</span>
-        </div>
-      </div>
-      <div style={{ display: "flex" }}>
-        <div style={{ width: 130, background: "rgba(255,255,255,0.03)", borderRight: "1px solid rgba(255,255,255,0.06)", padding: "16px 12px" }}>
-          {["📋 Übersicht", "👥 Kunden", "💸 Empfehlungen", "⬛ Stempelkarten", "⚙️ Einstellungen"].map((item, i) => (
-            <div key={i} style={{ padding: "8px 10px", borderRadius: 8, fontSize: 11, fontWeight: i === 0 ? 700 : 400, color: i === 0 ? "#10B981" : "rgba(255,255,255,0.35)", background: i === 0 ? "rgba(16,185,129,0.1)" : "transparent", marginBottom: 4 }}>{item}</div>
-          ))}
-        </div>
-        <div style={{ flex: 1, padding: "20px 18px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>Guten Morgen</div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Dein Unternehmen 👋</div>
+
+        {/* Right: laptop mockup */}
+        <div style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.97)",
+          transition: "opacity 0.8s ease, transform 0.8s ease",
+          animation: visible ? "dashFloat 5s ease-in-out infinite" : "none",
+        }}>
+          {/* Floating notification badge */}
+          <div style={{
+            position: "relative", marginBottom: -12, zIndex: 2,
+            display: "flex", justifyContent: "flex-end", paddingRight: 24,
+            animation: visible ? "badgePop 0.5s 0.9s both" : "none",
+          }}>
+            <div style={{
+              background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.4)",
+              borderRadius: 100, padding: "6px 14px",
+              display: "flex", alignItems: "center", gap: 7,
+              fontSize: 11, fontWeight: 700, color: "#10B981",
+              boxShadow: "0 4px 16px rgba(16,185,129,0.2)",
+            }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", animation: "liveDot 1.5s ease-in-out infinite" }} />
+              +3 Neukunden heute
             </div>
-            <div style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 8, padding: "5px 10px", fontSize: 10, fontWeight: 700, color: "#10B981" }}>Heute: +3 Neukunden</div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
-            {[
-              { icon: "📈", label: "Umsatz", value: "€4.280", change: "+23%", highlight: true },
-              { icon: "👥", label: "Kunden", value: "847", change: "+18%" },
-              { icon: "💸", label: "Empfehlungen", value: "234", change: "+31%", highlight: true },
-              { icon: "💰", label: "Provision", value: "€1.120", change: "+21%" },
-            ].map((s, i) => (
-              <div key={i} style={{ background: s.highlight ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${s.highlight ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: 12 }}>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>{s.icon} {s.label}</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{s.value}</div>
-                <div style={{ fontSize: 10, color: "#10B981", fontWeight: 600 }}>{s.change}</div>
+
+          {/* Browser window */}
+          <div style={{
+            background: "#111e28", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)",
+            overflow: "hidden", boxShadow: "0 30px 70px rgba(0,0,0,0.6)",
+          }}>
+            {/* Title bar */}
+            <div style={{ background: "#0a1612", padding: "10px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+              <div style={{ display: "flex", gap: 5 }}>
+                {["#FF5F57","#FFBD2E","#28CA41"].map(c => <div key={c} style={{ width: 9, height: 9, borderRadius: "50%", background: c }} />)}
               </div>
-            ))}
+              <div style={{ flex: 1, textAlign: "center", fontSize: 10, color: "rgba(255,255,255,0.3)" }}>app.sensalie.com/business</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100, padding: "2px 8px" }}>
+                <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981" }} />
+                <span style={{ fontSize: 9, fontWeight: 700, color: "#10B981" }}>LIVE</span>
+              </div>
+            </div>
+
+            <div style={{ display: "flex" }}>
+              {/* Sidebar */}
+              <div style={{ width: 110, background: "rgba(255,255,255,0.03)", borderRight: "1px solid rgba(255,255,255,0.06)", padding: "14px 10px" }}>
+                {["📋 Übersicht", "👥 Kunden", "💸 Empfehlungen", "⬛ Karten", "⚙️ Einstellungen"].map((item, i) => (
+                  <div key={i} style={{ padding: "7px 9px", borderRadius: 7, fontSize: 10, fontWeight: i === 0 ? 700 : 400, color: i === 0 ? "#10B981" : "rgba(255,255,255,0.3)", background: i === 0 ? "rgba(16,185,129,0.1)" : "transparent", marginBottom: 3 }}>{item}</div>
+                ))}
+              </div>
+
+              {/* Main content */}
+              <div style={{ flex: 1, padding: "16px 16px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <div>
+                    <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)" }}>Guten Morgen</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>Dein Unternehmen 👋</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
+                  {[
+                    { icon: "📈", label: "Umsatz", value: "€4.280", change: "+23%", hi: true },
+                    { icon: "👥", label: "Kunden", value: "847", change: "+18%", hi: false },
+                    { icon: "💸", label: "Empfehlungen", value: "234", change: "+31%", hi: true },
+                    { icon: "💰", label: "Provision", value: "€1.120", change: "+21%", hi: false },
+                  ].map((s, i) => (
+                    <div key={i} style={{
+                      background: s.hi ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.04)",
+                      border: `1px solid ${s.hi ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.07)"}`,
+                      borderRadius: 10, padding: "10px 11px",
+                      animation: visible ? `featureSlideIn 0.4s ease ${0.5 + i * 0.1}s both` : "none",
+                    }}>
+                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", marginBottom: 3 }}>{s.icon} {s.label}</div>
+                      <div style={{ fontSize: 17, fontWeight: 900, color: "#fff" }}>{s.value}</div>
+                      <div style={{ fontSize: 9, color: "#10B981", fontWeight: 600 }}>{s.change}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Animated bar chart */}
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>Umsatz letzte 7 Tage</div>
+                <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 44 }}>
+                  {barHeights.map((h, i) => (
+                    <div key={i} style={{
+                      flex: 1, background: `linear-gradient(to top, #10B981, #34D399)`,
+                      borderRadius: "3px 3px 0 0", height: `${h}%`,
+                      opacity: 0.55 + i * 0.06,
+                      transition: "height 1.8s cubic-bezier(0.34,1.56,0.64,1)",
+                    }} />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 8 }}>Umsatz letzte 7 Tage</div>
-          <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 40, marginBottom: 12 }}>
-            {[30,50,45,70,85,65,90].map((h, i) => (
-              <div key={i} style={{ flex: 1, background: "#10B981", borderRadius: "3px 3px 0 0", height: `${h}%`, opacity: 0.6 + i * 0.06 }} />
-            ))}
+
+          {/* Bottom floating pill */}
+          <div style={{
+            display: "flex", justifyContent: "center", marginTop: 14,
+            animation: visible ? "badgePop 0.5s 1.2s both" : "none",
+          }}>
+            <div style={{
+              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 100, padding: "8px 18px",
+              display: "flex", alignItems: "center", gap: 10, fontSize: 11,
+            }}>
+              {["📊 Live-Daten", "🔔 Auto-Alerts", "📱 Mobile-ready"].map((t, i) => (
+                <span key={i} style={{ color: "rgba(255,255,255,0.45)", fontWeight: 600 }}>{t}</span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -413,9 +566,22 @@ export default function ForBusiness() {
           from { opacity: 0; transform: translateX(-14px); }
           to { opacity: 1; transform: translateX(0); }
         }
+        @keyframes dashFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes badgePop {
+          from { opacity: 0; transform: scale(0.8) translateY(8px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes liveDot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(1.4); }
+        }
         @media(max-width:640px){
           .biz-plans-grid { grid-template-columns: 1fr !important; }
           .biz-hero-btns { flex-direction: column !important; align-items: center !important; }
+          .dash-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -459,14 +625,7 @@ export default function ForBusiness() {
 
       {/* Live Dashboard */}
       <div style={{ padding: "80px 24px", background: "#0a1410" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>LIVE-DASHBOARD</div>
-            <h2 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 900, margin: "0 0 10px" }}>Alles im Blick. Echtzeit.</h2>
-            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>↓ Scroll um alle Metriken zu sehen</div>
-          </div>
-          <DashboardPreview highlightText={dashHighlight === 0} />
-        </div>
+        <DashboardPreview />
       </div>
 
       {/* 6 Steps with slide-in */}
