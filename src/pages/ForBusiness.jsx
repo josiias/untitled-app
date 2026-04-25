@@ -23,6 +23,7 @@ const PLANS = [
     name: "Free",
     price: "0€",
     period: "",
+    regularPrice: null,
     badge: null,
     features: [
       { ok: true, text: "1 Stempelkarte" },
@@ -34,13 +35,14 @@ const PLANS = [
       { ok: false, text: "Credits für Sichtbarkeit" },
     ],
     cta: "Kostenlos starten",
-    ctaStyle: { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)" },
-    cardStyle: { background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" },
+    ctaStyle: { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.55)" },
+    cardStyle: { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" },
   },
   {
     name: "Plus",
     price: "9,90€",
     period: "/Monat",
+    regularPrice: "29,90€",
     badge: "Beliebt",
     badgeColor: "#10B981",
     pulse: "green",
@@ -63,6 +65,7 @@ const PLANS = [
     name: "Pro",
     price: "14,99€",
     period: "/Monat",
+    regularPrice: "49,90€",
     badge: "Premium",
     badgeColor: "#F59E0B",
     pulse: "amber",
@@ -197,16 +200,17 @@ function DashboardPreview({ highlightText }) {
   );
 }
 
-// ── Steps Section with scroll-triggered slide-in ───────────────────────────────
+// ── Steps Section with scroll-triggered slide-in + hover glow ─────────────────
 function StepsSlideSection() {
   const [visibleSteps, setVisibleSteps] = useState([]);
+  const [hoveredStep, setHoveredStep] = useState(null);
   const stepRefs = useRef([]);
 
   useEffect(() => {
     const observers = STEPS.map((_, i) => {
       const obs = new IntersectionObserver(
         ([e]) => { if (e.isIntersecting) setVisibleSteps(prev => prev.includes(i) ? prev : [...prev, i]); },
-        { threshold: 0.3 }
+        { threshold: 0.2 }
       );
       if (stepRefs.current[i]) obs.observe(stepRefs.current[i]);
       return obs;
@@ -222,50 +226,102 @@ function StepsSlideSection() {
           <h2 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 900, margin: "0 0 10px", color: "#fff" }}>In 6 Schritten zum Wachstum.</h2>
           <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 14 }}>Scroll dich durch — und sieh sofort, was passiert.</div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {STEPS.map((step, i) => {
-            const isVisible = visibleSteps.includes(i);
-            const fromLeft = i % 2 === 0;
-            return (
-              <div
-                key={step.num}
-                ref={el => stepRefs.current[i] = el}
-                style={{
-                  borderRadius: 20, overflow: "hidden", position: "relative",
-                  border: isVisible ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.06)",
-                  minHeight: 140,
-                  opacity: isVisible ? 1 : 0,
-                  transform: isVisible ? "translateX(0)" : `translateX(${fromLeft ? "-60px" : "60px"})`,
-                  transition: `opacity 0.7s ease ${i * 0.05}s, transform 0.7s ease ${i * 0.05}s, border-color 0.5s ease`,
-                  boxShadow: isVisible ? "0 8px 32px rgba(0,0,0,0.35), 0 0 0 0 rgba(16,185,129,0)" : "none",
-                }}
-              >
-                <img src={step.img} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.22 }} />
-                <div style={{ position: "absolute", inset: 0, background: "rgba(8,20,10,0.55)" }} />
-                {/* Active highlight bar */}
-                {isVisible && (
-                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, #10B981, #34D399, transparent)" }} />
-                )}
-                <div style={{ position: "relative", zIndex: 1, padding: "24px 24px", display: "flex", alignItems: "center", gap: 20 }}>
-                  <div style={{ flexShrink: 0, textAlign: "center" }}>
+
+        {/* Connected steps with vertical line */}
+        <div style={{ position: "relative" }}>
+          {/* Vertical connector line */}
+          <div style={{
+            position: "absolute", left: 35, top: 40, bottom: 40,
+            width: 2,
+            background: "linear-gradient(to bottom, #10B981, rgba(16,185,129,0.1))",
+            zIndex: 0,
+          }} />
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+            {STEPS.map((step, i) => {
+              const isVisible = visibleSteps.includes(i);
+              const isHovered = hoveredStep === i;
+              const fromLeft = i % 2 === 0;
+              return (
+                <div
+                  key={step.num}
+                  ref={el => stepRefs.current[i] = el}
+                  onMouseEnter={() => setHoveredStep(i)}
+                  onMouseLeave={() => setHoveredStep(null)}
+                  style={{
+                    borderRadius: 20, overflow: "hidden", position: "relative",
+                    border: isHovered
+                      ? "1.5px solid rgba(16,185,129,0.7)"
+                      : isVisible
+                        ? "1px solid rgba(16,185,129,0.25)"
+                        : "1px solid rgba(255,255,255,0.06)",
+                    minHeight: 130,
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible
+                      ? (isHovered ? "translateX(6px) scale(1.01)" : "translateX(0)")
+                      : `translateX(${fromLeft ? "-60px" : "60px"})`,
+                    transition: `opacity 0.7s ease ${i * 0.06}s, transform 0.5s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s ease, box-shadow 0.3s ease`,
+                    boxShadow: isHovered
+                      ? "0 12px 40px rgba(0,0,0,0.5), 0 0 30px rgba(16,185,129,0.2)"
+                      : isVisible ? "0 6px 24px rgba(0,0,0,0.3)" : "none",
+                    cursor: "default",
+                    zIndex: isHovered ? 2 : 1,
+                  }}
+                >
+                  <img src={step.img} alt="" style={{
+                    position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover",
+                    opacity: isHovered ? 0.35 : 0.18,
+                    transform: isHovered ? "scale(1.04)" : "scale(1)",
+                    transition: "opacity 0.4s, transform 0.6s",
+                  }} />
+                  <div style={{ position: "absolute", inset: 0, background: isHovered ? "rgba(8,20,10,0.5)" : "rgba(8,20,10,0.6)" }} />
+                  {/* Top glow bar */}
+                  <div style={{
+                    position: "absolute", top: 0, left: 0, right: 0, height: 2,
+                    background: isHovered
+                      ? "linear-gradient(90deg, #10B981, #34D399, #10B981)"
+                      : isVisible ? "linear-gradient(90deg, rgba(16,185,129,0.4), transparent)" : "transparent",
+                    transition: "background 0.3s",
+                  }} />
+                  <div style={{ position: "relative", zIndex: 1, padding: "26px 28px", display: "flex", alignItems: "center", gap: 22 }}>
+                    {/* Icon + number */}
+                    <div style={{ flexShrink: 0, textAlign: "center", width: 54 }}>
+                      <div style={{
+                        width: 54, height: 54, borderRadius: 16,
+                        background: isHovered ? "rgba(16,185,129,0.25)" : "rgba(16,185,129,0.12)",
+                        border: isHovered ? "2px solid rgba(16,185,129,0.8)" : "1.5px solid rgba(16,185,129,0.35)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: isHovered ? 26 : 22, marginBottom: 6,
+                        boxShadow: isHovered ? "0 0 20px rgba(16,185,129,0.45)" : "none",
+                        transition: "all 0.3s ease",
+                      }}>{step.icon}</div>
+                      <div style={{ fontSize: 11, fontWeight: 900, color: "#10B981" }}>{step.num}</div>
+                    </div>
+                    {/* Text */}
+                    <div style={{ flex: 1 }}>
+                      <div style={{
+                        fontSize: 17, fontWeight: 800, marginBottom: 8,
+                        color: isHovered ? "#fff" : "rgba(255,255,255,0.9)",
+                        transition: "color 0.3s",
+                      }}>{step.title}</div>
+                      <div style={{
+                        fontSize: 13,
+                        color: isHovered ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.45)",
+                        lineHeight: 1.65, transition: "color 0.3s",
+                      }}>{step.desc}</div>
+                    </div>
+                    {/* Arrow indicator on hover */}
                     <div style={{
-                      width: 50, height: 50, borderRadius: 16,
-                      background: "rgba(16,185,129,0.15)", border: "1.5px solid rgba(16,185,129,0.4)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 22, marginBottom: 6,
-                      boxShadow: isVisible ? "0 0 14px rgba(16,185,129,0.25)" : "none",
-                      transition: "box-shadow 0.5s",
-                    }}>{step.icon}</div>
-                    <div style={{ fontSize: 11, fontWeight: 900, color: "#10B981" }}>{step.num}</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", marginBottom: 7 }}>{step.title}</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.58)", lineHeight: 1.6 }}>{step.desc}</div>
+                      flexShrink: 0, fontSize: 20, color: "#10B981",
+                      opacity: isHovered ? 1 : 0,
+                      transform: isHovered ? "translateX(0)" : "translateX(-8px)",
+                      transition: "all 0.3s ease",
+                    }}>→</div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -343,13 +399,19 @@ export default function ForBusiness() {
           0%, 100% { box-shadow: 0 8px 30px rgba(16,185,129,0.4), 0 0 0 0 rgba(16,185,129,0.25); }
           50% { box-shadow: 0 8px 50px rgba(16,185,129,0.6), 0 0 0 14px rgba(16,185,129,0); }
         }
-        @keyframes plusPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.35), 0 12px 40px rgba(0,0,0,0.4); }
-          50% { box-shadow: 0 0 0 10px rgba(16,185,129,0), 0 12px 40px rgba(0,0,0,0.4); }
+        @keyframes plusSwing {
+          0%, 100% { transform: rotate(-1.5deg) translateY(0px); }
+          25% { transform: rotate(1.5deg) translateY(-3px); }
+          50% { transform: rotate(-1deg) translateY(-1px); }
+          75% { transform: rotate(1deg) translateY(-4px); }
         }
         @keyframes proPulse {
           0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.25), 0 8px 32px rgba(0,0,0,0.35); }
           50% { box-shadow: 0 0 0 8px rgba(245,158,11,0), 0 8px 32px rgba(0,0,0,0.35); }
+        }
+        @keyframes featureSlideIn {
+          from { opacity: 0; transform: translateX(-14px); }
+          to { opacity: 1; transform: translateX(0); }
         }
         @media(max-width:640px){
           .biz-plans-grid { grid-template-columns: 1fr !important; }
@@ -421,27 +483,67 @@ export default function ForBusiness() {
               🐦 Early-Bird-Aktion — jetzt bis zu 50% günstiger!
             </div>
           </div>
-          <div className="biz-plans-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-            {PLANS.map(plan => (
+          <div className="biz-plans-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, alignItems: "start" }}>
+            {PLANS.map((plan, pi) => (
               <div key={plan.name} style={{
                 ...plan.cardStyle,
-                borderRadius: 24, padding: "28px 22px", position: "relative",
-                animation: plan.pulse === "green" ? "plusPulse 3s ease-in-out infinite" : plan.pulse === "amber" ? "proPulse 3.5s ease-in-out infinite" : "none",
+                borderRadius: 24, padding: "32px 22px", position: "relative",
+                animation: plan.pulse === "green"
+                  ? "plusSwing 4s ease-in-out infinite"
+                  : plan.pulse === "amber"
+                    ? "proPulse 3.5s ease-in-out infinite"
+                    : "none",
               }}>
                 {plan.badge && (
                   <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", background: plan.badgeColor, borderRadius: 100, padding: "4px 16px", fontSize: 11, fontWeight: 800, color: "#fff", whiteSpace: "nowrap" }}>
                     {plan.badge}
                   </div>
                 )}
-                <div style={{ fontSize: 18, fontWeight: 900, color: plan.badge ? "#fff" : "rgba(255,255,255,0.45)", marginBottom: 8 }}>{plan.name}</div>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 22 }}>
-                  <span style={{ fontSize: 38, fontWeight: 900, color: plan.badge === "Premium" ? "#F59E0B" : plan.badge === "Beliebt" ? "#10B981" : "rgba(255,255,255,0.35)" }}>{plan.price}</span>
-                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)" }}>{plan.period}</span>
-                </div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: plan.badge ? "#fff" : "rgba(255,255,255,0.6)", marginBottom: 6 }}>{plan.name}</div>
+
+                {/* Early bird price + strikethrough */}
+                {plan.regularPrice ? (
+                  <div style={{ marginBottom: 20 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", textDecoration: "line-through" }}>{plan.regularPrice}</span>
+                      <span style={{ background: "#F59E0B", color: "#000", fontSize: 9, fontWeight: 900, borderRadius: 100, padding: "2px 7px" }}>EARLY BIRD</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+                      <span style={{ fontSize: 40, fontWeight: 900, color: plan.pulse === "amber" ? "#F59E0B" : "#10B981" }}>{plan.price}</span>
+                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>{plan.period}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 20 }}>
+                    <span style={{ fontSize: 40, fontWeight: 900, color: "rgba(255,255,255,0.5)" }}>{plan.price}</span>
+                    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>{plan.period}</span>
+                  </div>
+                )}
+
                 <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24 }}>
-                  {plan.features.map(f => (
-                    <div key={f.text} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: f.ok ? (plan.badge ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.35)") : "rgba(255,255,255,0.2)" }}>
-                      <span style={{ color: f.ok ? (plan.badge ? "#10B981" : "rgba(255,255,255,0.3)") : "rgba(255,255,255,0.15)", flexShrink: 0 }}>{f.ok ? "✓" : "✕"}</span>
+                  {plan.features.map((f, fi) => (
+                    <div
+                      key={f.text}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        fontSize: 12,
+                        color: f.ok
+                          ? (plan.badge ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.5)")
+                          : "rgba(255,255,255,0.22)",
+                        animation: `featureSlideIn 0.4s ease ${fi * 0.05}s both`,
+                      }}
+                    >
+                      <span style={{
+                        flexShrink: 0,
+                        fontWeight: 700,
+                        fontSize: 13,
+                        color: f.ok
+                          ? (plan.badge ? "#10B981" : "rgba(255,255,255,0.35)")
+                          : "#EF4444",
+                        animation: !f.ok ? `featureSlideIn 0.4s ease ${fi * 0.05 + 0.1}s both` : "none",
+                      }}>
+                        {f.ok ? "✓" : "✕"}
+                      </span>
                       {f.text}
                     </div>
                   ))}
