@@ -10,12 +10,12 @@ const HERO_SLIDES = [
 ];
 
 const STEPS = [
-  { num: "01", icon: "⚙️", title: "Du richtest es ein", desc: "Du legst deine Stempelkarte in wenigen Minuten an — Anzahl der Stempel, Belohnung, Provision. Einmal eingestellt, läuft es von alleine.", img: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80" },
-  { num: "02", icon: "📱", title: "Dein Kunde scannt", desc: "Beim nächsten Besuch scannt dein Kunde einfach deinen QR-Code — kein Download, kein Aufwand. Die Stempelkarte ist sofort aktiv.", img: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&q=80" },
-  { num: "03", icon: "📢", title: "Er empfiehlt dich weiter", desc: "Mit einem Klick schickt dein Kunde seinen persönlichen Link an Freunde und Familie — direkt über WhatsApp. Kein Aufwand für dich.", img: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&q=80" },
-  { num: "04", icon: "🚶", title: "Neuer Kunde betritt deinen Laden", desc: "Der empfohlene Freund kommt zu dir, scannt den Code und startet seine eigene Karte. Du gewinnst einen neuen Stammkunden — automatisch.", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" },
-  { num: "05", icon: "💰", title: "Du zahlst erst bei Erfolg", desc: "Erst wenn der neue Kunde wirklich da war, löst die Provision aus. Kein Risiko, keine Vorabkosten — du zahlst nur für echte Ergebnisse.", img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&q=80" },
-  { num: "06", icon: "∞", title: "Das System arbeitet für dich", desc: "Jeder neue Kunde empfiehlt weiter. Der Kreislauf dreht sich — ohne dass du etwas tun musst. Dein Wachstum passiert im Hintergrund.", img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80" },
+  { num: "01", icon: "⚙️", title: "Einrichten", desc: "Stempelkarte anlegen, Prämie & Provision festlegen. Einmal — läuft dann alleine.", img: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80" },
+  { num: "02", icon: "📱", title: "Kunde scannt", desc: "QR-Code an der Kasse — kein Download, sofort aktiv.", img: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&q=80" },
+  { num: "03", icon: "📢", title: "Empfehlung per WhatsApp", desc: "Kunde teilt seinen Link mit Freunden — ein Klick, kein Aufwand für dich.", img: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&q=80" },
+  { num: "04", icon: "🚶", title: "Neuer Kunde kommt", desc: "Der Freund scannt, startet seine Karte — du gewinnst automatisch einen Stammkunden.", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" },
+  { num: "05", icon: "💰", title: "Zahlen nur bei Erfolg", desc: "Provision löst erst aus, wenn der Neue wirklich da war. Kein Risiko.", img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&q=80" },
+  { num: "06", icon: "∞", title: "Kreislauf läuft", desc: "Jeder neue Kunde empfiehlt weiter. Dein Wachstum passiert im Hintergrund.", img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80" },
 ];
 
 const PLANS = [
