@@ -216,9 +216,9 @@ function DashboardPreview() {
   const statHighlight = [0, 1, 2, 3]; // indices 0-3 map to tooltip 0-3, index 4 = chart
 
   return (
-    <div ref={sectionRef} style={{ height: `${DASH_TOOLTIPS.length * 80}vh`, position: "relative" }}>
+    <div ref={sectionRef} style={{ height: `${DASH_TOOLTIPS.length * 80}vh`, position: "relative", overflow: "visible" }}>
       {/* Sticky wrapper */}
-      <div style={{ position: "sticky", top: 0, height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+      <div style={{ position: "sticky", top: 0, height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px", overflow: "visible" }}>
         <div style={{ maxWidth: 780, width: "100%", margin: "0 auto" }}>
 
           {/* Header above mockup */}
@@ -575,7 +575,7 @@ export default function ForBusiness() {
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a1410", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "#0a1410", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "clip" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
@@ -655,7 +655,7 @@ export default function ForBusiness() {
       <StatsSection />
 
       {/* Live Dashboard */}
-      <div style={{ padding: "80px 24px", background: "#0a1410" }}>
+      <div style={{ background: "#0a1410" }}>
         <DashboardPreview />
       </div>
 
