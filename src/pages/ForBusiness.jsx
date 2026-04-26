@@ -146,205 +146,236 @@ function StatsSection() {
   );
 }
 
-// ── Dashboard Preview ──────────────────────────────────────────────────────────
-const DASHBOARD_FEATURES = [
-  { icon: "📊", title: "Echtzeit-Statistiken", desc: "Sieh sofort, wie viele Kunden heute gestempelt haben — live, ohne Verzögerung." },
-  { icon: "💸", title: "Empfehlungs-Tracking", desc: "Verfolge jeden Kunden, der durch eine Empfehlung zu dir kam, und wie viel Provision ausgelöst wurde." },
-  { icon: "🔔", title: "Automatische Benachrichtigungen", desc: "Du wirst informiert, wenn eine Provision fällig wird — kein manueller Aufwand." },
-  { icon: "📈", title: "Wachstumsverlauf", desc: "Sieh auf einen Blick, wie sich Umsatz und Kundenzahl Woche für Woche entwickeln." },
+// ── Dashboard Preview — sticky scroll with speech bubbles ────────────────────
+const DASH_TOOLTIPS = [
+  {
+    label: "Umsatz",
+    icon: "📈",
+    text: "Dein Mindestumsatz aus allen Stempel-Besuchen — automatisch berechnet.",
+    // position on the mockup (relative to browser window)
+    top: "38%", left: "52%",
+  },
+  {
+    label: "Kunden",
+    icon: "👥",
+    text: "Aktive Kunden, die mindestens einmal in den letzten 30 Tagen gescannt haben.",
+    top: "38%", left: "76%",
+  },
+  {
+    label: "Empfehlungen",
+    icon: "💸",
+    text: "Jede erfolgreiche Empfehlung, die einen neuen Kunden gebracht hat.",
+    top: "57%", left: "52%",
+  },
+  {
+    label: "Provision",
+    icon: "💰",
+    text: "Deine gesamte offene Provision — wird automatisch nach X Besuchen ausgelöst.",
+    top: "57%", left: "76%",
+  },
+  {
+    label: "Balkendiagramm",
+    icon: "📊",
+    text: "Live-Umsatzkurve der letzten 7 Tage — du siehst Trends auf einen Blick.",
+    top: "78%", left: "60%",
+  },
 ];
 
 function DashboardPreview() {
-  const [activeFeature, setActiveFeature] = useState(0);
-  const [visible, setVisible] = useState(false);
+  const [activeTooltip, setActiveTooltip] = useState(0);
   const [barHeights, setBarHeights] = useState([30,50,45,70,85,65,90]);
-  const ref = useRef(null);
+  const sectionRef = useRef(null);
+  const mockupRef = useRef(null);
 
+  // Scroll-driven tooltip cycling
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.3 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
+    const onScroll = () => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const total = sectionRef.current.offsetHeight - window.innerHeight;
+      const scrolled = Math.max(0, -rect.top);
+      const progress = Math.min(1, scrolled / Math.max(total, 1));
+      const idx = Math.min(DASH_TOOLTIPS.length - 1, Math.floor(progress * DASH_TOOLTIPS.length));
+      setActiveTooltip(idx);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Cycle through features
+  // Animate bars
   useEffect(() => {
-    const t = setInterval(() => setActiveFeature(i => (i + 1) % DASHBOARD_FEATURES.length), 3000);
-    return () => clearInterval(t);
-  }, []);
-
-  // Animate bars when visible
-  useEffect(() => {
-    if (!visible) return;
     const t = setInterval(() => {
-      setBarHeights(prev => prev.map(h => {
-        const delta = (Math.random() - 0.5) * 20;
-        return Math.max(20, Math.min(95, h + delta));
-      }));
-    }, 2200);
+      setBarHeights(prev => prev.map(h => Math.max(20, Math.min(95, h + (Math.random() - 0.5) * 18))));
+    }, 2000);
     return () => clearInterval(t);
-  }, [visible]);
+  }, []);
 
-  const f = DASHBOARD_FEATURES[activeFeature];
+  const tip = DASH_TOOLTIPS[activeTooltip];
+
+  // Which stat cards map to which tooltip index
+  const statHighlight = [0, 1, 2, 3]; // indices 0-3 map to tooltip 0-3, index 4 = chart
 
   return (
-    <div ref={ref} style={{ maxWidth: 880, margin: "0 auto" }}>
-      <div style={{
-        display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center",
-      }}
-        className="dash-grid"
-      >
-        {/* Left: explanation text */}
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>LIVE-DASHBOARD</div>
-          <h2 style={{ fontSize: "clamp(26px,4vw,40px)", fontWeight: 900, margin: "0 0 16px", lineHeight: 1.2 }}>
-            Alles im Blick.<br /><span style={{ color: "#10B981" }}>Jederzeit. Echtzeit.</span>
-          </h2>
-          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: "0 0 32px" }}>
-            Dein persönliches Business-Dashboard zeigt dir auf einen Blick, was gerade passiert — Kunden, Umsatz, Empfehlungen und Provisionen, alles live.
-          </p>
+    <div ref={sectionRef} style={{ height: `${DASH_TOOLTIPS.length * 80}vh`, position: "relative" }}>
+      {/* Sticky wrapper */}
+      <div style={{ position: "sticky", top: 0, height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+        <div style={{ maxWidth: 780, width: "100%", margin: "0 auto" }}>
 
-          {/* Feature tabs */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {DASHBOARD_FEATURES.map((feat, i) => {
-              const isActive = i === activeFeature;
-              return (
-                <div
-                  key={i}
-                  onClick={() => setActiveFeature(i)}
-                  style={{
-                    display: "flex", alignItems: "flex-start", gap: 14, padding: "14px 16px",
-                    borderRadius: 14, cursor: "pointer",
-                    background: isActive ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)",
-                    border: isActive ? "1px solid rgba(16,185,129,0.35)" : "1px solid rgba(255,255,255,0.06)",
-                    transition: "all 0.35s ease",
-                  }}
-                >
-                  <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{feat.icon}</span>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: isActive ? "#fff" : "rgba(255,255,255,0.5)", marginBottom: isActive ? 4 : 0, transition: "color 0.3s" }}>{feat.title}</div>
-                    <div style={{
-                      fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.55,
-                      maxHeight: isActive ? 60 : 0, overflow: "hidden",
-                      transition: "max-height 0.4s ease",
-                    }}>{feat.desc}</div>
-                  </div>
-                  {isActive && (
-                    <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#10B981", flexShrink: 0, marginTop: 6 }} />
-                  )}
-                </div>
-              );
-            })}
+          {/* Header above mockup */}
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>LIVE-DASHBOARD</div>
+            <h2 style={{ fontSize: "clamp(22px,3.5vw,36px)", fontWeight: 900, margin: 0, lineHeight: 1.2 }}>
+              Alles im Blick. <span style={{ color: "#10B981" }}>Echtzeit.</span>
+            </h2>
           </div>
-        </div>
 
-        {/* Right: laptop mockup */}
-        <div style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.97)",
-          transition: "opacity 0.8s ease, transform 0.8s ease",
-          animation: visible ? "dashFloat 5s ease-in-out infinite" : "none",
-        }}>
-          {/* Floating notification badge */}
-          <div style={{
-            position: "relative", marginBottom: -12, zIndex: 2,
-            display: "flex", justifyContent: "flex-end", paddingRight: 24,
-            animation: visible ? "badgePop 0.5s 0.9s both" : "none",
-          }}>
+          {/* Browser mockup — full width, with speech bubble overlay */}
+          <div ref={mockupRef} style={{ position: "relative" }}>
+
+            {/* Speech bubble */}
             <div style={{
-              background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.4)",
-              borderRadius: 100, padding: "6px 14px",
-              display: "flex", alignItems: "center", gap: 7,
-              fontSize: 11, fontWeight: 700, color: "#10B981",
-              boxShadow: "0 4px 16px rgba(16,185,129,0.2)",
+              position: "absolute",
+              top: tip.top, left: tip.left,
+              zIndex: 20,
+              transform: "translate(-50%, -130%)",
+              transition: "opacity 0.4s ease, transform 0.4s ease",
+              pointerEvents: "none",
             }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", animation: "liveDot 1.5s ease-in-out infinite" }} />
-              +3 Neukunden heute
+              <div style={{
+                background: "rgba(10,22,16,0.96)",
+                border: "1px solid rgba(16,185,129,0.5)",
+                borderRadius: 12,
+                padding: "10px 14px",
+                maxWidth: 200,
+                boxShadow: "0 8px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(16,185,129,0.1)",
+                backdropFilter: "blur(10px)",
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#10B981", marginBottom: 4 }}>
+                  {tip.icon} {tip.label}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", lineHeight: 1.5 }}>
+                  {tip.text}
+                </div>
+                {/* Arrow */}
+                <div style={{
+                  position: "absolute", bottom: -7, left: "50%", transform: "translateX(-50%)",
+                  width: 0, height: 0,
+                  borderLeft: "7px solid transparent",
+                  borderRight: "7px solid transparent",
+                  borderTop: "7px solid rgba(16,185,129,0.5)",
+                }} />
+              </div>
             </div>
-          </div>
 
-          {/* Browser window */}
-          <div style={{
-            background: "#111e28", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)",
-            overflow: "hidden", boxShadow: "0 30px 70px rgba(0,0,0,0.6)",
-          }}>
-            {/* Title bar */}
-            <div style={{ background: "#0a1612", padding: "10px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-              <div style={{ display: "flex", gap: 5 }}>
-                {["#FF5F57","#FFBD2E","#28CA41"].map(c => <div key={c} style={{ width: 9, height: 9, borderRadius: "50%", background: c }} />)}
-              </div>
-              <div style={{ flex: 1, textAlign: "center", fontSize: 10, color: "rgba(255,255,255,0.3)" }}>app.sensalie.com/business</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100, padding: "2px 8px" }}>
-                <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981" }} />
-                <span style={{ fontSize: 9, fontWeight: 700, color: "#10B981" }}>LIVE</span>
-              </div>
-            </div>
+            {/* Highlight dot on the active area */}
+            <div style={{
+              position: "absolute",
+              top: tip.top, left: tip.left,
+              transform: "translate(-50%, -50%)",
+              zIndex: 19,
+              width: 16, height: 16,
+              borderRadius: "50%",
+              background: "rgba(16,185,129,0.3)",
+              border: "2px solid #10B981",
+              boxShadow: "0 0 12px rgba(16,185,129,0.6)",
+              animation: "liveDot 1.2s ease-in-out infinite",
+              transition: "top 0.4s ease, left 0.4s ease",
+              pointerEvents: "none",
+            }} />
 
-            <div style={{ display: "flex" }}>
-              {/* Sidebar */}
-              <div style={{ width: 110, background: "rgba(255,255,255,0.03)", borderRight: "1px solid rgba(255,255,255,0.06)", padding: "14px 10px" }}>
-                {["📋 Übersicht", "👥 Kunden", "💸 Empfehlungen", "⬛ Karten", "⚙️ Einstellungen"].map((item, i) => (
-                  <div key={i} style={{ padding: "7px 9px", borderRadius: 7, fontSize: 10, fontWeight: i === 0 ? 700 : 400, color: i === 0 ? "#10B981" : "rgba(255,255,255,0.3)", background: i === 0 ? "rgba(16,185,129,0.1)" : "transparent", marginBottom: 3 }}>{item}</div>
-                ))}
+            {/* Browser chrome */}
+            <div style={{
+              background: "#111e28", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)",
+              overflow: "hidden", boxShadow: "0 30px 80px rgba(0,0,0,0.7)",
+            }}>
+              {/* Title bar */}
+              <div style={{ background: "#0a1612", padding: "10px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                <div style={{ display: "flex", gap: 5 }}>
+                  {["#FF5F57","#FFBD2E","#28CA41"].map(c => <div key={c} style={{ width: 9, height: 9, borderRadius: "50%", background: c }} />)}
+                </div>
+                <div style={{ flex: 1, textAlign: "center", fontSize: 10, color: "rgba(255,255,255,0.3)" }}>app.sensalie.com/business</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100, padding: "2px 8px" }}>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981", animation: "liveDot 1.5s ease-in-out infinite" }} />
+                  <span style={{ fontSize: 9, fontWeight: 700, color: "#10B981" }}>LIVE</span>
+                </div>
               </div>
 
-              {/* Main content */}
-              <div style={{ flex: 1, padding: "16px 16px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                  <div>
+              <div style={{ display: "flex" }}>
+                {/* Sidebar */}
+                <div style={{ width: 110, background: "rgba(255,255,255,0.03)", borderRight: "1px solid rgba(255,255,255,0.06)", padding: "14px 10px" }}>
+                  {["📋 Übersicht", "👥 Kunden", "💸 Empfehlungen", "⬛ Karten", "⚙️ Einstellungen"].map((item, i) => (
+                    <div key={i} style={{ padding: "7px 9px", borderRadius: 7, fontSize: 10, fontWeight: i === 0 ? 700 : 400, color: i === 0 ? "#10B981" : "rgba(255,255,255,0.3)", background: i === 0 ? "rgba(16,185,129,0.1)" : "transparent", marginBottom: 3 }}>{item}</div>
+                  ))}
+                </div>
+
+                {/* Main content */}
+                <div style={{ flex: 1, padding: "16px 16px" }}>
+                  <div style={{ marginBottom: 14 }}>
                     <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)" }}>Guten Morgen</div>
                     <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>Dein Unternehmen 👋</div>
                   </div>
-                </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
-                  {[
-                    { icon: "📈", label: "Umsatz", value: "€4.280", change: "+23%", hi: true },
-                    { icon: "👥", label: "Kunden", value: "847", change: "+18%", hi: false },
-                    { icon: "💸", label: "Empfehlungen", value: "234", change: "+31%", hi: true },
-                    { icon: "💰", label: "Provision", value: "€1.120", change: "+21%", hi: false },
-                  ].map((s, i) => (
-                    <div key={i} style={{
-                      background: s.hi ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.04)",
-                      border: `1px solid ${s.hi ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.07)"}`,
-                      borderRadius: 10, padding: "10px 11px",
-                      animation: visible ? `featureSlideIn 0.4s ease ${0.5 + i * 0.1}s both` : "none",
-                    }}>
-                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", marginBottom: 3 }}>{s.icon} {s.label}</div>
-                      <div style={{ fontSize: 17, fontWeight: 900, color: "#fff" }}>{s.value}</div>
-                      <div style={{ fontSize: 9, color: "#10B981", fontWeight: 600 }}>{s.change}</div>
-                    </div>
-                  ))}
-                </div>
+                  {/* 4 stat cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
+                    {[
+                      { icon: "📈", label: "Umsatz", value: "€4.280", change: "+23%", hi: true },
+                      { icon: "👥", label: "Kunden", value: "847", change: "+18%", hi: false },
+                      { icon: "💸", label: "Empfehlungen", value: "234", change: "+31%", hi: true },
+                      { icon: "💰", label: "Provision", value: "€1.120", change: "+21%", hi: false },
+                    ].map((s, i) => {
+                      const isHighlighted = activeTooltip === i;
+                      return (
+                        <div key={i} style={{
+                          background: s.hi ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.04)",
+                          border: isHighlighted
+                            ? "1.5px solid rgba(16,185,129,0.7)"
+                            : `1px solid ${s.hi ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.07)"}`,
+                          borderRadius: 10, padding: "10px 11px",
+                          transition: "border-color 0.35s ease, box-shadow 0.35s ease",
+                          boxShadow: isHighlighted ? "0 0 14px rgba(16,185,129,0.25)" : "none",
+                        }}>
+                          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", marginBottom: 3 }}>{s.icon} {s.label}</div>
+                          <div style={{ fontSize: 17, fontWeight: 900, color: "#fff" }}>{s.value}</div>
+                          <div style={{ fontSize: 9, color: "#10B981", fontWeight: 600 }}>{s.change}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
 
-                {/* Animated bar chart */}
-                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>Umsatz letzte 7 Tage</div>
-                <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 44 }}>
-                  {barHeights.map((h, i) => (
-                    <div key={i} style={{
-                      flex: 1, background: `linear-gradient(to top, #10B981, #34D399)`,
-                      borderRadius: "3px 3px 0 0", height: `${h}%`,
-                      opacity: 0.55 + i * 0.06,
-                      transition: "height 1.8s cubic-bezier(0.34,1.56,0.64,1)",
-                    }} />
-                  ))}
+                  {/* Bar chart */}
+                  <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>Umsatz letzte 7 Tage</div>
+                  <div style={{
+                    display: "flex", gap: 4, alignItems: "flex-end", height: 44,
+                    border: activeTooltip === 4 ? "1.5px solid rgba(16,185,129,0.5)" : "1.5px solid transparent",
+                    borderRadius: 8, padding: "0 4px",
+                    transition: "border-color 0.35s ease",
+                    boxShadow: activeTooltip === 4 ? "0 0 14px rgba(16,185,129,0.2)" : "none",
+                  }}>
+                    {barHeights.map((h, i) => (
+                      <div key={i} style={{
+                        flex: 1, background: "linear-gradient(to top, #10B981, #34D399)",
+                        borderRadius: "3px 3px 0 0", height: `${h}%`,
+                        opacity: 0.55 + i * 0.06,
+                        transition: "height 1.8s cubic-bezier(0.34,1.56,0.64,1)",
+                      }} />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Bottom floating pill */}
-          <div style={{
-            display: "flex", justifyContent: "center", marginTop: 14,
-            animation: visible ? "badgePop 0.5s 1.2s both" : "none",
-          }}>
-            <div style={{
-              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: 100, padding: "8px 18px",
-              display: "flex", alignItems: "center", gap: 10, fontSize: 11,
-            }}>
-              {["📊 Live-Daten", "🔔 Auto-Alerts", "📱 Mobile-ready"].map((t, i) => (
-                <span key={i} style={{ color: "rgba(255,255,255,0.45)", fontWeight: 600 }}>{t}</span>
+            {/* Progress dots */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 16 }}>
+              {DASH_TOOLTIPS.map((t, i) => (
+                <div key={i} style={{
+                  width: i === activeTooltip ? 20 : 6, height: 6, borderRadius: 100,
+                  background: i === activeTooltip ? "#10B981" : "rgba(255,255,255,0.15)",
+                  transition: "all 0.3s ease",
+                }} />
               ))}
+            </div>
+            <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
+              ↓ Weiter scrollen um alle Funktionen zu entdecken
             </div>
           </div>
         </div>
@@ -382,11 +413,11 @@ function StepsSlideSection() {
 
         {/* Connected steps with vertical line */}
         <div style={{ position: "relative" }}>
-          {/* Vertical connector line */}
+          {/* Vertical connector line — left edge of cards, subtle */}
           <div style={{
-            position: "absolute", left: 35, top: 40, bottom: 40,
-            width: 2,
-            background: "linear-gradient(to bottom, #10B981, rgba(16,185,129,0.1))",
+            position: "absolute", left: 0, top: 20, bottom: 20,
+            width: 1,
+            background: "linear-gradient(to bottom, rgba(16,185,129,0.4), rgba(16,185,129,0.05))",
             zIndex: 0,
           }} />
 
