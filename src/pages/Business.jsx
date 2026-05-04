@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import TeamBookingPreview from "@/components/business/TeamBookingPreview";
 import PlanSwitcher from "@/components/business/PlanSwitcher";
+import BusinessOnboarding from "@/components/business/BusinessOnboarding";
 
 // ── Hero Slideshow Bilder (Branchenimpressionen) ──────────────────────────────
 const HERO_SLIDES = [
@@ -540,6 +541,13 @@ function JuliaBizBot() {
 }
 
 export default function Business() {
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("sensalie_biz_onboarding_done"));
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem("sensalie_biz_onboarding_done", "1");
+    setShowOnboarding(false);
+  };
+
   const [currentPlan, setCurrentPlan] = useState(() => localStorage.getItem("sensalie_biz_plan") || "free");
 
   const handleChangePlan = (planId) => {
@@ -573,6 +581,8 @@ export default function Business() {
     : provisionValue.toFixed(2);
 
   return (
+    <>
+      {showOnboarding && <BusinessOnboarding onComplete={handleOnboardingComplete} />}
     <div style={{ minHeight: "100vh", background: "#0A1612", fontFamily: "'Inter', sans-serif", position: "relative", overflow: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Bricolage+Grotesque:wght@700;800&display=swap');
@@ -931,5 +941,6 @@ export default function Business() {
       {/* Julia Business Bot */}
       <JuliaBizBot />
     </div>
+    </>
   );
 }
