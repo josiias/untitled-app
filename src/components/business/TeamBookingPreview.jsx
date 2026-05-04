@@ -18,7 +18,7 @@ const MOCK_BOOKINGS = [
   { id: "b5", employee_id: "e3", time: "13:00", customer: "Hana B.", comment: "", status: "pending", confirmation_nr: "SEN-4825" },
 ];
 
-export default function TeamBookingPreview() {
+export default function TeamBookingPreview({ unlocked = false }) {
   return (
     <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, marginBottom: 16, position: "relative", overflow: "hidden" }}>
 
@@ -36,8 +36,8 @@ export default function TeamBookingPreview() {
         </div>
       </div>
 
-      {/* Preview Content — blurred */}
-      <div style={{ opacity: 0.28, pointerEvents: "none", padding: "0 24px 20px" }}>
+      {/* Preview Content — blurred when locked, fully interactive when unlocked */}
+      <div style={{ opacity: unlocked ? 1 : 0.28, pointerEvents: unlocked ? "auto" : "none", padding: "0 24px 20px" }}>
 
         {/* Employee cards */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 14 }}>
@@ -81,8 +81,8 @@ export default function TeamBookingPreview() {
         </div>
       </div>
 
-      {/* Lock Overlay */}
-      <div style={{
+      {/* Lock Overlay — nur wenn nicht freigeschaltet */}
+      {!unlocked && <div style={{
         position: "absolute", inset: 0, borderRadius: 20,
         background: "rgba(10,16,14,0.65)",
         backdropFilter: "blur(4px)",
@@ -119,7 +119,7 @@ export default function TeamBookingPreview() {
         <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", textAlign: "center" }}>
           Supabase-powered · Echtzeit-Sync · Benachrichtigungen
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

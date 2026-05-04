@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import TeamBookingPreview from "@/components/business/TeamBookingPreview";
+import PlanSwitcher from "@/components/business/PlanSwitcher";
 
 // ── Hero Slideshow Bilder (Branchenimpressionen) ──────────────────────────────
 const HERO_SLIDES = [
@@ -539,6 +540,16 @@ function JuliaBizBot() {
 }
 
 export default function Business() {
+  const [currentPlan, setCurrentPlan] = useState(() => localStorage.getItem("sensalie_biz_plan") || "free");
+
+  const handleChangePlan = (planId) => {
+    setCurrentPlan(planId);
+    localStorage.setItem("sensalie_biz_plan", planId);
+  };
+
+  const isPro = currentPlan === "pro";
+  const isPlus = currentPlan === "plus" || isPro;
+
   const [settings, setSettings] = useState({
     minAmountForStamp: "20",
     provisionAfterVisits: "3",
@@ -905,11 +916,14 @@ export default function Business() {
           ))}
         </div>
 
+        {/* Abo-Verwaltung */}
+        <PlanSwitcher currentPlan={currentPlan} onChangePlan={handleChangePlan} />
+
         {/* Rangliste */}
         <RankingSection />
 
-        {/* Team Booking — Pro Feature Preview */}
-        <TeamBookingPreview />
+        {/* Team Booking — Pro Feature (freigeschaltet wenn Pro, sonst gesperrt) */}
+        <TeamBookingPreview unlocked={isPro} />
 
 
       </div>
