@@ -598,7 +598,7 @@ export default function Business() {
           </div>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <a href="/BusinessAnalytics" style={{ fontSize: 13, color: "#10B981", textDecoration: "none", fontWeight: 600, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 8, padding: "5px 12px" }}>📈 Analyse</a>
-            <a href="/" style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textDecoration: "none", fontWeight: 500 }}>← Zurück</a>
+            <a href="/for-business" style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textDecoration: "none", fontWeight: 500 }}>← Zurück</a>
             <button onClick={() => setActiveSection(activeSection === 'profile' ? null : 'profile')} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "5px 12px", fontSize: 13, color: "rgba(255,255,255,0.6)", cursor: "pointer", fontFamily: "inherit" }}>⚙️ Profil</button>
           </div>
         </div>

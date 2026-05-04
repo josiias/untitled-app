@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import SiteFooter from "@/components/SiteFooter";
+import WaitingListForm from "@/components/WaitingListForm";
 
 const HERO_SLIDES = [
   { img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1400&q=80", label: "Barbershops" },
@@ -802,8 +804,17 @@ export default function CustomerLanding() {
       {/* Berlin Map */}
       <MapSection />
 
+      {/* Waiting List */}
+      <div style={{ padding: "0 20px 60px", background: "#0a1a10" }}>
+        <div style={{ maxWidth: 560, margin: "0 auto" }}>
+          <WaitingListForm variant="customer" />
+        </div>
+      </div>
+
       {/* ── CTA ── */}
       <CtaSection />
+
+      <SiteFooter />
     </div>
   );
 }

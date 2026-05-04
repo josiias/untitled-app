@@ -1,75 +1,39 @@
-import { useLocation } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { Link, useLocation } from 'react-router-dom';
 
+export default function PageNotFound() {
+  const location = useLocation();
 
-export default function PageNotFound({}) {
-    const location = useLocation();
-    const pageName = location.pathname.substring(1);
+  return (
+    <div style={{
+      minHeight: "100vh", background: "#0a1410",
+      fontFamily: "'Inter', sans-serif", color: "#fff",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      padding: "24px", textAlign: "center",
+    }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap');`}</style>
 
-    const { data: authData, isFetched } = useQuery({
-        queryKey: ['user'],
-        queryFn: async () => {
-            try {
-                const user = await base44.auth.me();
-                return { user, isAuthenticated: true };
-            } catch (error) {
-                return { user: null, isAuthenticated: false };
-            }
-        }
-    });
-    
-    return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
-            <div className="max-w-md w-full">
-                <div className="text-center space-y-6">
-                    {/* 404 Error Code */}
-                    <div className="space-y-2">
-                        <h1 className="text-7xl font-light text-slate-300">404</h1>
-                        <div className="h-0.5 w-16 bg-slate-200 mx-auto"></div>
-                    </div>
-                    
-                    {/* Main Message */}
-                    <div className="space-y-3">
-                        <h2 className="text-2xl font-medium text-slate-800">
-                            Page Not Found
-                        </h2>
-                        <p className="text-slate-600 leading-relaxed">
-                            The page <span className="font-medium text-slate-700">"{pageName}"</span> could not be found in this application.
-                        </p>
-                    </div>
-                    
-                    {/* Admin Note */}
-                    {isFetched && authData.isAuthenticated && authData.user?.role === 'admin' && (
-                        <div className="mt-8 p-4 bg-slate-100 rounded-lg border border-slate-200">
-                            <div className="flex items-start space-x-3">
-                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
-                                    <div className="w-2 h-2 rounded-full bg-orange-400"></div>
-                                </div>
-                                <div className="text-left space-y-1">
-                                    <p className="text-sm font-medium text-slate-700">Admin Note</p>
-                                    <p className="text-sm text-slate-600 leading-relaxed">
-                                        This could mean that the AI hasn't implemented this page yet. Ask it to implement it in the chat.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    
-                    {/* Action Button */}
-                    <div className="pt-6">
-                        <button 
-                            onClick={() => window.location.href = '/'} 
-                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
-                        >
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            Go Home
-                        </button>
-                    </div>
-                </div>
-            </div>
+      {/* Glow */}
+      <div style={{ position: "fixed", top: "30%", left: "50%", transform: "translateX(-50%)", width: 400, height: 400, background: "radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+      <div style={{ position: "relative", maxWidth: 440 }}>
+        <div style={{ fontSize: "clamp(80px,20vw,140px)", fontWeight: 900, color: "rgba(16,185,129,0.15)", lineHeight: 1, marginBottom: 0, userSelect: "none" }}>404</div>
+        <div style={{ fontSize: "clamp(22px,5vw,36px)", fontWeight: 900, color: "#fff", marginBottom: 12, marginTop: -16 }}>Seite nicht gefunden</div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.45)", marginBottom: 36, lineHeight: 1.6 }}>
+          Die Seite <span style={{ color: "rgba(255,255,255,0.7)", fontWeight: 600 }}>"{location.pathname}"</span> existiert nicht.
         </div>
-    )
+        <Link to="/" style={{
+          display: "inline-flex", alignItems: "center", gap: 8,
+          background: "#10B981", color: "#fff", fontWeight: 800, fontSize: 15,
+          padding: "14px 28px", borderRadius: 100, textDecoration: "none",
+          boxShadow: "0 8px 28px rgba(16,185,129,0.35)",
+        }}>
+          ← Zurück zur Startseite
+        </Link>
+        <div style={{ marginTop: 24, display: "flex", gap: 20, justifyContent: "center" }}>
+          <Link to="/for-business" style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>Für Unternehmer</Link>
+          <Link to="/customer" style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>Für Kunden</Link>
+        </div>
+      </div>
+    </div>
+  );
 }

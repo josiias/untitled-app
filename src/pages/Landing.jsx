@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import SiteFooter from "@/components/SiteFooter";
 
 export default function Landing() {
   return (
@@ -97,9 +98,15 @@ export default function Landing() {
         </Link>
       </div>
 
-      {/* Footer */}
-      <div style={{ marginTop: 48, fontSize: 12, color: "rgba(255,255,255,0.2)" }}>
-        © 2026 Sensalie · Einfach. Digital. Loyal.
+      {/* Footer links */}
+      <div style={{ marginTop: 48, display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center" }}>
+        {[
+          { label: "Impressum", to: "/impressum" },
+          { label: "Datenschutz", to: "/datenschutz" },
+        ].map(l => (
+          <Link key={l.to} to={l.to} style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{l.label}</Link>
+        ))}
+        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.15)" }}>© 2026 Sensalie</span>
       </div>
     </div>
   );

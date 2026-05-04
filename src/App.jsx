@@ -9,6 +9,9 @@ import KnowledgeBaseAdmin from './pages/KnowledgeBaseAdmin';
 import Landing from './pages/Landing';
 import CustomerLanding from './pages/CustomerLanding';
 import ForBusiness from './pages/ForBusiness';
+import Impressum from './pages/Impressum';
+import Datenschutz from './pages/Datenschutz';
+import CookieBanner from './components/CookieBanner';
 
 function App() {
   return (
@@ -24,7 +27,10 @@ function App() {
         <Route path="/app" element={<AppLanding />} />
         <Route path="/dashboard" element={<CustomerDashboard />} />
         <Route path="/admin/knowledge" element={<KnowledgeBaseAdmin />} />
+        <Route path="/impressum" element={<Impressum />} />
+        <Route path="/datenschutz" element={<Datenschutz />} />
       </Routes>
+      <CookieBanner />
     </BrowserRouter>
   )
 }
