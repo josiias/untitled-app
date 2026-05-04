@@ -5,6 +5,7 @@ import NotificationSettings, { useNotificationChecker } from "@/components/custo
 import LevelSystem, { calcUserStats, LEVELS } from "@/components/customer/LevelSystem";
 import { WelcomeBanner, TabHint } from "@/components/customer/OnboardingTooltips";
 import ProfilePage from "@/components/customer/ProfilePage";
+import CustomerOnboarding from "@/components/CustomerOnboarding";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -1113,6 +1114,9 @@ function QRModal({ onClose }) {
 // Onboarding Modal removed — replaced by inline WelcomeBanner + TabHint system
 
 export default function CustomerDashboard() {
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem("sensalie_onboarding_done");
+  });
   const [tab, setTab] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
@@ -1132,6 +1136,15 @@ export default function CustomerDashboard() {
     setAppointments(prev => ({ ...prev, [cardId]: appt }));
     setBookingCard(null);
   };
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem("sensalie_onboarding_done", "1");
+    setShowOnboarding(false);
+  };
+
+  if (showOnboarding) {
+    return <CustomerOnboarding onComplete={handleOnboardingComplete} />;
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "#111e28", fontFamily: "'Inter', sans-serif", color: "#fff", overflowX: "hidden", position: "relative" }}>
