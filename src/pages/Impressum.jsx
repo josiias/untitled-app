@@ -20,9 +20,9 @@ export default function Impressum() {
             title: "Verantwortlich",
             content: (
               <>
-                <p>Sensalie GmbH (in Gründung)</p>
-                <p>Musterstraße 1</p>
-                <p>10115 Berlin</p>
+                <p>Marvin Gognon</p>
+                <p>Kantstr. 8</p>
+                <p>51379 Leverkusen</p>
                 <p>Deutschland</p>
               </>
             ),
@@ -34,14 +34,6 @@ export default function Impressum() {
                 <p>E-Mail: <a href="mailto:info@sensalie.de" style={{ color: "#10B981" }}>info@sensalie.de</a></p>
               </>
             ),
-          },
-          {
-            title: "Vertreten durch",
-            content: <p>Geschäftsführung: [Name eintragen]</p>,
-          },
-          {
-            title: "Umsatzsteuer-ID",
-            content: <p>Umsatzsteuer-Identifikationsnummer gemäß §27a UStG: [USt-ID eintragen]</p>,
           },
           {
             title: "Haftungsausschluss",
