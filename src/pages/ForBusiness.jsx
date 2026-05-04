@@ -83,6 +83,10 @@ const PLANS = [
       { ok: true, text: "Echtzeit-Dashboard" },
       { ok: true, text: "WhatsApp Integration" },
       { ok: true, text: "Prioritäts-Support" },
+      { ok: true, text: "📅 Team-Terminbuchung (Mitarbeiter-Kalender)", highlight: true },
+      { ok: true, text: "👤 Mitarbeiter-Profile & Fotoauswahl", highlight: true },
+      { ok: true, text: "📊 Auslastungsübersicht je Mitarbeiter", highlight: true },
+      { ok: true, text: "✉️ Bestätigungsnummer & Kunden-Kommentare", highlight: true },
     ],
     cta: "Jetzt starten",
     ctaStyle: { background: "#F59E0B", color: "#fff" },
@@ -725,6 +729,12 @@ export default function ForBusiness() {
                           ? (plan.badge ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.5)")
                           : "rgba(255,255,255,0.22)",
                         animation: `featureSlideIn 0.4s ease ${fi * 0.05}s both`,
+                        background: f.highlight ? "rgba(245,158,11,0.07)" : "transparent",
+                        border: f.highlight ? "1px solid rgba(245,158,11,0.2)" : "none",
+                        borderRadius: f.highlight ? 8 : 0,
+                        padding: f.highlight ? "5px 8px" : "0",
+                        marginLeft: f.highlight ? -8 : 0,
+                        marginRight: f.highlight ? -8 : 0,
                       }}
                     >
                       <span style={{
@@ -732,13 +742,15 @@ export default function ForBusiness() {
                         fontWeight: 700,
                         fontSize: 13,
                         color: f.ok
-                          ? (plan.badge ? "#10B981" : "rgba(255,255,255,0.35)")
+                          ? (f.highlight ? "#F59E0B" : plan.badge ? "#10B981" : "rgba(255,255,255,0.35)")
                           : "#EF4444",
-                        animation: !f.ok ? `featureSlideIn 0.4s ease ${fi * 0.05 + 0.1}s both` : "none",
                       }}>
                         {f.ok ? "✓" : "✕"}
                       </span>
                       {f.text}
+                      {f.highlight && (
+                        <span style={{ marginLeft: "auto", fontSize: 8, fontWeight: 800, color: "#F59E0B", background: "rgba(245,158,11,0.15)", borderRadius: 4, padding: "2px 5px", whiteSpace: "nowrap" }}>NEU</span>
+                      )}
                     </div>
                   ))}
                 </div>

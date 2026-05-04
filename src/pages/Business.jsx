@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import TeamBookingPreview from "@/components/business/TeamBookingPreview";
 
 // ── Hero Slideshow Bilder (Branchenimpressionen) ──────────────────────────────
 const HERO_SLIDES = [
@@ -906,6 +907,10 @@ export default function Business() {
 
         {/* Rangliste */}
         <RankingSection />
+
+        {/* Team Booking — Pro Feature Preview */}
+        <TeamBookingPreview />
+
 
       </div>
 
