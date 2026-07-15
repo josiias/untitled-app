@@ -56,12 +56,11 @@ export default function EmployeeDashboard() {
       const biz = await base44.entities.Business.filter({ id: emp.business_id }, "-created_date", 1);
       if (biz.length > 0) setBusiness(biz[0]);
 
-      // Heutige Termine
-      const appts = await base44.entities.Appointment.filter({
-        employee_id: emp.id,
-        date: todayISO()
-      }, "time");
-      setAppointments(appts);
+      // Alle Termine des Mitarbeiters (für Kalender-Navigation)
+      const allAppts = await base44.entities.Appointment.filter({
+        employee_id: emp.id
+      }, "date");
+      setAppointments(allAppts);
 
       // Offene Prämien des Geschäfts
       const rw = await base44.entities.Reward.filter({
@@ -156,50 +155,240 @@ export default function EmployeeDashboard() {
 }
 
 // ── Termine Tab ─────────────────────────────────────────────────────────────
-function AppointmentsTab({ appointments, onUpdate }) {
-  if (appointments.length === 0) {
-    return <EmptyState icon="📅" title="Keine Termine heute" description="Für heute sind keine Termine bei dir gebucht." />;
+const STATUS_META = {
+  confirmed: { label: "Bestätigt", color: "#10B981", bg: "rgba(16,185,129,0.15)" },
+  pending:   { label: "Offen",     color: "#F59E0B", bg: "rgba(245,158,11,0.15)" },
+  completed: { label: "Fertig",    color: "#6366F1", bg: "rgba(99,102,241,0.15)" },
+  cancelled: { label: "Storniert", color: "#EF4444", bg: "rgba(239,68,68,0.15)" },
+};
+
+const MOCK_SLOTS = ["09:00","09:30","10:00","10:30","11:00","11:30","12:00","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00"];
+
+function buildDateStrip(numDays = 14) {
+  const days = [];
+  const base = new Date();
+  for (let i = 0; i < numDays; i++) {
+    const d = new Date(base);
+    d.setDate(base.getDate() + i);
+    days.push(d.toISOString().split("T")[0]);
   }
+  return days;
+}
+
+function formatNiceDate(iso) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "short" });
+}
+
+function AppointmentsTab({ appointments, onUpdate }) {
+  const [selectedDate, setSelectedDate] = useState(todayISO());
+  const [rescheduleAppt, setRescheduleAppt] = useState(null);
+  const dateStrip = buildDateStrip(14);
+
+  const dayAppointments = appointments
+    .filter(a => a.date === selectedDate)
+    .sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+
+  const statusCounts = (["confirmed","pending","completed","cancelled"]).map(st => ({
+    ...STATUS_META[st], key: st, count: dayAppointments.filter(a => a.status === st).length
+  })).filter(s => s.count > 0);
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>
-        {appointments.length} Termin(e) heute · {new Date().toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long" })}
-      </div>
-      {appointments.map(appt => (
-        <div key={appt.id} style={{ background: "#1a2530", border: `1px solid ${appt.status === "cancelled" ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 16, padding: "14px 16px", opacity: appt.status === "cancelled" ? 0.5 : 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ background: "rgba(16,185,129,0.12)", borderRadius: 12, padding: "10px 12px", textAlign: "center", minWidth: 56 }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "#10B981" }}>{appt.time}</div>
-              <div style={{ fontSize: 8, color: "rgba(255,255,255,0.3)", textTransform: "uppercase" }}>Uhr</div>
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{appt.customer_name || "Kunde"}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{appt.customer_phone}</div>
-              {appt.comment && (
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 6, background: "rgba(255,255,255,0.04)", borderRadius: 8, padding: "6px 8px" }}>💬 {appt.comment}</div>
-              )}
-            </div>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontFamily: "monospace", marginBottom: 6 }}>{appt.confirmation_nr}</div>
-              <span style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6,
-                background: appt.status === "confirmed" ? "rgba(16,185,129,0.15)" : appt.status === "pending" ? "rgba(245,158,11,0.15)" : appt.status === "completed" ? "rgba(99,102,241,0.15)" : "rgba(239,68,68,0.15)",
-                color: appt.status === "confirmed" ? "#10B981" : appt.status === "pending" ? "#F59E0B" : appt.status === "completed" ? "#6366F1" : "#EF4444" }}>
-                {appt.status === "confirmed" ? "Bestätigt" : appt.status === "pending" ? "Offen" : appt.status === "completed" ? "Fertig" : "Storniert"}
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {/* Date strip */}
+      <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>
+        {dateStrip.map(iso => {
+          const count = appointments.filter(a => a.date === iso && a.status !== "cancelled").length;
+          const isToday = iso === todayISO();
+          const isSelected = iso === selectedDate;
+          const d = new Date(iso + "T00:00:00");
+          return (
+            <button key={iso} onClick={() => setSelectedDate(iso)} style={{
+              flexShrink: 0, minWidth: 52, padding: "10px 6px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit",
+              background: isSelected ? "#10B981" : "rgba(255,255,255,0.04)",
+              border: isSelected ? "none" : "1px solid rgba(255,255,255,0.07)",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 2, transition: "all 0.2s",
+            }}>
+              <span style={{ fontSize: 9, fontWeight: 700, color: isSelected ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.35)", textTransform: "uppercase" }}>
+                {isToday ? "Heute" : d.toLocaleDateString("de-DE", { weekday: "short" })}
               </span>
-            </div>
-          </div>
-          {/* Action buttons */}
-          {appt.status !== "cancelled" && appt.status !== "completed" && (
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              {appt.status === "pending" && (
-                <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "confirmed" }); onUpdate(); }} style={{ flex: 1, padding: "9px", background: "#10B981", color: "#fff", border: "none", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Bestätigen</button>
+              <span style={{ fontSize: 16, fontWeight: 800, color: isSelected ? "#fff" : "rgba(255,255,255,0.6)" }}>{d.getDate()}</span>
+              {count > 0 && (
+                <span style={{ fontSize: 8, fontWeight: 700, color: isSelected ? "#fff" : "#10B981", marginTop: 1 }}>{count} Termin{count > 1 ? "e" : ""}</span>
               )}
-              <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "completed" }); onUpdate(); }} style={{ flex: 1, padding: "9px", background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#6366F1", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Abschließen</button>
-              <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "cancelled" }); onUpdate(); }} style={{ padding: "9px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Stornieren</button>
-            </div>
-          )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Header + status summary */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{new Date(selectedDate + "T00:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long" })}</div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{dayAppointments.length} Termin(e) an diesem Tag</div>
         </div>
-      ))}
+        {statusCounts.length > 0 && (
+          <div style={{ display: "flex", gap: 5, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            {statusCounts.map(s => (
+              <span key={s.key} style={{ fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: s.bg, color: s.color }}>{s.count} {s.label}</span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Appointment cards */}
+      {dayAppointments.length === 0 ? (
+        <EmptyState icon="📅" title="Keine Termine" description="An diesem Tag sind keine Termine bei dir gebucht." />
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {dayAppointments.map(appt => {
+            const meta = STATUS_META[appt.status] || STATUS_META.pending;
+            const isCancelled = appt.status === "cancelled";
+            const isCompleted = appt.status === "completed";
+            return (
+              <div key={appt.id} style={{
+                background: "#1a2530",
+                border: `1px solid ${isCancelled ? "rgba(239,68,68,0.2)" : meta.key === "pending" ? "rgba(245,158,11,0.15)" : "rgba(255,255,255,0.07)"}`,
+                borderRadius: 16, padding: "16px", opacity: isCancelled ? 0.55 : 1,
+                boxShadow: meta.key === "pending" ? "0 2px 12px rgba(245,158,11,0.08)" : "none",
+              }}>
+                {/* Top row: time + customer + status */}
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <div style={{ background: `${meta.color}1A`, border: `1px solid ${meta.color}44`, borderRadius: 12, padding: "10px 12px", textAlign: "center", minWidth: 58, flexShrink: 0 }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: meta.color }}>{appt.time}</div>
+                    <div style={{ fontSize: 8, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", marginTop: 1 }}>Uhr</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
+                      {appt.customer_name || "Kunde"}
+                      {isCancelled && <span style={{ fontSize: 11 }}>🚫</span>}
+                      {isCompleted && <span style={{ fontSize: 11 }}>✅</span>}
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 3, display: "flex", alignItems: "center", gap: 6 }}>
+                      <Phone size={11} /> {appt.customer_phone || "—"}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, padding: "4px 10px", borderRadius: 6, background: meta.bg, color: meta.color, display: "inline-block" }}>
+                      {meta.label}
+                    </span>
+                    <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontFamily: "monospace", marginTop: 6 }}>{appt.confirmation_nr}</div>
+                  </div>
+                </div>
+
+                {/* Customer wish / comment */}
+                {appt.comment && (
+                  <div style={{ marginTop: 12, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 10, padding: "10px 12px" }}>
+                    <div style={{ fontSize: 9, fontWeight: 800, color: "#F59E0B", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>💬 Kundenwunsch</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", lineHeight: 1.5 }}>{appt.comment}</div>
+                  </div>
+                )}
+
+                {/* Action buttons */}
+                {!isCancelled && !isCompleted && (
+                  <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+                    {appt.status === "pending" && (
+                      <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "confirmed" }); onUpdate(); }} style={{ flex: 1, padding: "10px", background: "#10B981", color: "#fff", border: "none", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>✓ Bestätigen</button>
+                    )}
+                    <button onClick={() => setRescheduleAppt(appt)} style={{ flex: 1, padding: "10px", background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", color: "#818CF8", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>📅 Verschieben</button>
+                    <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "completed" }); onUpdate(); }} style={{ flex: 1, padding: "10px", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", color: "#10B981", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>✓ Fertig</button>
+                    <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "cancelled" }); onUpdate(); }} style={{ padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Stornieren</button>
+                  </div>
+                )}
+
+                {/* Rescheduled note */}
+                {isCancelled && (
+                  <div style={{ marginTop: 10, fontSize: 11, color: "rgba(239,68,68,0.6)", display: "flex", alignItems: "center", gap: 6 }}>
+                    🚫 Dieser Termin wurde storniert
+                  </div>
+                )}
+                {isCompleted && (
+                  <div style={{ marginTop: 10, fontSize: 11, color: "rgba(99,102,241,0.6)", display: "flex", alignItems: "center", gap: 6 }}>
+                    ✅ Dieser Termin wurde abgeschlossen
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Reschedule Modal */}
+      {rescheduleAppt && (
+        <RescheduleModal
+          appt={rescheduleAppt}
+          onClose={() => setRescheduleAppt(null)}
+          onReschedule={async (newDate, newTime) => {
+            await base44.entities.Appointment.update(rescheduleAppt.id, { date: newDate, time: newTime, status: "confirmed" });
+            setRescheduleAppt(null);
+            onUpdate();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Verschieben Modal ───────────────────────────────────────────────────────
+function RescheduleModal({ appt, onClose, onReschedule }) {
+  const [newDate, setNewDate] = useState(appt.date);
+  const [newTime, setNewTime] = useState(null);
+  const dateStrip = buildDateStrip(14);
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "#111e28", borderRadius: "24px 24px 0 0", border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "24px 24px 40px" }}>
+        <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 100, margin: "0 auto 18px" }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
+          <div style={{ width: 40, height: 40, background: "rgba(99,102,241,0.15)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📅</div>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Termin verschieben</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{appt.customer_name} · aktuell {formatNiceDate(appt.date)} {appt.time}</div>
+          </div>
+        </div>
+
+        {/* Date picker */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Neues Datum</div>
+          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
+            {dateStrip.map(iso => {
+              const isSelected = iso === newDate;
+              const d = new Date(iso + "T00:00:00");
+              return (
+                <button key={iso} onClick={() => { setNewDate(iso); setNewTime(null); }} style={{
+                  flexShrink: 0, minWidth: 56, padding: "10px 6px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "inherit",
+                  background: isSelected ? "#818CF8" : "rgba(255,255,255,0.05)",
+                  display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: isSelected ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.35)" }}>{d.toLocaleDateString("de-DE", { weekday: "short" })}</span>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: isSelected ? "#fff" : "rgba(255,255,255,0.6)" }}>{d.getDate()}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Time slots */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Uhrzeit wählen</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+            {MOCK_SLOTS.map(slot => (
+              <button key={slot} onClick={() => setNewTime(slot)} style={{
+                padding: "10px 6px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 13, fontWeight: 700,
+                background: newTime === slot ? "#818CF8" : "rgba(255,255,255,0.05)",
+                color: newTime === slot ? "#fff" : "rgba(255,255,255,0.6)",
+              }}>{slot}</button>
+            ))}
+          </div>
+        </div>
+
+        <button onClick={() => newTime && onReschedule(newDate, newTime)} disabled={!newTime} style={{
+          width: "100%", padding: "14px", background: !newTime ? "rgba(255,255,255,0.08)" : "#818CF8", color: "#fff", border: "none", borderRadius: 14, fontSize: 15, fontWeight: 800, cursor: newTime ? "pointer" : "not-allowed", fontFamily: "inherit",
+        }}>
+          {newTime ? `Verschieben auf ${formatNiceDate(newDate)} ${newTime}` : "Uhrzeit auswählen"}
+        </button>
+      </div>
     </div>
   );
 }
