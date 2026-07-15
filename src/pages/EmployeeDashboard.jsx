@@ -288,11 +288,11 @@ function AppointmentsTab({ appointments, onUpdate }) {
                 {!isCancelled && !isCompleted && (
                   <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
                     {appt.status === "pending" && (
-                      <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "confirmed" }); onUpdate(); }} style={{ flex: 1, padding: "10px", background: "#10B981", color: "#fff", border: "none", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>✓ Bestätigen</button>
+                      <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "confirmed" }); try { await base44.entities.CustomerNotification.create({ customer_phone: appt.customer_phone, title: "Termin bestätigt ✅", body: `Dein Termin am ${new Date(appt.date+"T00:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"short"})} um ${appt.time} Uhr wurde bestätigt.`, type: "appointment_confirmed", icon: "✅", read: false }); } catch(e){} onUpdate(); }} style={{ flex: 1, padding: "10px", background: "#10B981", color: "#fff", border: "none", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>✓ Bestätigen</button>
                     )}
                     <button onClick={() => setRescheduleAppt(appt)} style={{ flex: 1, padding: "10px", background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", color: "#818CF8", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>📅 Verschieben</button>
-                    <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "completed" }); onUpdate(); }} style={{ flex: 1, padding: "10px", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", color: "#10B981", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>✓ Fertig</button>
-                    <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "cancelled" }); onUpdate(); }} style={{ padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Stornieren</button>
+                    <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "completed" }); try { await base44.entities.CustomerNotification.create({ customer_phone: appt.customer_phone, title: "Termin abgeschlossen ✓", body: `Dein Termin am ${new Date(appt.date+"T00:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"short"})} wurde als abgeschlossen markiert. Danke für deinen Besuch!`, type: "appointment_completed", icon: "✓", read: false }); } catch(e){} onUpdate(); }} style={{ flex: 1, padding: "10px", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", color: "#10B981", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>✓ Fertig</button>
+                    <button onClick={async () => { await base44.entities.Appointment.update(appt.id, { status: "cancelled" }); try { await base44.entities.CustomerNotification.create({ customer_phone: appt.customer_phone, title: "Termin storniert 🚫", body: `Dein Termin am ${new Date(appt.date+"T00:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"short"})} um ${appt.time} Uhr wurde storniert. Bei Fragen melde dich gerne.`, type: "appointment_cancelled", icon: "🚫", read: false }); } catch(e){} onUpdate(); }} style={{ padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Stornieren</button>
                   </div>
                 )}
 
@@ -320,6 +320,7 @@ function AppointmentsTab({ appointments, onUpdate }) {
           onClose={() => setRescheduleAppt(null)}
           onReschedule={async (newDate, newTime) => {
             await base44.entities.Appointment.update(rescheduleAppt.id, { date: newDate, time: newTime, status: "confirmed" });
+            try { await base44.entities.CustomerNotification.create({ customer_phone: rescheduleAppt.customer_phone, title: "Termin verschoben 📅", body: `Dein Termin wurde auf ${new Date(newDate+"T00:00:00").toLocaleDateString("de-DE",{weekday:"long",day:"2-digit",month:"long"})} um ${newTime} Uhr verschoben.`, type: "appointment_rescheduled", icon: "📅", read: false }); } catch(e){}
             setRescheduleAppt(null);
             onUpdate();
           }}
@@ -454,6 +455,7 @@ function StampTab({ business }) {
           reward_description: business.reward_description,
           status: "bereit"
         });
+        try { await base44.entities.CustomerNotification.create({ customer_phone: customer.phone, customer_id: customer.id, title: "Prämie bereit 🎁", body: `Herzlichen Glückwunsch! Deine Prämie "${business.reward_description}" kann bei ${business.name} abgeholt werden.`, type: "reward_ready", icon: "🎁", read: false }); } catch(e){}
         rewardCreated = true;
         newStamps = 0;
       }

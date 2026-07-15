@@ -1,0 +1,52 @@
+{
+  "name": "CustomerNotification",
+  "type": "object",
+  "properties": {
+    "customer_phone": {
+      "type": "string",
+      "description": "Telefonnummer des Kunden"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "Optionale Kunden-ID"
+    },
+    "title": {
+      "type": "string",
+      "description": "Kurzer Titel"
+    },
+    "body": {
+      "type": "string",
+      "description": "Detail-Text der Benachrichtigung"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "appointment_confirmed",
+        "appointment_cancelled",
+        "appointment_rescheduled",
+        "appointment_completed",
+        "reward_ready",
+        "stamp_progress",
+        "reward_expiry",
+        "info"
+      ],
+      "default": "info",
+      "description": "Art der Benachrichtigung"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji-Icon"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Wurde die Benachrichtigung gelesen?"
+    }
+  },
+  "required": [
+    "customer_phone",
+    "title",
+    "body"
+  ],
+  "description": "In-App Benachrichtigung f\u00fcr Kunden"
+}

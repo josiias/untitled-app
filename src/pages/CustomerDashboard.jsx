@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import SuggestBusinessTab from "@/components/customer/SuggestBusinessTab";
 import SupportChatTab from "@/components/customer/SupportChatTab";
 import NotificationSettings, { useNotificationChecker } from "@/components/customer/NotificationSettings";
+import NotificationBell from "@/components/customer/NotificationBell";
 import LevelSystem, { calcUserStats, LEVELS } from "@/components/customer/LevelSystem";
 import { WelcomeBanner, TabHint } from "@/components/customer/OnboardingTooltips";
 import ProfilePage from "@/components/customer/ProfilePage";
@@ -1196,6 +1197,7 @@ export default function CustomerDashboard() {
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>Mitglied seit {USER.since}</div>
             </div>
           </div>
+          <NotificationBell customerPhone={USER.phone} />
           {/* Hamburger menu */}
           <button onClick={() => setMenuOpen(v => !v)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "9px 12px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, alignItems: "center", justifyContent: "center" }}>
             <div style={{ width: 18, height: 2, background: "rgba(255,255,255,0.6)", borderRadius: 2 }} />
