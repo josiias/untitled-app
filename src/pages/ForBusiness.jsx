@@ -28,7 +28,7 @@ const T = {
     nav_login: "Login",
     nav_cta: "Kostenlos starten",
     hero_h1: "Wachstum durch Kunden,\ndie wirklich hinter dir\nstehen.",
-    hero_cta: "Kostenlos starten →",
+    hero_cta: "Kostenlos starten",
     hero_how: "So funktioniert's",
     hero_demo: "🚀 Demo ausprobieren",
     stats_label: "WARUM SENSALIE?",
@@ -50,13 +50,13 @@ const T = {
     price_bird: "🐦 Early-Bird-Aktion — jetzt bis zu 50% günstiger!",
     cta_h2: "Kostenlos starten.\nKein Risiko. Kein Vertrag.",
     cta_sub: "Starte noch heute — in 2 Minuten eingerichtet. Deine Kunden werden es lieben.",
-    cta_btn: "Jetzt kostenlos registrieren →",
+    cta_btn: "Jetzt kostenlos registrieren",
   },
   en: {
     nav_login: "Login",
     nav_cta: "Get started free",
     hero_h1: "Growth through customers\nwho truly stand\nbehind you.",
-    hero_cta: "Get started free →",
+    hero_cta: "Get started free",
     hero_how: "How it works",
     hero_demo: "🚀 Try the demo",
     stats_label: "WHY SENSALIE?",
@@ -78,7 +78,7 @@ const T = {
     price_bird: "🐦 Early-Bird offer — up to 50% off!",
     cta_h2: "Start for free.\nNo risk. No contract.",
     cta_sub: "Get started today — set up in 2 minutes. Your customers will love it.",
-    cta_btn: "Register for free now →",
+    cta_btn: "Register for free now",
   },
 };
 
