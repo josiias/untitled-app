@@ -46,6 +46,7 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(false);
         }
         setIsLoadingPublicSettings(false);
+        setAuthChecked(true);
       } catch (appError) {
         console.error('App state check failed:', appError);
         
