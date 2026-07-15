@@ -597,9 +597,6 @@ export default function ForBusiness() {
             <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>{t.price_label}</div>
             <h2 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: 900, margin: "0 0 10px", color: "#fff" }}>{t.price_h2}</h2>
             <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, marginBottom: 20 }}>{t.price_sub}</div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 100, padding: "8px 20px", fontSize: 13, fontWeight: 700, color: "#F59E0B" }}>
-              {t.price_bird}
-            </div>
           </div>
           <div className="biz-plans-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, alignItems: "start" }}>
             {PLANS.map(plan => (
@@ -614,7 +611,6 @@ export default function ForBusiness() {
                   <div style={{ marginBottom: 20 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                       <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", textDecoration: "line-through" }}>{plan.regularPrice}</span>
-                      <span style={{ background: "#F59E0B", color: "#000", fontSize: 9, fontWeight: 900, borderRadius: 100, padding: "2px 7px" }}>EARLY BIRD</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
                       <span style={{ fontSize: 40, fontWeight: 900, color: plan.pulse === "amber" ? "#F59E0B" : "#10B981" }}>{plan.price}</span>
