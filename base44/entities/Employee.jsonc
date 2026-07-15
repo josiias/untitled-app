@@ -14,9 +14,13 @@
       "type": "string",
       "description": "Zugeh\u00f6riges Gesch\u00e4ft"
     },
+    "email": {
+      "type": "string",
+      "description": "E-Mail f\u00fcr Login-Zuordnung (muss mit App-User \u00fcbereinstimmen)"
+    },
     "user_id": {
       "type": "string",
-      "description": "Verkn\u00fcpfung zum App-User (f\u00fcr Login)"
+      "description": "Verkn\u00fcpfung zum App-User (optional, wird nach Invite gesetzt)"
     },
     "photo_url": {
       "type": "string",
@@ -30,11 +34,37 @@
       "type": "boolean",
       "default": true,
       "description": "Ist der Mitarbeiter aktuell aktiv?"
+    },
+    "notify_new_appointment": {
+      "type": "boolean",
+      "default": true,
+      "description": "Benachrichtigung: Neuer Termin gebucht"
+    },
+    "notify_cancellation": {
+      "type": "boolean",
+      "default": true,
+      "description": "Benachrichtigung: Termin storniert"
+    },
+    "notify_stamp_confirmation": {
+      "type": "boolean",
+      "default": false,
+      "description": "Benachrichtigung: Stempel best\u00e4tigt"
+    },
+    "notify_reward_ready": {
+      "type": "boolean",
+      "default": true,
+      "description": "Benachrichtigung: Pr\u00e4mie bereit zur Abholung"
+    },
+    "notify_daily_summary": {
+      "type": "boolean",
+      "default": true,
+      "description": "T\u00e4gliche Zusammenfassung der Termine"
     }
   },
   "required": [
     "name",
-    "business_id"
+    "business_id",
+    "email"
   ],
   "description": "Mitarbeiter eines Gesch\u00e4fts mit eigenem Dashboard-Zugang"
 }

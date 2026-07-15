@@ -3,6 +3,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import TeamBookingPreview from "@/components/business/TeamBookingPreview";
 import PlanSwitcher from "@/components/business/PlanSwitcher";
 import BusinessOnboarding from "@/components/business/BusinessOnboarding";
+import EmployeeManagement from "@/components/business/EmployeeManagement";
 import EmptyState from "@/components/EmptyState";
 
 // ── Hero Slideshow Bilder (Branchenimpressionen) ──────────────────────────────
@@ -664,12 +665,18 @@ export default function Business() {
             <button className={`ghost-btn${activeSection === 'commission' ? ' active' : ''}`} onClick={() => setActiveSection(activeSection === 'commission' ? null : 'commission')}>
               💶 Provisionsmodell
             </button>
+            <button className={`ghost-btn${activeSection === 'team' ? ' active' : ''}`} onClick={() => setActiveSection(activeSection === 'team' ? null : 'team')}>
+              👥 Team
+            </button>
           </div>
           </div>
         </div>
 
         {/* QR Section */}
         {activeSection === 'qr' && <QRCodeSection businessId={DEMO_BUSINESS_ID} businessName={BUSINESS_NAME} />}
+
+        {/* Team Management */}
+        {activeSection === 'team' && <EmployeeManagement businessId={DEMO_BUSINESS_ID} businessName={BUSINESS_NAME} />}
 
         {/* Stamp Settings */}
         {activeSection === 'stamp' && (

@@ -8,6 +8,15 @@ const TABS = [
   { id: "appointments", icon: "📅", label: "Termine" },
   { id: "stamp", icon: "✅", label: "Stempeln" },
   { id: "rewards", icon: "🎁", label: "Prämien" },
+  { id: "notifications", icon: "🔔", label: "Info" },
+];
+
+const NOTIFICATION_LABELS = [
+  { key: "notify_new_appointment", icon: "📅", label: "Neuer Termin gebucht", desc: "Wenn ein Kunde einen Termin bei dir bucht" },
+  { key: "notify_cancellation", icon: "❌", label: "Termin storniert", desc: "Wenn ein Kunde einen Termin absagt" },
+  { key: "notify_stamp_confirmation", icon: "✅", label: "Stempel bestätigt", desc: "Bei jedem von dir bestätigten Stempel" },
+  { key: "notify_reward_ready", icon: "🎁", label: "Prämie bereit", desc: "Wenn eine Belohnung abholbereit ist" },
+  { key: "notify_daily_summary", icon: "📊", label: "Tägliche Zusammenfassung", desc: "Morgens ein Überblick deiner heutigen Termine" },
 ];
 
 function genConfirmationNr() {
@@ -33,8 +42,8 @@ export default function EmployeeDashboard() {
       setError(null);
       const user = await base44.auth.me();
 
-      // Mitarbeiter-Profil des eingeloggten Users finden
-      const emps = await base44.entities.Employee.filter({ user_id: user.id }, "-created_date", 1);
+      // Mitarbeiter-Profil des eingeloggten Users finden (Match per E-Mail)
+      const emps = await base44.entities.Employee.filter({ email: user.email }, "-created_date", 1);
       if (emps.length === 0) {
         setError("Kein Mitarbeiter-Profil mit deinem Konto verknüpft. Bitte den Geschäftsinhaber bitten, dich anzulegen.");
         setLoading(false);
@@ -140,6 +149,7 @@ export default function EmployeeDashboard() {
         {tab === "appointments" && <AppointmentsTab appointments={appointments} employee={employee} onUpdate={loadData} />}
         {tab === "stamp" && <StampTab business={business} />}
         {tab === "rewards" && <RewardsTab rewards={rewards} onUpdate={loadData} />}
+        {tab === "notifications" && <NotificationsTab employee={employee} onUpdate={loadData} />}
       </div>
     </div>
   );
@@ -374,6 +384,60 @@ function RewardsTab({ rewards, onUpdate }) {
           <button onClick={async () => { await base44.entities.Reward.update(rw.id, { status: "eingelöst" }); onUpdate(); }} style={{ width: "100%", padding: "10px", background: "#10B981", color: "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Als eingelöst markieren</button>
         </div>
       ))}
+    </div>
+  );
+}
+
+// ── Benachrichtigungen Tab ───────────────────────────────────────────────────
+function NotificationsTab({ employee, onUpdate }) {
+  const [toggling, setToggling] = useState(null);
+
+  const toggle = async (key, currentVal) => {
+    try {
+      setToggling(key);
+      await base44.entities.Employee.update(employee.id, { [key]: !currentVal });
+      onUpdate();
+    } catch (err) {
+      // silent
+    } finally {
+      setToggling(null);
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Deine Benachrichtigungen</div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.5 }}>Hier siehst du, über welche Ereignisse du informiert wirst. Dein Geschäftsinhaber kann diese ebenfalls anpassen.</div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {NOTIFICATION_LABELS.map(n => {
+          const enabled = employee[n.key];
+          return (
+            <div key={n.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#1a2530", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: enabled ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{n.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{n.label}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{n.desc}</div>
+                </div>
+              </div>
+              <button onClick={() => toggle(n.key, enabled)} disabled={toggling === n.key} style={{ width: 44, height: 24, borderRadius: 100, border: "none", cursor: "pointer", background: enabled ? "#10B981" : "rgba(255,255,255,0.15)", position: "relative", transition: "background 0.2s", flexShrink: 0, opacity: toggling === n.key ? 0.5 : 1 }}>
+                <div style={{ position: "absolute", top: 2, left: enabled ? 22 : 2, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "left 0.2s" }} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 14, padding: "16px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <span style={{ fontSize: 16 }}>📬</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#6366F1" }}>Wie erhältst du Benachrichtigungen?</span>
+        </div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>Benachrichtigungen erscheinen direkt in der App und als E-Mail an <span style={{ color: "#fff", fontWeight: 600 }}>{employee?.email || "deine Adresse"}</span>.</div>
+      </div>
     </div>
   );
 }
