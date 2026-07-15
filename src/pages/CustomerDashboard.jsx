@@ -6,6 +6,8 @@ import LevelSystem, { calcUserStats, LEVELS } from "@/components/customer/LevelS
 import { WelcomeBanner, TabHint } from "@/components/customer/OnboardingTooltips";
 import ProfilePage from "@/components/customer/ProfilePage";
 import CustomerOnboarding from "@/components/CustomerOnboarding";
+import EmptyState from "@/components/EmptyState";
+import LoadingState from "@/components/LoadingState";
 
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 const USER = { name: "Max Mustermann", phone: "0151 234 567 89", avatar: "MM", since: "März 2026" };
@@ -812,6 +814,14 @@ function HomeTab({ onTabChange, appointments, onBookAppointment }) {
 
 // ── Cards Tab ──────────────────────────────────────────────────────────────────
 function CardsTab({ appointments, onBookAppointment }) {
+  if (STAMP_CARDS.length === 0) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Deine Stempelkarten</div>
+        <EmptyState icon="🪪" title="Noch keine Stempelkarten" description="Scanne den QR-Code eines Partnergeschäfts, um deine erste Karte zu starten." />
+      </div>
+    );
+  }
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Deine {STAMP_CARDS.length} Stempelkarten</div>
@@ -831,7 +841,11 @@ function RewardsTab() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Deine Prämien</div>
-      {REWARDS.map(r => (
+      {REWARDS.length === 0 ? (
+        <EmptyState icon="🎁" title="Noch keine Prämien" description="Sammle Stempel, um deine erste Prämie freizuschalten." />
+      ) : (
+        <>
+        {REWARDS.map(r => (
         <div key={r.id} style={{
           background: "#1a2530", border: r.status === "bereit" ? "1.5px solid rgba(16,185,129,0.4)" : "1px solid rgba(255,255,255,0.07)",
           borderRadius: 20, overflow: "hidden",
@@ -871,6 +885,8 @@ function RewardsTab() {
         <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>Weitere Prämien freischalten</div>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", lineHeight: 1.5 }}>Sammle weiter Stempel und sichere dir mehr Belohnungen</div>
       </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1021,6 +1037,9 @@ function ReferralTab() {
       {/* History */}
       <div>
         <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>Empfehlungsverlauf</div>
+        {REFERRAL_STATS.history.length === 0 ? (
+          <EmptyState icon="💸" title="Noch keine Empfehlungen" description="Teile deinen Link, um hier deine ersten Provisionen zu sehen." />
+        ) : (
         <div style={{ background: "#1a2530", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, overflow: "hidden" }}>
           {REFERRAL_STATS.history.map((h, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 16px", borderBottom: i < REFERRAL_STATS.history.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
@@ -1038,6 +1057,7 @@ function ReferralTab() {
             </div>
           ))}
         </div>
+        )}
       </div>
     </div>
   );
@@ -1117,6 +1137,7 @@ export default function CustomerDashboard() {
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem("sensalie_onboarding_done");
   });
+  const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
@@ -1125,6 +1146,11 @@ export default function CustomerDashboard() {
   const [showNotifSettings, setShowNotifSettings] = useState(false);
 
   useNotificationChecker(STAMP_CARDS, REWARDS);
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(t);
+  }, []);
 
   // appointments: { [cardId]: { date, time, confirmed } }
   const initialAppointments = {};
@@ -1247,6 +1273,8 @@ export default function CustomerDashboard() {
       {/* ── Content ── */}
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px 20px 110px", position: "relative", zIndex: 1 }}>
         <TabHint tabId={tab} />
+        {loading ? <LoadingState lines={4} height={90} /> : (
+        <>
         {tab === "home"      && <><WelcomeBanner userName={USER.name} /><HomeTab onTabChange={setTab} appointments={appointments} onBookAppointment={handleBookAppointment} /></>}
         {tab === "cards"     && <CardsTab appointments={appointments} onBookAppointment={handleBookAppointment} />}
         {tab === "rewards"   && <RewardsTab />}
@@ -1255,6 +1283,8 @@ export default function CustomerDashboard() {
         {tab === "support"   && <SupportChatTab />}
         {tab === "analytics" && <LockedAnalyticsChart />}
         {tab === "profil"    && <ProfilePage onClose={() => setTab("home")} />}
+        </>
+        )}
       </div>
 
       {/* ── Sticky Bottom Bar ── */}

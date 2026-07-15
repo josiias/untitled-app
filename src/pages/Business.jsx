@@ -3,6 +3,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import TeamBookingPreview from "@/components/business/TeamBookingPreview";
 import PlanSwitcher from "@/components/business/PlanSwitcher";
 import BusinessOnboarding from "@/components/business/BusinessOnboarding";
+import EmptyState from "@/components/EmptyState";
 
 // ── Hero Slideshow Bilder (Branchenimpressionen) ──────────────────────────────
 const HERO_SLIDES = [
@@ -914,7 +915,10 @@ export default function Business() {
         {/* Activity Feed */}
         <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 28, marginBottom: 16 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 16 }}>Letzte Aktivitäten</div>
-          {DUMMY_ACTIVITY.map((item, i) => (
+          {DUMMY_ACTIVITY.length === 0 ? (
+            <EmptyState icon="📋" title="Noch keine Aktivität" description="Sobald Kunden stempeln oder Empfehlungen senden, siehst du es hier." />
+          ) : (
+          DUMMY_ACTIVITY.map((item, i) => (
             <div key={i} className="activity-item">
               <div className="avatar">{item.avatar}</div>
               <div style={{ flex: 1 }}>
@@ -923,7 +927,8 @@ export default function Business() {
               </div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", whiteSpace: "nowrap" }}>{item.time}</div>
             </div>
-          ))}
+          ))
+          )}
         </div>
 
         {/* Abo-Verwaltung */}
