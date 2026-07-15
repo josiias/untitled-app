@@ -13,6 +13,7 @@ import EmployeeDashboard from './pages/EmployeeDashboard';
 import Landing from './pages/Landing';
 import CustomerLanding from './pages/CustomerLanding';
 import ForBusiness from './pages/ForBusiness';
+import StartAuth from './pages/StartAuth';
 import Impressum from './pages/Impressum';
 import Datenschutz from './pages/Datenschutz';
 import CookieBanner from './components/CookieBanner';
@@ -28,6 +29,7 @@ function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/customer" element={<CustomerLanding />} />
             <Route path="/for-business" element={<ForBusiness />} />
+            <Route path="/start" element={<StartAuth />} />
             <Route path="/scan/:businessId" element={<ScanLanding />} />
             <Route path="/app" element={<AppLanding />} />
             <Route path="/impressum" element={<Impressum />} />

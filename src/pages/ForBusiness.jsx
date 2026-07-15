@@ -3,17 +3,17 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import FaqSection from "@/components/FaqSection";
 
-// Prüft Login → sonst Login-Seite mit Redirect zurück zu /Business
+// Prüft Login → eingeloggt direkt aufs Dashboard, sonst zur schön gestalteten Auth-Seite
 async function handleStart() {
   try {
     const authed = await base44.auth.isAuthenticated();
     if (authed) {
       window.location.href = "/Business";
     } else {
-      base44.auth.redirectToLogin("/Business");
+      window.location.href = "/start";
     }
   } catch {
-    base44.auth.redirectToLogin("/Business");
+    window.location.href = "/start";
   }
 }
 import SocialProof from "@/components/SocialProof";
