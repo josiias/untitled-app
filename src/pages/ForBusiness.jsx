@@ -1,6 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
 import FaqSection from "@/components/FaqSection";
+
+// Prüft Login → sonst Login-Seite mit Redirect zurück zu /Business
+async function handleStart() {
+  try {
+    const authed = await base44.auth.isAuthenticated();
+    if (authed) {
+      window.location.href = "/Business";
+    } else {
+      base44.auth.redirectToLogin("/Business");
+    }
+  } catch {
+    base44.auth.redirectToLogin("/Business");
+  }
+}
 import SocialProof from "@/components/SocialProof";
 import WaitingListForm from "@/components/WaitingListForm";
 import SiteFooter from "@/components/SiteFooter";
@@ -458,9 +473,9 @@ function CtaForBusiness({ t }) {
           {lines[0]}<br /><span style={{ color: "#10B981" }}>{lines[1]}</span>
         </h2>
         <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginBottom: 36 }}>{t.cta_sub}</div>
-        <Link to="/Business" style={{ display: "inline-block", background: "#10B981", color: "#fff", fontWeight: 800, fontSize: 17, padding: "18px 44px", borderRadius: 100, textDecoration: "none", animation: "bizCtaPulse 2.5s ease-in-out infinite" }}>
+        <button onClick={handleStart} style={{ display: "inline-block", background: "#10B981", color: "#fff", fontWeight: 800, fontSize: 17, padding: "18px 44px", borderRadius: 100, border: "none", cursor: "pointer", fontFamily: "inherit", animation: "bizCtaPulse 2.5s ease-in-out infinite" }}>
           {t.cta_btn}
-        </Link>
+        </button>
       </div>
     </div>
   );
@@ -539,8 +554,8 @@ export default function ForBusiness() {
           <button onClick={toggleDark} style={{ background: darkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)", border: `1px solid ${borderColor}`, borderRadius: 8, padding: "6px 10px", fontSize: 15, cursor: "pointer", color: textColor }}>
             {darkMode ? "☀️" : "🌙"}
           </button>
-          <Link to="/Business" style={{ fontSize: 13, color: darkMode ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.5)", textDecoration: "none", fontWeight: 500 }}>{t.nav_login}</Link>
-          <Link to="/Business" style={{ background: "#10B981", color: "#fff", fontWeight: 700, fontSize: 13, padding: "9px 20px", borderRadius: 100, textDecoration: "none" }}>{t.nav_cta}</Link>
+          <button onClick={handleStart} style={{ fontSize: 13, color: darkMode ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.5)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>{t.nav_login}</button>
+          <button onClick={handleStart} style={{ background: "#10B981", color: "#fff", fontWeight: 700, fontSize: 13, padding: "9px 20px", borderRadius: 100, border: "none", cursor: "pointer", fontFamily: "inherit" }}>{t.nav_cta}</button>
         </div>
       </nav>
 
@@ -567,9 +582,9 @@ export default function ForBusiness() {
           </div>
 
           <div className="biz-hero-btns" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <Link to="/Business" style={{ background: "#10B981", color: "#fff", fontWeight: 800, fontSize: 16, padding: "16px 34px", borderRadius: 100, textDecoration: "none", boxShadow: "0 8px 30px rgba(16,185,129,0.4)" }}>
+            <button onClick={handleStart} style={{ background: "#10B981", color: "#fff", fontWeight: 800, fontSize: 16, padding: "16px 34px", borderRadius: 100, border: "none", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 8px 30px rgba(16,185,129,0.4)" }}>
               {t.hero_cta}
-            </Link>
+            </button>
             <a href="#how" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontWeight: 700, fontSize: 16, padding: "16px 34px", borderRadius: 100, textDecoration: "none" }}>
               {t.hero_how}
             </a>
@@ -631,7 +646,7 @@ export default function ForBusiness() {
                     </div>
                   ))}
                 </div>
-                <button style={{ width: "100%", padding: "13px", borderRadius: 100, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 14, fontWeight: 800, ...plan.ctaStyle }}>
+                <button onClick={handleStart} style={{ width: "100%", padding: "13px", borderRadius: 100, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 14, fontWeight: 800, ...plan.ctaStyle }}>
                   {plan.cta[lang]}
                 </button>
               </div>
