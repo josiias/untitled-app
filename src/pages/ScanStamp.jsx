@@ -13,6 +13,7 @@ export default function ScanStamp() {
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [rewardEarned, setRewardEarned] = useState(false);
   const phoneInputRef = useRef(null);
 
   // Business-Daten laden
@@ -73,7 +74,7 @@ export default function ScanStamp() {
 
   // Erstellt ReferralPayout wenn nötig
   const checkAndCreatePayout = async (cust) => {
-    if (!cust.referred_by) return;
+    if (!cust.referred_by_customer_id) return;
     
     const payoutsExist = await base44.entities.ReferralPayout.filter({
       new_customer_id: cust.id,
@@ -91,7 +92,7 @@ export default function ScanStamp() {
       }
       
       await base44.entities.ReferralPayout.create({
-        referrer_customer_id: cust.referred_by,
+        referrer_customer_id: cust.referred_by_customer_id,
         new_customer_id: cust.id,
         business_id: businessId,
         amount: amount,
@@ -149,15 +150,30 @@ export default function ScanStamp() {
       });
       
       const newVisits = customer.total_visits + 1;
-      const newStamps = customer.total_stamps + 1;
-      
+      let newStamps = customer.total_stamps + 1;
+      let earnedReward = false;
+
+      // Stempelkarte voll → Belohnung erstellen & Karte zurücksetzen
+      if (newStamps >= business.stamps_required) {
+        await base44.entities.Reward.create({
+          customer_id: customer.id,
+          business_id: businessId,
+          customer_phone: customer.phone,
+          reward_description: business.reward_description,
+          status: "bereit"
+        });
+        earnedReward = true;
+        newStamps = 0;
+      }
+
       const updatedCustomer = await base44.entities.Customer.update(customer.id, {
         total_visits: newVisits,
         total_stamps: newStamps
       });
-      
+
       await checkAndCreatePayout(updatedCustomer);
-      
+
+      setRewardEarned(earnedReward);
       setCustomer(updatedCustomer);
       setStep("success");
     } catch (err) {
@@ -324,7 +340,14 @@ export default function ScanStamp() {
                 ✅
               </div>
               <h2 style={{ fontSize: 20, fontWeight: 800, color: "#1f2937", margin: "0 0 8px" }}>Stempel erfolgreich gesammelt!</h2>
-              <p style={{ fontSize: 14, color: "rgba(0,0,0,0.6)", marginBottom: 32 }}>Fortschritt: {customer.total_stamps}/{business.stamps_required}</p>
+              {rewardEarned ? (
+                <div style={{ background: "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05))", border: "1.5px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "14px 16px", marginBottom: 20 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#F59E0B", marginBottom: 4 }}>🎁 Prämie freigeschaltet!</div>
+                  <div style={{ fontSize: 13, color: "rgba(0,0,0,0.6)" }}>{business.reward_description}</div>
+                </div>
+              ) : (
+                <p style={{ fontSize: 14, color: "rgba(0,0,0,0.6)", marginBottom: 32 }}>Fortschritt: {customer.total_stamps}/{business.stamps_required}</p>
+              )}
             </div>
 
             <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04))", border: "2px solid rgba(16,185,129,0.3)", borderRadius: 16, padding: 20, marginBottom: 24 }}>
