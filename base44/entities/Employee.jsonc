@@ -1,0 +1,40 @@
+{
+  "name": "Employee",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name des Mitarbeiters"
+    },
+    "role": {
+      "type": "string",
+      "description": "Position / Rolle (z.B. 'Barbier', 'Senior Stylistin')"
+    },
+    "business_id": {
+      "type": "string",
+      "description": "Zugeh\u00f6riges Gesch\u00e4ft"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Verkn\u00fcpfung zum App-User (f\u00fcr Login)"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Profilfoto URL"
+    },
+    "color": {
+      "type": "string",
+      "description": "Farbe f\u00fcr Kalender-Darstellung (Hex)"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Ist der Mitarbeiter aktuell aktiv?"
+    }
+  },
+  "required": [
+    "name",
+    "business_id"
+  ],
+  "description": "Mitarbeiter eines Gesch\u00e4fts mit eigenem Dashboard-Zugang"
+}

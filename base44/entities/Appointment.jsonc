@@ -1,0 +1,58 @@
+{
+  "name": "Appointment",
+  "type": "object",
+  "properties": {
+    "employee_id": {
+      "type": "string",
+      "description": "Zugeordneter Mitarbeiter"
+    },
+    "business_id": {
+      "type": "string",
+      "description": "Gesch\u00e4ft"
+    },
+    "customer_phone": {
+      "type": "string",
+      "description": "Telefonnummer des Kunden"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Name des Kunden"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Datum des Termins"
+    },
+    "time": {
+      "type": "string",
+      "description": "Uhrzeit (z.B. '14:00')"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "completed"
+      ],
+      "default": "pending",
+      "description": "pending = wartet auf Best\u00e4tigung, confirmed = best\u00e4tigt, cancelled = storniert, completed = abgeschlossen"
+    },
+    "comment": {
+      "type": "string",
+      "description": "Kunden-Wunsch / Notiz"
+    },
+    "confirmation_nr": {
+      "type": "string",
+      "description": "Eindeutige Best\u00e4tigungsnummer (z.B. 'SEN-4821')"
+    }
+  },
+  "required": [
+    "employee_id",
+    "business_id",
+    "date",
+    "time",
+    "confirmation_nr"
+  ],
+  "description": "Terminbuchung eines Kunden bei einem bestimmten Mitarbeiter"
+}

@@ -9,6 +9,7 @@ import ScanLanding from './pages/ScanLanding';
 import AppLanding from './pages/AppLanding';
 import CustomerDashboard from './pages/CustomerDashboard';
 import KnowledgeBaseAdmin from './pages/KnowledgeBaseAdmin';
+import EmployeeDashboard from './pages/EmployeeDashboard';
 import Landing from './pages/Landing';
 import CustomerLanding from './pages/CustomerLanding';
 import ForBusiness from './pages/ForBusiness';
@@ -39,6 +40,7 @@ function App() {
               <Route path="/dashboard" element={<CustomerDashboard />} />
               <Route path="/ScanStamp" element={<ScanStamp />} />
               <Route path="/admin/knowledge" element={<KnowledgeBaseAdmin />} />
+              <Route path="/employee" element={<EmployeeDashboard />} />
             </Route>
           </Routes>
           <CookieBanner />
